@@ -420,12 +420,12 @@ function processPK() {
   D.pk = {
     sort: {
       total: sort.length,
-      ops: Object.entries(sortByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(([op,v])=>({op,...v})),
+      ops: Object.entries(sortByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(function(e){ return Object.assign({op:e[0]},e[1]); }),
       byDay: sortByDay, motivos: sortMotivos, ids: sortIds
     },
     et: {
       total: etDedup.length,
-      ops: Object.entries(etByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(([op,v])=>({op,...v})),
+      ops: Object.entries(etByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(function(e){ return Object.assign({op:e[0]},e[1]); }),
       ids: etIds
     }
   };
@@ -538,9 +538,18 @@ function gerarDemo() {
   const overlay=document.getElementById('loadingOverlay');
   overlay.style.display='flex';
   setTimeout(()=>{
-    processar();
-    const html=buildHTML();
-    document.getElementById('demoScreen').innerHTML=html;
+    try {
+      processar();
+      const html=buildHTML();
+      document.getElementById('demoScreen').innerHTML=html;
+    } catch(e) {
+      console.error('Erro ao gerar demonstrativo:', e);
+      document.getElementById('demoScreen').innerHTML='<div style="color:red;padding:20px">Erro: '+e.message+'</div>';
+      document.getElementById('uploadScreen').style.display='none';
+      document.getElementById('demoScreen').style.display='block';
+      overlay.style.display='none';
+      return;
+    }
     document.getElementById('uploadScreen').style.display='none';
     document.getElementById('demoScreen').style.display='block';
     overlay.style.display='none';
