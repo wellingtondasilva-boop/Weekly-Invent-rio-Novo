@@ -4,48 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Demonstrativo Semanal · SVC · Inventário</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 :root{--y:#FFE600;--bl:#3483FA;--dk:#0D1117;--sf:#161B22;--sf2:#21262D;--sf3:#30363D;--br:rgba(48,54,61,0.9);--tx:#E6EDF3;--td:#7D8590;--tm:#B1BAC4;--gn:#3FB950;--rd:#F85149;--or:#E8A838;--pu:#BC8CFF;--cy:#39D2C0;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
-
-/* ── UPLOAD SCREEN ── */
-#uploadScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;}
-.up-wrap{width:100%;max-width:860px;}
-.up-logo{display:flex;align-items:center;gap:14px;margin-bottom:32px;}
-.up-logobox{width:44px;height:44px;background:var(--y);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;color:#000;}
-.up-title{font-size:22px;font-weight:800;}
-.up-sub{font-size:12px;color:var(--td);margin-top:3px;}
-.up-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:24px;}
-.up-section{font-size:10px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
-.up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:20px;}
-.up-item{background:var(--sf2);border:1px solid var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s;position:relative;}
-.up-item:hover{border-color:var(--bl);}
-.up-item.loaded{border-color:var(--gn);}
-.up-item.loaded .up-status{background:rgba(63,185,80,.15);color:var(--gn);}
-.up-item input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.up-name{font-size:11px;font-weight:600;margin-bottom:4px;}
-.up-desc{font-size:10px;color:var(--td);line-height:1.4;margin-bottom:8px;}
-.up-status{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);}
-.up-sep{display:flex;align-items:center;gap:6px;margin-bottom:16px;}
-.up-sepline{flex:1;height:1px;background:var(--br);}
-.up-seplabel{font-size:10px;color:var(--td);}
-.up-week{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
-.up-field label{display:block;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-.up-field input,.up-field select{width:100%;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;outline:none;}
-.up-field input:focus,.up-field select:focus{border-color:var(--bl);}
-.up-progress{margin-bottom:20px;}
-.up-pbar{height:4px;background:var(--sf3);border-radius:2px;overflow:hidden;margin-bottom:6px;}
-.up-pfill{height:100%;background:var(--bl);border-radius:2px;transition:width .4s ease;width:0%;}
-.up-plabel{font-size:10px;color:var(--td);}
-.btn-go{width:100%;padding:13px;background:var(--y);color:#000;font-family:'Inter',sans-serif;font-size:13px;font-weight:800;border:none;border-radius:8px;cursor:pointer;transition:opacity .15s;}
-.btn-go:hover{opacity:.88;}
-.btn-go:disabled{opacity:.35;cursor:not-allowed;}
-.up-note{text-align:center;font-size:10px;color:var(--td);margin-top:10px;}
-
-/* ── DEMO SCREEN ── */
-#demoScreen{display:none;}
 .sticky-top{position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(0,0,0,.6);}
 .header{background:var(--sf);border-bottom:1px solid var(--br);padding:0 32px;display:flex;align-items:stretch;}
 .hbrand{display:flex;align-items:center;gap:12px;padding:12px 18px 12px 0;border-right:1px solid var(--br);margin-right:16px;}
@@ -58,10 +24,6 @@ body{font-family:'Inter',sans-serif;background:var(--dk);color:var(--tx);min-hei
 .hright{margin-left:auto;display:flex;align-items:center;gap:8px;padding:12px 0;}
 .wchip{background:var(--y);color:#000;font-weight:800;font-size:11px;padding:4px 10px;border-radius:5px;}
 .pchip{background:var(--sf2);color:var(--tm);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--br);}
-.btn-reload{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;}
-.btn-reload:hover{color:var(--tx);border-color:var(--tm);}
-.btn-export{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.35);color:var(--gn);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;}
-.btn-export:hover{background:rgba(63,185,80,.25);}
 .nav{background:var(--sf);border-bottom:1px solid var(--br);padding:0 32px;display:flex;overflow-x:auto;scrollbar-width:none;}
 .nav::-webkit-scrollbar{display:none;}
 .nb{background:none;border:none;color:var(--td);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
@@ -95,7 +57,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .rh{background:rgba(248,81,73,.06)!important;}.wh{background:rgba(232,168,56,.05)!important;}
 .bw{display:flex;align-items:center;gap:6px;}
 .bb{flex:1;height:4px;background:var(--sf3);border-radius:2px;min-width:40px;}
-.bf{height:100%;border-radius:2px;}
+.bf{height:100%;border-radius:2px;transition:width .6s ease;}
 .bv{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;min-width:30px;text-align:right;}
 .alert{border-radius:8px;padding:10px 14px;margin-bottom:12px;border-left:3px solid;display:flex;gap:10px;}
 .alert.cr{background:rgba(248,81,73,.07);border-color:var(--rd);}
@@ -107,6 +69,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .ab{font-size:11px;color:var(--tm);line-height:1.5;}
 .ab strong{color:var(--tx);}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
 .trow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
 .tc2{background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:12px 13px;text-align:center;}
 .tc2.cur{border-color:var(--y);}
@@ -128,6 +91,8 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .adesc strong{color:var(--tm);}
 .ameta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;}
 .achip{font-size:9px;padding:2px 7px;border-radius:3px;background:var(--sf2);color:var(--tm);border:1px solid var(--br);}
+.footer{text-align:center;padding:20px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:22px;}
+.footer strong{color:var(--tm);}
 .chart-wrap{background:var(--sf);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:12px;}
 .chart-head{padding:10px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
 .chart-title{font-size:12px;font-weight:600;}.chart-note{font-size:10px;color:var(--td);}
@@ -142,1207 +107,1063 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .dsumm td:first-child{text-align:left;font-weight:600;font-size:10px;}
 .dsumm tr:last-child td{border-bottom:none;}
 .note{font-size:9px;color:var(--td);padding:4px 14px 10px;font-style:italic;}
-.footer{text-align:center;padding:20px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:22px;}
-.footer strong{color:var(--tm);}
-#loadingOverlay{position:fixed;inset:0;background:rgba(13,17,23,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;display:none;}
-.load-spinner{width:36px;height:36px;border:3px solid var(--sf3);border-top-color:var(--y);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.load-text{font-size:13px;color:var(--tm);}
-.load-step{font-size:11px;color:var(--td);margin-top:6px;}
 @media(max-width:768px){
   .content{padding:12px;}.header,.nav{padding-left:12px;padding-right:12px;}
-  .g2{grid-template-columns:1fr;}.trow{grid-template-columns:1fr 1fr;}.hinfo{display:none;}
-  .up-week{grid-template-columns:1fr 1fr;}
+  .g2,.g3{grid-template-columns:1fr;}.trow{grid-template-columns:1fr 1fr;}.hinfo{display:none;}
 }
-</style>
-<script defer>
-// ══════════════════════════════════════════
-//  ESTADO GLOBAL
-// ══════════════════════════════════════════
-const RAW = {}; // dados brutos parseados por chave
-let LOADED = 0;
-const TOTAL_FILES = 7;
-let D = {}; // dados processados finais
 
-// ══════════════════════════════════════════
-//  UPLOAD: LEITURA E PARSE CSV
-// ══════════════════════════════════════════
-function loadFile(key, input) {
-  const file = input.files[0];
+#uploadScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--dk);}
+#demoScreen{display:none;}
+.up-wrap{width:100%;max-width:760px;}
+.up-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+.up-logobox{width:40px;height:40px;background:var(--y);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#000;}
+.up-title{font-size:20px;font-weight:800;}.up-sub{font-size:11px;color:var(--td);margin-top:3px;}
+.up-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:24px;}
+.up-section{font-size:10px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px;}
+.up-item{background:var(--sf2);border:1.5px dashed var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative;}
+.up-item:hover{border-color:var(--bl);}
+.up-item.ok{border-style:solid;border-color:var(--gn);background:rgba(63,185,80,.05);}
+.up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.up-name{font-size:11px;font-weight:600;margin-bottom:3px;}.up-hint{font-size:9px;color:var(--td);margin-bottom:7px;}
+.up-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);display:inline-block;}
+.up-item.ok .up-st{background:rgba(63,185,80,.15);color:var(--gn);}
+.up-cfg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.up-field label{display:block;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.up-field input{width:100%;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;outline:none;}
+.up-field input:focus{border-color:var(--bl);}
+.up-pbar{height:3px;background:var(--sf3);border-radius:2px;margin-bottom:5px;}
+.up-pfill{height:100%;background:var(--bl);border-radius:2px;width:0%;transition:width .4s;}
+.up-plabel{font-size:10px;color:var(--td);margin-bottom:16px;}
+.btn-go{width:100%;padding:12px;background:var(--y);color:#000;font-family:'Inter',sans-serif;font-size:13px;font-weight:800;border:none;border-radius:8px;cursor:pointer;}
+.btn-go:disabled{opacity:.3;cursor:not-allowed;}.btn-go:not(:disabled):hover{opacity:.88;}
+.up-note{text-align:center;font-size:10px;color:var(--td);margin-top:10px;}
+.btn-export-aba{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.3);color:var(--gn);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;}
+.btn-export-aba:hover{background:rgba(63,185,80,.25);}
+.btn-reload{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;}
+.btn-reload:hover{color:var(--tx);}
+
+</style>
+</head>
+<body>
+
+<div id="uploadScreen">
+  <div class="up-wrap">
+    <div class="up-logo">
+      <div class="up-logobox">ML</div>
+      <div><div class="up-title">Demonstrativo Semanal de Inventário</div><div class="up-sub">Carregue os 7 arquivos CSV da semana para gerar o relatório</div></div>
+    </div>
+    <div class="up-card">
+      <div class="up-section">Configuração da semana</div>
+      <div class="up-cfg">
+        <div class="up-field"><label>SVC</label><input id="cfgSvc" value="SSP15"></div>
+        <div class="up-field"><label>Nome do SVC</label><input id="cfgNome" value="Santos"></div>
+        <div class="up-field"><label>Semana</label><input id="cfgWeek" value="W32"></div>
+        <div class="up-field"><label>Data início</label><input id="cfgStart" value="02/08/2026"></div>
+        <div class="up-field"><label>Data fim</label><input id="cfgEnd" value="08/08/2026"></div>
+        <div class="up-field"><label>Código BPP (AAAA-SS)</label><input id="cfgBpp" value="2026-32"></div>
+      </div>
+      <div class="up-section">Arquivos — clique ou arraste</div>
+      <div class="up-grid">
+        <div class="up-item" id="ui-base2"><input type="file" accept=".csv" onchange="onFile('base2',this)"><div class="up-name">01 · Base 2 Inventário</div><div class="up-hint">BASE_2_INVENTARIO_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-base2">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-falt"><input type="file" accept=".csv" onchange="onFile('falt',this)"><div class="up-name">02 · Waterfall Faltantes</div><div class="up-hint">CONTEOS_INVENTORY_LATAM_Wxx.csv · sep=,</div><span class="up-st" id="st-falt">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-desloc"><input type="file" accept=".csv" onchange="onFile('desloc',this)"><div class="up-name">03 · Deslocados</div><div class="up-hint">Deslocados_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-desloc">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-bpp"><input type="file" accept=".csv" onchange="onFile('bpp',this)"><div class="up-name">04 · BPP 4 Semanas</div><div class="up-hint">BPP_SVC_4SEMANAS.csv · sep=;</div><span class="up-st" id="st-bpp">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-et"><input type="file" accept=".csv" onchange="onFile('et',this)"><div class="up-name">05 · PK Etiquetagem</div><div class="up-hint">PK_ETIQUETAGEM_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-et">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-sort"><input type="file" accept=".csv" onchange="onFile('sort',this)"><div class="up-name">06 · PK Sorting</div><div class="up-hint">PK_SORTING_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-sort">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-aduana"><input type="file" accept=".csv" onchange="onFile('aduana',this)"><div class="up-name">07 · Aduanas</div><div class="up-hint">Aduanas_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-aduana">⬆ Aguardando</span></div>
+      </div>
+      <div class="up-pbar"><div class="up-pfill" id="upFill"></div></div>
+      <div class="up-plabel" id="upLabel">0 de 7 arquivos carregados</div>
+      <button class="btn-go" id="btnGo" disabled onclick="gerarDemo()">⚡ Gerar Demonstrativo</button>
+      <p class="up-note">Arquivos processados localmente no browser — nenhum dado enviado a servidores externos.</p>
+    </div>
+  </div>
+</div>
+
+<div id="demoScreen"></div>
+
+<script>
+
+function cv(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function setupCanvas(id, h) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const dpr = window.devicePixelRatio || 1;
+  const W = el.parentElement.clientWidth - 2;
+  el.width = Math.round(W * dpr);
+  el.height = Math.round(h * dpr);
+  el.style.width = W + 'px';
+  el.style.height = h + 'px';
+  const ctx = el.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, W, H: h };
+}
+
+function grid(ctx, pad, W, H, maxV, steps, fmt) {
+  const ch = H - pad.t - pad.b;
+  for (let i = 0; i <= steps; i++) {
+    const f = i / steps;
+    const y = pad.t + ch * (1 - f);
+    ctx.strokeStyle = 'rgba(48,54,61,0.7)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillStyle = cv('--td'); ctx.font = '9px Inter'; ctx.textAlign = 'right';
+    ctx.fillText(fmt ? fmt(maxV * f) : Math.round(maxV * f), pad.l - 4, y + 3);
+  }
+}
+
+function xlabels(ctx, labels, pad, W, H) {
+  const n = labels.length, cw = W - pad.l - pad.r, gap = cw / n;
+  ctx.fillStyle = cv('--td'); ctx.font = '9px Inter'; ctx.textAlign = 'center';
+  labels.forEach((l, i) => ctx.fillText(l, pad.l + i * gap + gap / 2, H - 4));
+}
+
+function lineChart(id, labels, data, color, fill, goalLines, minV, maxV, fmt) {
+  const s = setupCanvas(id, 130); if (!s) return;
+  const { ctx, W, H } = s;
+  const pad = { t: 16, r: 12, b: 22, l: 44 };
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+  const n = labels.length, gap = cw / n;
+  const range = maxV - minV;
+  grid(ctx, pad, W, H, maxV, 4, fmt);
+  if (goalLines) goalLines.forEach(gl => {
+    const y = pad.t + ch * (1 - (gl.val - minV) / range);
+    ctx.strokeStyle = gl.color; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = gl.color; ctx.font = 'bold 9px Inter'; ctx.textAlign = 'left';
+    ctx.fillText(gl.label, pad.l + 4, y - 3);
+  });
+  if (fill) {
+    ctx.beginPath();
+    data.forEach((v, i) => {
+      const x = pad.l + i * gap + gap / 2;
+      const y = pad.t + ch * (1 - (v - minV) / range);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(pad.l + (n-1)*gap+gap/2, pad.t+ch);
+    ctx.lineTo(pad.l+gap/2, pad.t+ch);
+    ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([]);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = pad.l + i * gap + gap / 2;
+    const y = pad.t + ch * (1 - (v - minV) / range);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  data.forEach((v, i) => {
+    const x = pad.l + i * gap + gap / 2;
+    const y = pad.t + ch * (1 - (v - minV) / range);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = cv('--tx'); ctx.font = 'bold 9px JetBrains Mono'; ctx.textAlign = 'center';
+    ctx.fillText(fmt ? fmt(v) : v, x, y - 6);
+  });
+  xlabels(ctx, labels, pad, W, H);
+}
+
+function groupedBar(id, labels, d1, c1, d2, c2, goalVal, goalColor, maxV, fmt) {
+  const s = setupCanvas(id, 130); if (!s) return;
+  const { ctx, W, H } = s;
+  const pad = { t: 16, r: 12, b: 22, l: 44 };
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+  const n = labels.length, gap = cw / n, bw = gap * 0.33;
+  grid(ctx, pad, W, H, maxV, 4, fmt);
+  if (goalVal) {
+    const gy = pad.t + ch * (1 - goalVal / maxV);
+    ctx.strokeStyle = goalColor; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = goalColor; ctx.font = 'bold 9px Inter'; ctx.textAlign = 'left';
+    ctx.fillText('Meta 5%', pad.l + 4, gy - 3);
+  }
+  labels.forEach((l, i) => {
+    const cx = pad.l + i * gap + gap / 2;
+    const v1 = d1[i];
+    const x1 = cx - bw - 1;
+    const bh1 = ch * (v1 / maxV);
+    ctx.fillStyle = v1 > 5 ? 'rgba(248,81,73,0.8)' : c1;
+    ctx.beginPath(); ctx.rect(x1, pad.t+ch-bh1, bw, bh1); ctx.fill();
+    ctx.fillStyle = cv('--tx'); ctx.font = 'bold 9px JetBrains Mono'; ctx.textAlign = 'center';
+    ctx.fillText(fmt(v1), x1 + bw/2, pad.t+ch-bh1-3);
+    const v2 = d2[i];
+    const x2 = cx + 1;
+    const bh2 = ch * (v2 / maxV);
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.rect(x2, pad.t+ch-bh2, bw, bh2); ctx.fill();
+    if (v2 > 0) {
+      ctx.fillStyle = cv('--or'); ctx.font = 'bold 9px JetBrains Mono'; ctx.textAlign = 'center';
+      ctx.fillText(fmt(v2), x2+bw/2, pad.t+ch-bh2-3);
+    }
+  });
+  xlabels(ctx, labels, pad, W, H);
+}
+
+function stackedBar(id, datasets, labels, maxV) {
+  const s = setupCanvas(id, 130); if (!s) return;
+  const { ctx, W, H } = s;
+  const pad = { t: 18, r: 12, b: 22, l: 44 };
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+  const n = labels.length, gap = cw / n, bw = gap * 0.58;
+  const totals = labels.map((_,i) => datasets.reduce((s,d) => s + Math.max(0,d.data[i]), 0));
+  const mx = maxV || Math.max(...totals) * 1.18;
+  grid(ctx, pad, W, H, mx, 4, null);
+  labels.forEach((l, i) => {
+    const x = pad.l + i * gap + (gap - bw) / 2;
+    let base = pad.t + ch;
+    datasets.forEach(ds => {
+      const v = Math.max(0, ds.data[i]);
+      if (v === 0) return;
+      const bh = ch * (v / mx);
+      base -= bh;
+      ctx.fillStyle = ds.color;
+      ctx.beginPath(); ctx.rect(x, base, bw, bh); ctx.fill();
+    });
+    const tot = totals[i];
+    const topY = pad.t + ch * (1 - tot / mx);
+    ctx.fillStyle = cv('--tx'); ctx.font = 'bold 9px JetBrains Mono'; ctx.textAlign = 'center';
+    ctx.fillText(tot, x + bw/2, topY - 3);
+  });
+  xlabels(ctx, labels, pad, W, H);
+}
+
+
+
+// ══════════════════════════════════════════════
+// ENGINE DE PROCESSAMENTO — DEMONSTRATIVO SVC
+// Arquitetura: CSV → Python → JSON embutido → render JS
+// ══════════════════════════════════════════════
+
+var RAW = {};
+var LOADED = 0;
+var D = null; // dados processados (JSON embutido ou processados dos CSVs)
+
+// ── UPLOAD ──────────────────────────────────
+function onFile(key, inp) {
+  var file = inp.files[0];
   if (!file) return;
-  const sep = key === 'bpp' ? ';' : ',';
-  const reader = new FileReader();
-  reader.onload = e => {
+  var sep = (key === 'bpp') ? ';' : ',';
+  var reader = new FileReader();
+  reader.onload = function(e) {
     try {
       RAW[key] = parseCSV(e.target.result, sep);
-      document.getElementById('st-' + key).textContent = '✓ ' + file.name.slice(0,28);
-      document.getElementById('item-' + key).classList.add('loaded');
+      document.getElementById('st-' + key).textContent = '✓ ' + file.name.slice(0, 25);
+      document.getElementById('ui-' + key).classList.add('ok');
       LOADED++;
-      updateProgress();
+      document.getElementById('upFill').style.width = (LOADED / 7 * 100) + '%';
+      document.getElementById('upLabel').textContent = LOADED + ' de 7 arquivos carregados';
+      if (LOADED === 7) document.getElementById('btnGo').disabled = false;
     } catch(err) {
-      document.getElementById('st-' + key).textContent = '❌ Erro ao ler';
-      console.error(key, err);
+      document.getElementById('st-' + key).textContent = '❌ Erro';
     }
   };
   reader.readAsText(file, 'UTF-8');
 }
 
-function parseCSV(text, sep=',') {
-  const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim());
-  const headers = splitCSVLine(lines[0], sep);
-  return lines.slice(1).map(line => {
-    const vals = splitCSVLine(line, sep);
-    const obj = {};
-    headers.forEach((h,i) => obj[h.trim()] = (vals[i]||'').trim());
-    return obj;
-  }).filter(r => Object.values(r).some(v=>v));
+function parseCSV(txt, sep) {
+  var lines = txt.replace(/\r/g, '').split('\n');
+  var rows = [];
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].trim()) rows.push(lines[i]);
+  }
+  if (rows.length < 2) return [];
+  var headers = splitLine(rows[0], sep);
+  var out = [];
+  for (var i = 1; i < rows.length; i++) {
+    var vals = splitLine(rows[i], sep);
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j].trim()] = (vals[j] || '').trim();
+    }
+    out.push(obj);
+  }
+  return out;
 }
 
-function splitCSVLine(line, sep) {
-  const res=[]; let cur='', inQ=false;
-  for(let i=0;i<line.length;i++){
-    const c=line[i];
-    if(c==='"'){inQ=!inQ;}
-    else if(c===sep && !inQ){res.push(cur);cur='';}
-    else cur+=c;
+function splitLine(line, sep) {
+  var res = [], cur = '', inQ = false;
+  for (var i = 0; i < line.length; i++) {
+    var c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === sep && !inQ) { res.push(cur); cur = ''; }
+    else { cur += c; }
   }
   res.push(cur);
   return res;
 }
 
-function updateProgress() {
-  const pct = (LOADED/TOTAL_FILES*100).toFixed(0);
-  document.getElementById('upProgress').style.width = pct+'%';
-  document.getElementById('upLabel').textContent = LOADED+' de '+TOTAL_FILES+' arquivos carregados';
-  if(LOADED===TOTAL_FILES) document.getElementById('btnGo').disabled = false;
-}
-
-// ══════════════════════════════════════════
-//  PROCESSAMENTO DOS DADOS
-// ══════════════════════════════════════════
+// ── PROCESSAMENTO ────────────────────────────
 function processar() {
-  const cfg = {
+  var cfg = {
     svc: document.getElementById('cfgSvc').value || 'SSP15',
-    svcName: document.getElementById('cfgSvcName').value || 'Santos',
+    svcName: document.getElementById('cfgNome').value || 'Santos',
     week: document.getElementById('cfgWeek').value || 'W32',
-    dateStart: document.getElementById('cfgDateStart').value,
-    dateEnd: document.getElementById('cfgDateEnd').value,
-    bppWeek: document.getElementById('cfgBppWeek').value || '2026-32',
+    dateStart: document.getElementById('cfgStart').value || '',
+    dateEnd: document.getElementById('cfgEnd').value || '',
+    bppWeek: document.getElementById('cfgBpp').value || '2026-32'
   };
-  D.cfg = cfg;
 
-  setStep('Processando Accuracy...');
-  processAccuracy();
-  setStep('Processando Deslocados...');
-  processDeslocados();
-  setStep('Processando BPP...');
-  processBPP();
-  setStep('Processando Poka Yoke...');
-  processPK();
-  setStep('Processando Aduanas...');
-  processAduanas();
-  setStep('Montando demonstrativo...');
+  var acc = calcAccuracy(cfg);
+  var desloc = calcDeslocados(cfg, acc.totalInv);
+  var bpp = calcBPP(cfg);
+  var pk = calcPK();
+  var aduana = calcAduanas(acc, bpp, pk, desloc);
+
+  D = { cfg: cfg, acc: acc, desloc: desloc, bpp: bpp, pk: pk, aduana: aduana };
 }
 
-// ── ACCURACY ──────────────────────────────
-function processAccuracy() {
-  const b2 = RAW.base2;
-  const inv_rows = b2.filter(r=>r['CLASIFICACION']==='INVENTARIADO PLANIFICADO');
-  const falt_rows = b2.filter(r=>r['CLASIFICACION']==='FALTANTE EN INVENTARIO');
-
-  // por dia
-  const days = {};
-  [...inv_rows,...falt_rows].forEach(r=>{
-    const dt = r['INIT_DTTM_LOCAL'];
-    if(!days[dt]) days[dt]={inv:new Set(),falt:new Set()};
-  });
-  inv_rows.forEach(r=>{ if(!days[r['INIT_DTTM_LOCAL']]) days[r['INIT_DTTM_LOCAL']]={inv:new Set(),falt:new Set()}; days[r['INIT_DTTM_LOCAL']].inv.add(r['SHIPMENT']); });
-  falt_rows.forEach(r=>{ if(!days[r['INIT_DTTM_LOCAL']]) days[r['INIT_DTTM_LOCAL']]={inv:new Set(),falt:new Set()}; days[r['INIT_DTTM_LOCAL']].falt.add(r['SHIPMENT']); });
-
-  const dayLabels = Object.keys(days).sort((a,b)=>parsePtDate(a)-parsePtDate(b));
-  D.acc = {
-    totalInv: inv_rows.length,
-    totalFalt: falt_rows.length,
-    geral: (inv_rows.length/(inv_rows.length+falt_rows.length)*100),
-    days: dayLabels.map(dt=>({
-      label: fmtDayLabel(dt),
-      inv: days[dt].inv.size,
-      falt: days[dt].falt.size,
-      acc: (days[dt].inv.size/(days[dt].inv.size+days[dt].falt.size)*100)
-    })),
-    porZona: groupCount(falt_rows,'SHP_ZONE_NAME'),
-    ids_falt: new Set(falt_rows.map(r=>r['SHIPMENT']))
-  };
+function tousd(s) { var v = parseFloat(String(s).replace(',','.')); return isNaN(v) ? 0 : v; }
+function groupBy(arr, key) {
+  var m = {};
+  for (var i = 0; i < arr.length; i++) { var k = arr[i][key] || ''; m[k] = (m[k]||0)+1; }
+  return m;
+}
+function topN(obj, n) {
+  var arr = Object.keys(obj).map(function(k){ return [k, obj[k]]; });
+  arr.sort(function(a,b){ return b[1]-a[1]; });
+  return arr.slice(0, n || arr.length);
 }
 
-// ── DESLOCADOS ────────────────────────────
-function processDeslocados() {
-  const rows = RAW.desloc;
-  const total = rows.length;
-  const naoCorrigidos = rows.filter(r=>r['PACOTES_NAO_CORRIGIDOS']==='True'||r['PACOTES_NAO_CORRIGIDOS']==='true');
-  const pct = total / D.acc.totalInv * 100;
+function calcAccuracy(cfg) {
+  var b2 = RAW.base2 || [];
+  var inv_rows = [], falt_rows = [];
+  for (var i = 0; i < b2.length; i++) {
+    var cl = b2[i]['CLASIFICACION'] || '';
+    if (cl === 'INVENTARIADO PLANIFICADO') inv_rows.push(b2[i]);
+    else if (cl === 'FALTANTE EN INVENTARIO') falt_rows.push(b2[i]);
+  }
 
-  // por dia
-  const byDay = {};
-  rows.forEach(r=>{
-    const dt = (r['SHP_INVENTORY_INIT_DTTM']||'').slice(0,10);
-    if(!byDay[dt]) byDay[dt]={total:0,nc:0};
+  // Por dia
+  var inv_dia = {}, falt_dia = {};
+  for (var i = 0; i < inv_rows.length; i++) { var dt = inv_rows[i]['INIT_DTTM_LOCAL'] || ''; inv_dia[dt] = (inv_dia[dt]||0)+1; }
+  for (var i = 0; i < falt_rows.length; i++) { var dt = falt_rows[i]['INIT_DTTM_LOCAL'] || ''; falt_dia[dt] = (falt_dia[dt]||0)+1; }
+
+  var ptOrder = function(s) {
+    var months = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+    var m = s.match(/(\d+)\s+de\s+(\w+)/i);
+    if (m) return months[m[2].toLowerCase().slice(0,3)] * 100 + parseInt(m[1]);
+    return 0;
+  };
+  var dayLabels = ['Dom 02','Seg 03','Ter 04','Qua 05','Qui 06','Sex 07','Sab 08'];
+  var dates = Object.keys(inv_dia).sort(function(a,b){ return ptOrder(a)-ptOrder(b); });
+  var days = [];
+  for (var i = 0; i < dates.length; i++) {
+    var dt = dates[i];
+    var inv = inv_dia[dt]||0, falt = falt_dia[dt]||0;
+    days.push({ label: dayLabels[i]||dt, inv: inv, falt: falt, acc: inv+falt>0 ? Math.round(inv/(inv+falt)*1000)/10 : 0 });
+  }
+
+  var totalInv = inv_rows.length, totalFalt = falt_rows.length;
+  var geral = totalInv+totalFalt>0 ? Math.round(totalInv/(totalInv+totalFalt)*1000)/10 : 0;
+
+  var zonaMap = groupBy(falt_rows, 'SHP_ZONE_NAME');
+  var porZona = topN(zonaMap, 10).map(function(x){ return [x[0], x[1]]; });
+
+  // IDs para correlação
+  var ids_falt = {};
+  for (var i = 0; i < falt_rows.length; i++) ids_falt[falt_rows[i]['SHIPMENT']] = true;
+
+  return { geral: geral, totalInv: totalInv, totalFalt: totalFalt, days: days, porZona: porZona, ids_falt: ids_falt };
+}
+
+function calcDeslocados(cfg, totalInv) {
+  var rows = RAW.desloc || [];
+  var total = rows.length;
+  var naoCorr = 0;
+  for (var i = 0; i < rows.length; i++) { if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') naoCorr++; }
+  var pct = totalInv > 0 ? Math.round(total/totalInv*1000)/10 : 0;
+
+  // Por dia
+  var byDay = {};
+  for (var i = 0; i < rows.length; i++) {
+    var dt = (rows[i]['SHP_INVENTORY_INIT_DTTM']||'').slice(0,10);
+    if (!byDay[dt]) byDay[dt] = {total:0,nc:0};
     byDay[dt].total++;
-    if(r['PACOTES_NAO_CORRIGIDOS']==='True'||r['PACOTES_NAO_CORRIGIDOS']==='true') byDay[dt].nc++;
-  });
+    if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') byDay[dt].nc++;
+  }
+  var byDayArr = Object.keys(byDay).sort().map(function(k){ return {dt:k,total:byDay[k].total,nc:byDay[k].nc}; });
 
-  // top fluxos
-  const fluxos = {};
-  rows.forEach(r=>{
-    const k=(r['SHP_PLANNED_ZONE']||'?')+' → '+(r['SHP_ZONE_NAME']||'?');
-    fluxos[k]=(fluxos[k]||0)+1;
-  });
+  // Fluxos
+  var fluxMap = {};
+  for (var i = 0; i < rows.length; i++) {
+    var k = (rows[i]['SHP_PLANNED_ZONE']||'?') + ' -> ' + (rows[i]['SHP_ZONE_NAME']||'?');
+    fluxMap[k] = (fluxMap[k]||0)+1;
+  }
+  var fluxos = topN(fluxMap, 10).map(function(x){ return [x[0],x[1]]; });
 
-  // top operadores
-  const ops = {};
-  rows.forEach(r=>{
-    const op=r['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';
-    if(!ops[op]) ops[op]={total:0,nc:0};
-    ops[op].total++;
-    if(r['PACOTES_NAO_CORRIGIDOS']==='True'||r['PACOTES_NAO_CORRIGIDOS']==='true') ops[op].nc++;
-  });
+  // Operadores
+  var opMap = {};
+  for (var i = 0; i < rows.length; i++) {
+    var op = rows[i]['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';
+    if (!opMap[op]) opMap[op] = {total:0,nc:0};
+    opMap[op].total++;
+    if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') opMap[op].nc++;
+  }
+  var ops = Object.keys(opMap).map(function(k){ return {id:k,total:opMap[k].total,nc:opMap[k].nc}; });
+  ops.sort(function(a,b){ return b.total-a.total; });
+  ops = ops.slice(0,20);
 
-  D.desloc = {
-    total, naoCorrigidos: naoCorrigidos.length, pct,
-    byDay,
-    fluxosTop: Object.entries(fluxos).sort((a,b)=>b[1]-a[1]).slice(0,10),
-    opsTop: Object.entries(ops).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(([id,v])=>({id,...v})),
-    ids: new Set(rows.map(r=>r['SHP_SHIPMENT_ID']))
-  };
+  // IDs para correlação
+  var ids = {};
+  for (var i = 0; i < rows.length; i++) ids[rows[i]['SHP_SHIPMENT_ID']] = true;
+
+  return { total:total, naoCorrigidos:naoCorr, pct:pct, byDay:byDayArr, fluxos:fluxos, ops:ops, ids:ids };
 }
 
-// ── BPP ───────────────────────────────────
-function processBPP() {
-  const rows = RAW.bpp;
-  const wk = D.cfg.bppWeek;
-  const wkRows = rows.filter(r=>r['Values_Dates']===wk);
-  const wkReal = wkRows.filter(r=>r['F_CLASIFICATION']!==' Visualizar GMV');
-  const wkGmv  = wkRows.filter(r=>r['F_CLASIFICATION']===' Visualizar GMV');
+function calcBPP(cfg) {
+  var rows = RAW.bpp || [];
+  var wkReal = [], wkGmv = [], wkAll = {};
 
-  const toUsd = s => parseFloat((s||'0').replace(',','.')) || 0;
-  const totalCashout = wkReal.reduce((s,r)=>s+toUsd(r['Bpp Cashout Usd']),0);
-  const totalGmv = wkGmv.reduce((s,r)=>s+toUsd(r['TOTALGMV']||r['TotalGMV (std)']||'0'),0);
-  const pctBpp = totalGmv>0 ? totalCashout/totalGmv*100 : 0;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var wk = r['Values_Dates']||'';
+    if (!wkAll[wk]) wkAll[wk] = {real:[],gmv:[]};
+    if (r['F_CLASIFICATION']===' Visualizar GMV') {
+      wkAll[wk].gmv.push(r);
+      if (wk === cfg.bppWeek) wkGmv.push(r);
+    } else {
+      wkAll[wk].real.push(r);
+      if (wk === cfg.bppWeek) wkReal.push(r);
+    }
+  }
 
-  // Tendência semanas
-  const weekCodes = [...new Set(rows.map(r=>r['Values_Dates']))].sort();
-  const tendencia = weekCodes.map(wc=>{
-    const wr = rows.filter(r=>r['Values_Dates']===wc && r['F_CLASIFICATION']!==' Visualizar GMV');
-    const wg = rows.filter(r=>r['Values_Dates']===wc && r['F_CLASIFICATION']===' Visualizar GMV');
-    const co = wr.reduce((s,r)=>s+toUsd(r['Bpp Cashout Usd']),0);
-    const gm = wg.reduce((s,r)=>s+toUsd(r['TOTALGMV']||r['TotalGMV (std)']||'0'),0);
-    return {wk:wc, cashout:co, gmv:gm, pct:gm>0?co/gm*100:0};
+  var cashout = 0;
+  for (var i = 0; i < wkReal.length; i++) cashout += tousd(wkReal[i]['Bpp Cashout Usd']);
+  var gmvTotal = 0;
+  var gmvCol = rows.length > 0 && rows[0]['TOTALGMV'] !== undefined ? 'TOTALGMV' : 'TotalGMV (std)';
+  for (var i = 0; i < wkGmv.length; i++) gmvTotal += tousd(wkGmv[i][gmvCol]);
+  var pct = gmvTotal > 0 ? Math.round(cashout/gmvTotal*1000000)/10000 : 0;
+
+  // Tendência
+  var tend = Object.keys(wkAll).sort().map(function(wk) {
+    var co = 0; for (var i = 0; i < wkAll[wk].real.length; i++) co += tousd(wkAll[wk].real[i]['Bpp Cashout Usd']);
+    var gm = 0; for (var i = 0; i < wkAll[wk].gmv.length; i++) gm += tousd(wkAll[wk].gmv[i][gmvCol]);
+    return {wk:wk, cashout:Math.round(co*100)/100, gmv:Math.round(gm*100)/100, pct:gm>0?Math.round(co/gm*1000000)/10000:0};
   });
 
-  // por MLP
-  const mlpMap = {};
-  wkReal.forEach(r=>{
-    const mlp = (r['MLP']||'').includes('Sin Asignar')||!(r['MLP']||'').trim() ? 'SVC ('+D.cfg.svc+')' : r['MLP'];
-    if(!mlpMap[mlp]) mlpMap[mlp]={total:0,cashout:0,gmv:0,lost:0,dmg:0,pnr:0,drivers:{}};
+  // MLP
+  var mlpMap = {};
+  for (var i = 0; i < wkReal.length; i++) {
+    var r = wkReal[i];
+    var mlp = (r['MLP']||'').indexOf('Sin Asignar')>=0 ? 'SVC (' + cfg.svc + ')' : (r['MLP']||'Outros');
+    if (!mlpMap[mlp]) mlpMap[mlp] = {total:0,cashout:0,gmv:0,lost:0,dmg:0,pnr:0,drivers:{}};
     mlpMap[mlp].total++;
-    mlpMap[mlp].cashout+=toUsd(r['Bpp Cashout Usd']);
-    if(r['F_CLASIFICATION']==='LOST') mlpMap[mlp].lost++;
-    if(r['F_CLASIFICATION']==='DAMAGED') mlpMap[mlp].dmg++;
-    if(r['F_CLASIFICATION']==='PNR C') mlpMap[mlp].pnr++;
-    const drv = r['Driver Id']||'';
-    if(drv){ if(!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,lost:0,dmg:0,pnr:0,node:'',tramo:'',status:'',aging:''}; const d=mlpMap[mlp].drivers[drv]; d.total++; d.cashout+=toUsd(r['Bpp Cashout Usd']); if(r['F_CLASIFICATION']==='LOST')d.lost++; if(r['F_CLASIFICATION']==='DAMAGED')d.dmg++; if(r['F_CLASIFICATION']==='PNR C')d.pnr++; d.node=r['NODE_ID']||d.node; d.tramo=r['NODES_LM']||d.tramo; d.status=r['Driver Status']||d.status; d.aging=r['Driver Aging clas']||d.aging; }
+    mlpMap[mlp].cashout += tousd(r['Bpp Cashout Usd']);
+    var fc = r['F_CLASIFICATION']||'';
+    if (fc==='LOST') mlpMap[mlp].lost++;
+    if (fc==='DAMAGED') mlpMap[mlp].dmg++;
+    if (fc==='PNR C') mlpMap[mlp].pnr++;
+    var drv = r['Driver Id']||'';
+    if (drv && drv !== 'nan') {
+      if (!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,lost:0,dmg:0,pnr:0,node:'',tramo:'',status:'',aging:''};
+      var d = mlpMap[mlp].drivers[drv];
+      d.total++; d.cashout+=tousd(r['Bpp Cashout Usd']);
+      if (fc==='LOST') d.lost++;
+      if (fc==='DAMAGED') d.dmg++;
+      if (fc==='PNR C') d.pnr++;
+      if (r['NODE_ID']) d.node = r['NODE_ID'];
+      if (r['NODES_LM']) d.tramo = r['NODES_LM'];
+      if (r['Driver Status']) d.status = r['Driver Status'];
+      if (r['Driver Aging clas']) d.aging = r['Driver Aging clas'];
+    }
+  }
+  for (var i = 0; i < wkGmv.length; i++) {
+    var r = wkGmv[i];
+    var mlp = (r['MLP']||'').indexOf('Sin Asignar')>=0 ? 'SVC (' + cfg.svc + ')' : (r['MLP']||'Outros');
+    if (mlpMap[mlp]) mlpMap[mlp].gmv += tousd(r[gmvCol]);
+  }
+
+  var mlpList = Object.keys(mlpMap).map(function(mlp) {
+    var v = mlpMap[mlp];
+    var pctM = v.gmv > 0 ? Math.round(v.cashout/v.gmv*1000000)/10000 : null;
+    var top3 = Object.keys(v.drivers).map(function(k){ return {id:k, total:v.drivers[k].total, cashout:Math.round(v.drivers[k].cashout*100)/100, lost:v.drivers[k].lost, dmg:v.drivers[k].dmg, pnr:v.drivers[k].pnr, node:v.drivers[k].node, tramo:v.drivers[k].tramo, status:v.drivers[k].status, aging:v.drivers[k].aging}; });
+    top3.sort(function(a,b){ return b.total-a.total; });
+    return {mlp:mlp, total:v.total, cashout:Math.round(v.cashout*100)/100, gmv:Math.round(v.gmv*100)/100, lost:v.lost, dmg:v.dmg, pnr:v.pnr, pct:pctM, top3:top3.slice(0,3)};
   });
-  // GMV por MLP
-  wkGmv.forEach(r=>{
-    const mlp = (r['MLP']||'').includes('Sin Asignar')||!(r['MLP']||'').trim() ? 'SVC ('+D.cfg.svc+')' : r['MLP'];
-    if(!mlpMap[mlp]) mlpMap[mlp]={total:0,cashout:0,gmv:0,lost:0,dmg:0,pnr:0,drivers:{}};
-    mlpMap[mlp].gmv+=toUsd(r['TOTALGMV']||r['TotalGMV (std)']||'0');
-  });
+  mlpList.sort(function(a,b){ return (b.pct||0)-(a.pct||0); });
 
-  const mlpList = Object.entries(mlpMap).map(([mlp,v])=>({
-    mlp, ...v,
-    pct: v.gmv>0?v.cashout/v.gmv*100:null,
-    top3: Object.entries(v.drivers).sort((a,b)=>b[1].total-a[1].total).slice(0,3).map(([id,d])=>({id,...d}))
-  })).sort((a,b)=>(b.pct||0)-(a.pct||0));
+  // Tipos
+  var tipoMap = {};
+  for (var i = 0; i < wkReal.length; i++) { var fc = wkReal[i]['F_CLASIFICATION']||'?'; tipoMap[fc]=(tipoMap[fc]||0)+1; }
+  var tipos = topN(tipoMap,10).map(function(x){ return [x[0],x[1]]; });
 
-  // por tipo
-  const tipoMap = groupCount(wkReal,'F_CLASIFICATION');
-  // IDs com BPP
-  const ids_bpp = new Set(wkReal.map(r=>r['Shipment']).filter(Boolean));
+  // IDs
+  var ids_bpp = {};
+  for (var i = 0; i < wkReal.length; i++) ids_bpp[wkReal[i]['Shipment']] = true;
 
-  D.bpp = { totalCashout, totalGmv, pctBpp, total: wkReal.length, tendencia, mlpList, tipoMap, ids_bpp };
+  return { cashout:Math.round(cashout*100)/100, gmv:Math.round(gmvTotal*100)/100, pct:pct, total:wkReal.length, tend:tend, mlpList:mlpList, tipos:tipos, ids_bpp:ids_bpp };
 }
 
-// ── POKA YOKE ─────────────────────────────
-function processPK() {
-  // SORTING
-  const sort = RAW.sort;
-  const sortByOp = {};
-  sort.forEach(r=>{
-    const op=r['OPERADOR']||'?';
-    if(!sortByOp[op]) sortByOp[op]={total:0,gaiola:0,qr_sem:0,qr_com:0,saida:0,div:0};
-    sortByOp[op].total++;
-    const ev=r['EVENT_TYPE']||'';
-    if(ev==='CONTAINER_MISMATCH') sortByOp[op].gaiola++;
-    else if(ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByOp[op].qr_sem++;
-    else if(ev==='QR_PROBLEM') sortByOp[op].qr_com++;
-    else if(ev==='FORCE_EXIT') sortByOp[op].saida++;
-    else if(ev==='SHIPMENT_MISMATCH') sortByOp[op].div++;
-  });
-  const sortByDay = {};
-  sort.forEach(r=>{
-    const dt=(r['DATA_EVENTO']||'').slice(0,10);
-    if(!sortByDay[dt]) sortByDay[dt]={total:0,qr_sem:0,gaiola:0,saida:0};
+function calcPK() {
+  var sort = RAW.sort || [];
+  var et = RAW.et || [];
+
+  // Sorting por dia
+  var sortByDay = {};
+  for (var i = 0; i < sort.length; i++) {
+    var dt = (sort[i]['DATA_EVENTO']||'').slice(0,10);
+    var ev = sort[i]['EVENT_TYPE']||'';
+    if (!sortByDay[dt]) sortByDay[dt] = {total:0,qr_sem:0,gaiola:0,saida:0};
     sortByDay[dt].total++;
-    const ev=r['EVENT_TYPE']||'';
-    if(ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByDay[dt].qr_sem++;
-    if(ev==='CONTAINER_MISMATCH') sortByDay[dt].gaiola++;
-    if(ev==='FORCE_EXIT') sortByDay[dt].saida++;
-  });
-  const sortMotivos = groupCount(sort,'MOTIVO_POKA_YOKE');
-  const sortIds = new Set(sort.map(r=>r['ID_PACOTE']));
+    if (ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByDay[dt].qr_sem++;
+    else if (ev==='CONTAINER_MISMATCH') sortByDay[dt].gaiola++;
+    else if (ev==='FORCE_EXIT') sortByDay[dt].saida++;
+  }
 
-  // ETIQUETAGEM — dedup por ID+Usuario
-  const et = RAW.et;
-  const etSeen = new Set();
-  const etDedup = [];
-  et.forEach(r=>{ const k=(r['ID']||'')+'|'+(r['Usuario_Recebido']||''); if(!etSeen.has(k)){etSeen.add(k);etDedup.push(r);} });
-  const etByOp = {};
-  etDedup.forEach(r=>{
-    const op=r['Usuario_Recebido']||'?';
-    if(!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0};
+  // Sorting por operador
+  var sortByOp = {};
+  for (var i = 0; i < sort.length; i++) {
+    var op = sort[i]['OPERADOR']||'?', ev = sort[i]['EVENT_TYPE']||'';
+    if (!sortByOp[op]) sortByOp[op]={total:0,qr_sem:0,gaiola:0,saida:0,div:0};
+    sortByOp[op].total++;
+    if (ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByOp[op].qr_sem++;
+    else if (ev==='CONTAINER_MISMATCH') sortByOp[op].gaiola++;
+    else if (ev==='FORCE_EXIT') sortByOp[op].saida++;
+    else if (ev==='SHIPMENT_MISMATCH') sortByOp[op].div++;
+  }
+  var sortOps = Object.keys(sortByOp).map(function(k){ return {op:k,total:sortByOp[k].total,qr_sem:sortByOp[k].qr_sem,gaiola:sortByOp[k].gaiola,saida:sortByOp[k].saida,div:sortByOp[k].div}; });
+  sortOps.sort(function(a,b){ return b.total-a.total; });
+
+  // Motivos
+  var motivoMap = {};
+  for (var i = 0; i < sort.length; i++) { var m = sort[i]['MOTIVO_POKA_YOKE']||'?'; motivoMap[m]=(motivoMap[m]||0)+1; }
+  var sortMotivos = topN(motivoMap, 10).map(function(x){ return [x[0],x[1]]; });
+
+  // Etiquetagem - dedup
+  var etSeen = {}, etDedup = [];
+  for (var i = 0; i < et.length; i++) { var k = (et[i]['ID']||'')+'|'+(et[i]['Usuario_Recebido']||''); if (!etSeen[k]) { etSeen[k]=true; etDedup.push(et[i]); } }
+  var etByOp = {};
+  for (var i = 0; i < etDedup.length; i++) {
+    var op = etDedup[i]['Usuario_Recebido']||'?';
+    if (!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0};
     etByOp[op].total++;
-    if(r['Erro']==='QR_PROBLEM_WITHOUT_POKAYOKE') etByOp[op].sem_pk++;
+    if (etDedup[i]['Erro']==='QR_PROBLEM_WITHOUT_POKAYOKE') etByOp[op].sem_pk++;
     else etByOp[op].com_pk++;
-  });
-  const etIds = new Set(etDedup.map(r=>r['ID']));
+  }
+  var etOps = Object.keys(etByOp).map(function(k){ return {op:k,total:etByOp[k].total,sem_pk:etByOp[k].sem_pk,com_pk:etByOp[k].com_pk}; });
+  etOps.sort(function(a,b){ return b.total-a.total; });
 
-  D.pk = {
-    sort: {
-      total: sort.length,
-      ops: Object.entries(sortByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(function(e){ return Object.assign({op:e[0]},e[1]); }),
-      byDay: sortByDay, motivos: sortMotivos, ids: sortIds
-    },
-    et: {
-      total: etDedup.length,
-      ops: Object.entries(etByOp).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(function(e){ return Object.assign({op:e[0]},e[1]); }),
-      ids: etIds
-    }
-  };
+  // IDs para correlação
+  var ids_sort = {}, ids_et = {};
+  for (var i = 0; i < sort.length; i++) ids_sort[sort[i]['ID_PACOTE']] = true;
+  for (var i = 0; i < etDedup.length; i++) ids_et[etDedup[i]['ID']] = true;
+
+  return { sort:{total:sort.length,byDay:sortByDay,ops:sortOps.slice(0,20),motivos:sortMotivos}, et:{total:etDedup.length,ops:etOps.slice(0,20)}, ids_sort:ids_sort, ids_et:ids_et };
 }
 
-// ── ADUANAS ──────────────────────────────
-function processAduanas() {
-  const rows = RAW.aduana;
-  const ids_aduana = [...new Set(rows.map(r=>r['ID_Pacote']).filter(Boolean))];
+function calcAduanas(acc, bpp, pk, desloc) {
+  var rows = RAW.aduana || [];
+  var seen = {}, ids = [];
+  for (var i = 0; i < rows.length; i++) { var pid = rows[i]['ID_Pacote']||''; if (pid && !seen[pid]) { seen[pid]=rows[i]; ids.push(pid); } }
 
-  const ids_falt = D.acc.ids_falt;
-  const ids_bpp  = D.bpp.ids_bpp;
-  const ids_sort = D.pk.sort.ids;
-  const ids_et   = D.pk.et.ids;
-  const ids_desloc = D.desloc.ids;
-
-  // índice aduana por ID
-  const adMap = {};
-  rows.forEach(r=>{ if(r['ID_Pacote']) adMap[r['ID_Pacote']]=r; });
-
-  const master = ids_aduana.map(id=>{
-    const r = adMap[id]||{};
-    const falt = ids_falt.has(id);
-    const bpp  = ids_bpp.has(id);
-    const sort = ids_sort.has(id);
-    const et   = ids_et.has(id);
-    const desloc = ids_desloc.has(String(id))||ids_desloc.has(id);
-    const score = [falt,bpp,sort,et,desloc].filter(Boolean).length;
-    return {id, mlp:r['MLP']||'', usuario:r['USUARIO_BIP']||'', data:r['DATA_CRIACAO_AUDITORIA']||'', falt,bpp,sort,et,desloc,score};
+  var master = ids.map(function(pid) {
+    var r = seen[pid];
+    var f=!!acc.ids_falt[pid], b=!!bpp.ids_bpp[pid], s=!!pk.ids_sort[pid], e=!!pk.ids_et[pid], d=!!desloc.ids[pid];
+    return {id:pid,mlp:r['MLP']||'',usuario:r['USUARIO_BIP']||'',data:(r['DATA_CRIACAO_AUDITORIA']||'').slice(0,10),falt:f,bpp:b,sort:s,et:e,desloc:d,score:+f+b+s+e+d};
   });
 
-  // por usuário
-  const byUser = {};
-  master.forEach(m=>{
-    const u=m.usuario;
-    if(!byUser[u]) byUser[u]={total:0,falt:0,bpp:0,sort:0,et:0,desloc:0,score:0};
-    byUser[u].total++; byUser[u].falt+=m.falt?1:0; byUser[u].bpp+=m.bpp?1:0;
-    byUser[u].sort+=m.sort?1:0; byUser[u].et+=m.et?1:0; byUser[u].desloc+=m.desloc?1:0;
-    byUser[u].score+=m.score;
-  });
-
-  // por MLP
-  const byMlp = {};
-  master.forEach(m=>{
-    const k=m.mlp||'Sem MLP';
-    if(!byMlp[k]) byMlp[k]={total:0,falt:0,bpp:0,sort:0,et:0,desloc:0};
-    byMlp[k].total++; byMlp[k].falt+=m.falt?1:0; byMlp[k].bpp+=m.bpp?1:0;
-    byMlp[k].sort+=m.sort?1:0; byMlp[k].et+=m.et?1:0; byMlp[k].desloc+=m.desloc?1:0;
-  });
-
-  // por dia
-  const byDay = {};
-  master.forEach(m=>{
-    const dt=(m.data||'').slice(0,10);
-    if(!byDay[dt]) byDay[dt]={total:0,falt:0};
-    byDay[dt].total++; byDay[dt].falt+=m.falt?1:0;
-  });
-
-  const comFalha = master.filter(m=>m.score>0).length;
-  const cadeia   = master.filter(m=>m.score>=3);
-  const faltBpp  = master.filter(m=>m.falt&&m.bpp).length;
-  const faltSortEt = master.filter(m=>m.falt&&(m.sort||m.et)).length;
-
-  D.aduana = {
-    total: ids_aduana.length, comFalha, cadeia, faltBpp, faltSortEt,
-    master, byUser, byMlp, byDay,
-    usersTop: Object.entries(byUser).sort((a,b)=>b[1].total-a[1].total).slice(0,20).map(([u,v])=>({u,...v,pctFalt:v.total>0?v.falt/v.total*100:0})),
-    mlpList: Object.entries(byMlp).sort((a,b)=>b[1].total-a[1].total).map(([k,v])=>({mlp:k,...v,pctFalt:v.total>0?v.falt/v.total*100:0}))
-  };
-}
-
-// ══════════════════════════════════════════
-//  UTILITÁRIOS
-// ══════════════════════════════════════════
-function groupCount(rows, col) {
-  const m={};
-  rows.forEach(r=>{ const v=r[col]||'?'; m[v]=(m[v]||0)+1; });
-  return Object.entries(m).sort((a,b)=>b[1]-a[1]);
-}
-function parsePtDate(s) {
-  // "8 de ago. de 2026" → Date
-  const months={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
-  const m=s.match(/(\d+)\s+de\s+(\w+)/i);
-  if(!m) return 0;
-  const mon=months[m[2].toLowerCase().slice(0,3)]||0;
-  return new Date(2026,mon,parseInt(m[1])).getTime();
-}
-function fmtDayLabel(s) {
-  const days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const m=s.match(/(\d+)\s+de\s+(\w+)/i);
-  if(!m) return s;
-  const months={jan:0,fev:1,mar:2,abr:3,mai:4,jun:5,jul:6,ago:7,set:8,out:9,nov:10,dez:11};
-  const mon=months[m[2].toLowerCase().slice(0,3)]||0;
-  const d=new Date(2026,mon,parseInt(m[1]));
-  return days[d.getDay()]+' '+m[1].padStart(2,'0');
-}
-function fmt1(n){return typeof n==='number'?n.toFixed(1):'—';}
-function fmt2(n){return typeof n==='number'?n.toFixed(2):'—';}
-function fmtPct(n){return typeof n==='number'?n.toFixed(1)+'%':'—';}
-function fmtUsd(n){return typeof n==='number'?n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.'):'—';}
-function fmtN(n){return typeof n==='number'?n.toString().replace(/\B(?=(\d{3})+(?!\d))+/g,'.'):String(n);}
-function clr(v,good,warn){return v<=good?'var(--gn)':v<=warn?'var(--or)':'var(--rd)';}
-function clrAcc(v){return v>=80?'var(--gn)':v>=70?'var(--or)':'var(--rd)';}
-function setStep(s){document.getElementById('loadStep').textContent=s;}
-
-// ══════════════════════════════════════════
-//  ORQUESTRADOR PRINCIPAL
-// ══════════════════════════════════════════
-function gerarDemo() {
-  const overlay=document.getElementById('loadingOverlay');
-  overlay.style.display='flex';
-  setTimeout(()=>{
-    try {
-      processar();
-      const html=buildHTML();
-      document.getElementById('demoScreen').innerHTML=html;
-    } catch(e) {
-      console.error('Erro ao gerar demonstrativo:', e);
-      document.getElementById('demoScreen').innerHTML='<div style="color:red;padding:20px">Erro: '+e.message+'</div>';
-      document.getElementById('uploadScreen').style.display='none';
-      document.getElementById('demoScreen').style.display='block';
-      overlay.style.display='none';
-      return;
-    }
-    document.getElementById('uploadScreen').style.display='none';
-    document.getElementById('demoScreen').style.display='block';
-    overlay.style.display='none';
-    setTimeout(()=>{
-      showTab('resumo',document.querySelector('.nb'));
-      drawAllCharts();
-    },80);
-  },50);
-}
-
-// ══════════════════════════════════════════
-//  BUILDER HTML DO DEMONSTRATIVO
-// ══════════════════════════════════════════
-function buildHTML() {
-  const {cfg,acc,desloc,bpp,pk,aduana} = D;
-  const accG = acc.geral.toFixed(1);
-  const days = acc.days;
-  const dLabels = days.map(d=>d.label);
-  const dAcc    = days.map(d=>d.acc.toFixed(1));
-  const dInv    = days.map(d=>d.inv);
-  const dFalt   = days.map(d=>d.falt);
-
-  const bppTend = bpp.tendencia;
-  const bppCur  = bppTend[bppTend.length-1];
-  const bppPrev = bppTend.length>1?bppTend[bppTend.length-2]:null;
-  const bppChg  = bppPrev&&bppPrev.pct>0?((bppCur.pct-bppPrev.pct)/bppPrev.pct*100):null;
-
-  // sort days
-  const sortDays = Object.entries(pk.sort.byDay).sort((a,b)=>a[0].localeCompare(b[0]));
-  const sortDLabels = sortDays.map(([d])=>d.slice(5).replace('-','/'));
-  const sortDTotal  = sortDays.map(([,v])=>v.total);
-  const sortDQr     = sortDays.map(([,v])=>v.qr_sem);
-  const sortDGaiola = sortDays.map(([,v])=>v.gaiola);
-  const sortDSaida  = sortDays.map(([,v])=>v.saida);
-
-  // aduana por dia
-  const adDays = Object.entries(aduana.byDay).sort((a,b)=>a[0].localeCompare(b[0]));
-  const adDLabels = adDays.map(([d])=>d.slice(5).replace('-','/'));
-  const adDVol    = adDays.map(([,v])=>v.total);
-  const adDPctF   = adDays.map(([,v])=>v.total>0?(v.falt/v.total*100).toFixed(1):0);
-
-  // helpers de cor inline
-  const tagStatus = (v,meta,higher=false)=>{
-    const ok=higher?v>=meta:v<=meta;
-    return ok?'<span class="tag ok">✓ OK</span>':'<span class="tag cr">Crítico</span>';
-  };
-
-  // top MLP rows
-  const mlpRows = bpp.mlpList.map((m,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const pctS=m.pct!=null?fmtPct(m.pct):'N/A';
-    const pctClr=m.pct>0.5?'var(--rd)':m.pct>0.35?'var(--or)':'var(--gn)';
-    return `<tr><td>${rank}</td><td><strong>${m.mlp}</strong></td>
-      <td class="tr mono" style="color:${pctClr}">${pctS}</td>
-      <td class="tr mono">${fmtUsd(m.cashout)}</td>
-      <td class="tr mono">${m.total}</td>
-      <td class="tr mono">${m.total>0?fmtPct(m.lost/m.total*100):'-'}</td>
-      <td class="tr mono">${m.total>0?fmtPct(m.dmg/m.total*100):'-'}</td></tr>`;
-  }).join('');
-
-  // top 3 drivers por MLP
-  const driverRows = bpp.mlpList.filter(m=>m.top3.length>0).map(m=>{
-    return m.top3.map((drv,di)=>{
-      const mlpCell=di===0?`<td rowspan="${m.top3.length}"><strong>${m.mlp}</strong></td>`:'';
-      const stClr=drv.status==='blocked'?'var(--rd)':'var(--gn)';
-      return `<tr class="${di===0&&m.top3.length>1?'wh':''}">
-        ${mlpCell}
-        <td class="mono">${drv.id}</td>
-        <td class="tr mono">${drv.total}</td>
-        <td class="tr mono">${drv.lost}</td>
-        <td class="tr mono">${drv.dmg}</td>
-        <td class="tr mono">${drv.pnr}</td>
-        <td class="tr mono">${fmtUsd(drv.cashout)}</td>
-        <td class="mono" style="font-size:9px">${drv.node||'-'}</td>
-        <td><span class="tag i" style="font-size:8px">${drv.tramo||'-'}</span></td>
-        <td><span class="tag" style="font-size:8px;background:rgba(0,0,0,.2);color:${stClr}">${drv.status||'-'}</span></td></tr>`;
-    }).join('');
-  }).join('');
-
-  // sort ops rows
-  const sortOpsRows = pk.sort.ops.map((o,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const perfil=o.saida>=20?'<span class="tag cr">Saída Forç.⚠</span>':o.gaiola/o.total>0.6?'<span class="tag cr">Gaiola crítico</span>':o.qr_sem/o.total>0.6?'<span class="tag w">QR dominante</span>':'<span class="tag w">Misto</span>';
-    return `<tr><td>${rank}</td><td>${o.op}</td>
-      <td class="tr mono" style="color:${o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit'}">${o.total}</td>
-      <td class="tr mono">${o.qr_sem}</td><td class="tr mono">${o.gaiola}</td>
-      <td class="tr mono" style="color:${o.saida>=20?'var(--rd)':'inherit'}">${o.saida}</td>
-      <td class="tr mono">${o.div}</td><td class="tc">${perfil}</td></tr>`;
-  }).join('');
-
-  // et ops rows
-  const etOpsRows = pk.et.ops.map((o,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const pct=o.total>0?(o.sem_pk/o.total*100).toFixed(1):'0';
-    return `<tr><td>${rank}</td><td>${o.op}</td>
-      <td class="tr mono" style="color:${o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit'}">${o.total}</td>
-      <td class="tr mono">${o.sem_pk}</td><td class="tr mono">${o.com_pk}</td>
-      <td class="tr mono">${pct}%</td>
-      <td class="tc"><span class="tag ${pct>=80?'cr':'w'}">${pct>=80?'Critico':'Alto'}</span></td></tr>`;
-  }).join('');
-
-  // desloc ops rows
-  const desOpsRows = desloc.opsTop.map((o,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const pctNc=o.total>0?(o.nc/o.total*100).toFixed(1):'0';
-    return `<tr><td>${rank}</td><td><strong>${o.id}</strong></td>
-      <td class="tr mono" style="color:${o.total>80?'var(--rd)':o.total>40?'var(--or)':'inherit'}">${o.total}</td>
-      <td class="tr mono" style="color:${o.nc>5?'var(--or)':'inherit'}">${o.nc}</td>
-      <td class="tr mono">${pctNc}%</td></tr>`;
-  }).join('');
-
-  // fluxo rows
-  const fluxoRows = desloc.fluxosTop.map(([k,v],i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    return `<tr><td>${rank}</td><td>${k.replace('_',' ').replace(/_/g,' ')}</td><td class="tr mono">${v}</td></tr>`;
-  }).join('');
-
-  // aduana cadeia rows
-  const cadeiaRows = aduana.cadeia.slice(0,17).map(m=>{
-    const sc=m.score;
-    const scClr=sc>=4?'var(--rd)':sc>=3?'var(--or)':'inherit';
-    const y='<td class="tc" style="color:var(--rd)">✓</td>';
-    const n='<td class="tc">—</td>';
-    return `<tr><td class="mono">${m.id}</td>
-      <td class="tc"><strong style="color:${scClr}">${sc}</strong></td>
-      ${m.falt?y:n}${m.bpp?y:n}${m.sort?y:n}${m.et?y:n}${m.desloc?y:n}
-      <td style="font-size:10px">${m.mlp||'-'}</td></tr>`;
-  }).join('');
-
-  // aduana MLP rows
-  const adMlpRows = aduana.mlpList.map((m,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const pClr=m.pctFalt>=30?'var(--rd)':m.pctFalt>=15?'var(--or)':'inherit';
-    return `<tr><td>${rank}</td><td>${m.mlp}</td>
-      <td class="tr mono">${m.total}</td>
-      <td class="tr mono" style="color:${pClr}">${m.falt}</td>
-      <td class="tr mono" style="color:${pClr}">${fmtPct(m.pctFalt)}</td>
-      <td class="tr mono">${m.bpp}</td>
-      <td class="tr mono">${m.sort}</td>
-      <td class="tr mono">${m.desloc}</td></tr>`;
-  }).join('');
-
-  // aduana users top volume e top faltante
-  const adUsVol = aduana.usersTop.slice(0,10).map((u,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    return `<tr><td>${rank}</td><td><strong>${u.u}</strong></td>
-      <td class="tr mono">${u.total}</td>
-      <td class="tr mono">${u.falt}</td>
-      <td class="tr mono">${u.desloc}</td>
-      <td class="tr mono">${u.sort}</td>
-      <td class="tr mono" style="font-family:'JetBrains Mono',monospace;font-size:10px">${(u.score/u.total).toFixed(2)}</td></tr>`;
-  }).join('');
-
-  const adUsFalt = [...aduana.usersTop].filter(u=>u.total>=10).sort((a,b)=>b.pctFalt-a.pctFalt).slice(0,10).map((u,i)=>{
-    const rank=i<3?`<span class="rn r${i+1}">${i+1}</span>`:`<span class="rn">${i+1}</span>`;
-    const pClr=u.pctFalt>=30?'var(--rd)':u.pctFalt>=15?'var(--or)':'inherit';
-    return `<tr><td>${rank}</td><td><strong>${u.u}</strong></td>
-      <td class="tr mono">${u.total}</td>
-      <td class="tr mono" style="color:${pClr}">${u.falt}</td>
-      <td class="tr mono" style="color:${pClr}">${fmtPct(u.pctFalt)}</td>
-      <td class="tr mono">${u.bpp}</td>
-      <td class="tc"><span class="tag ${u.pctFalt>=30?'cr':u.pctFalt>=15?'w':'ok'}">${u.pctFalt>=30?'Alto':u.pctFalt>=15?'Medio':'Baixo'}</span></td></tr>`;
-  }).join('');
-
-  // tendência BPP cards
-  const trendCards = bppTend.map((t,i)=>{
-    const isCur=i===bppTend.length-1;
-    const prev=i>0?bppTend[i-1]:null;
-    const chg=prev&&prev.pct>0?((t.pct-prev.pct)/prev.pct*100):null;
-    const chgTxt=chg!=null?(chg>0?`<span style="color:var(--rd)">▲ +${chg.toFixed(1)}%</span>`:`<span style="color:var(--gn)">▼ ${chg.toFixed(1)}%</span>`):'—';
-    const vClr=t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
-    return `<div class="tc2${isCur?' cur':''}"><div class="twk">${t.wk}${isCur?' <- atual':''}</div>
-      <div class="tv" style="color:${vClr}">${fmtPct(t.pct)}</div>
-      <div class="ts2">Cashout/GMV</div>
-      <div class="td2">${chgTxt}</div></div>`;
-  }).join('');
-
-  return `
-<div class="sticky-top">
-  <div class="header">
-    <div class="hbrand"><div class="logo">ML</div><div><div class="bname">${cfg.svc} · ${cfg.svcName}</div><div class="bsub">Demonstrativo Semanal de Inventário</div></div></div>
-    <div class="hinfo">
-      <div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">${accG}%</div></div>
-      <div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>
-      <div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv ${desloc.pct<=5?'g':'r'}">${fmtPct(desloc.pct)}</div></div>
-      <div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">${fmtPct(bpp.pctBpp)}</div></div>
-    </div>
-    <div class="hright"><span class="wchip">${cfg.week}</span><span class="pchip">${cfg.dateStart.slice(8)} – ${cfg.dateEnd.slice(8)} ${cfg.dateStart.slice(0,7).replace('-','/')}</span><button class="btn-export" onclick="exportarAcoes()">📥 Exportar Ações</button><button class="btn-reload" onclick="resetDemo()">↩ Nova semana</button></div>
-  </div>
-  <div class="nav">
-    <button class="nb active" onclick="showTab('resumo',this)">📊 Resumo</button>
-    <button class="nb" onclick="showTab('accuracy',this)">🎯 Acurácia <span class="bdg">!</span></button>
-    <button class="nb" onclick="showTab('deslocados',this)">🔄 Deslocados</button>
-    <button class="nb" onclick="showTab('bpp',this)">💸 BPP</button>
-    <button class="nb" onclick="showTab('pokayoke',this)">⚠️ Poka Yoke</button>
-    <button class="nb" onclick="showTab('aduana',this)">🔗 Aduanas</button>
-  </div>
-</div>
-
-<div class="content">
-
-<!-- RESUMO -->
-<div id="resumo" class="tab active">
-  <div class="sh"><div><div class="st">Resumo Executivo — ${cfg.week}</div><div class="ss">${cfg.svc} ${cfg.svcName} · ${cfg.dateStart} a ${cfg.dateEnd}</div></div></div>
-  <div style="background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:12px;">
-    <div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">📋 Abertura de Reunião — ${cfg.svc} ${cfg.week}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;">
-          <div style="font-size:9px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">✅ Destaques positivos</div>
-          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">${fmtPct(desloc.pct)}</strong> ${desloc.pct<=5?'dentro da meta':'acima da meta'}, com <strong style="color:var(--gn)">${fmtPct((desloc.total-desloc.naoCorrigidos)/desloc.total*100)}</strong> de correção no turno.${bppChg!=null&&bppChg<0?' BPP Bruto caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior - de '+fmtPct(bppPrev.pct)+' para <strong style="color:var(--y)">'+fmtPct(bppCur.pct)+'</strong>.':''}</p>
-        </div>
-        <div style="background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;">
-          <div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">⚠️ Alerta operacional</div>
-          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Poka Yoke com <strong style="color:var(--rd)">${(pk.sort.total+pk.et.total).toLocaleString()}</strong> erros na semana — ${pk.sort.total.toLocaleString()} no sorting e ${pk.et.total.toLocaleString()} na etiquetagem. Raiz operacional confirmada no cruzamento com aduanas.</p>
-        </div>
-      </div>
-      <div style="background:rgba(52,131,250,.07);border:1px solid rgba(52,131,250,.25);border-radius:6px;padding:10px 12px;">
-        <div style="font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">🔗 Oportunidade — Aduanas ${cfg.week}</div>
-        <p style="font-size:11.5px;line-height:1.75;color:var(--tm);margin-bottom:8px;">Auditamos <strong style="color:var(--tx)">${aduana.total.toLocaleString()}</strong> IDs nas aduanas. <strong style="color:var(--rd)">${fmtPct(aduana.comFalha/aduana.total*100)}</strong> apresentaram ao menos uma falha correlata em outro processo.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--rd)">${aduana.cadeia.length}</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia ≥3 processos</div></div>
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--or)">${aduana.faltBpp}</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP gerado</div></div>
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--or)">${aduana.mlpList[0]?fmtPct(aduana.mlpList[0].pctFalt):'-'}</div><div style="font-size:9px;color:var(--td);margin-top:2px;">${aduana.mlpList[0]?.mlp||'-'} maior faltante</div></div>
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--rd)">${adUsFalt.length>0?(()=>{const top=[...aduana.usersTop].filter(u=>u.total>=10).sort((a,b)=>b.pctFalt-a.pctFalt)[0];return top?fmtPct(top.pctFalt):'-'})():'—'}</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior taxa faltante (op.)</div></div>
-        </div>
-        <p style="font-size:10.5px;line-height:1.65;color:var(--td);">Detalhe completo na aba <strong style="color:var(--bl)">🔗 Aduanas</strong>.</p>
-      </div>
-    </div>
-  </div>
-  <div class="alert cr"><div class="ai">🔴</div><div><div class="at">Acurácia abaixo da meta — ponto de atenção prioritário</div><div class="ab">Accuracy <strong>com POC: ${accG}%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>
-  <div class="kr" style="grid-template-columns:repeat(4,1fr);">
-    <div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">${accG}%</div><div class="km">Meta: 80% · Gap: ${(acc.geral-80).toFixed(1)}pp</div><span class="tag ${acc.geral>=80?'ok':'cr'}">${acc.geral>=80?'OK':'Abaixo da meta'}</span></div>
-    <div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div><span class="tag ok">✓ Dentro do esperado</span></div>
-    <div class="kc ${desloc.pct<=5?'cg':'cr'}"><div class="kl">% Deslocados</div><div class="kv ${desloc.pct<=5?'g':'r'}">${fmtPct(desloc.pct)}</div><div class="km">Meta: ≤5% · Corrigidos: ${fmtPct((desloc.total-desloc.naoCorrigidos)/desloc.total*100)}</div><span class="tag ${desloc.pct<=5?'ok':'cr'}">${desloc.pct<=5?'Dentro da meta':'Acima da meta'}</span></div>
-    <div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">${fmtPct(bpp.pctBpp)}</div><div class="km">Cashout / GMV · ${bppChg!=null?(bppChg<0?'v '+Math.abs(bppChg).toFixed(1)+'% vs ant.':'^ +'+bppChg.toFixed(1)+'% vs ant.'):'W'+cfg.week}</div><span class="tag ${bppChg!=null&&bppChg<0?'ok':'w'}">${bppChg!=null&&bppChg<0?'Melhora vs ant.':'Monitorar'}</span></div>
-  </div>
-</div>
-
-<!-- ACURÁCIA -->
-<div id="accuracy" class="tab">
-  <div class="sh"><div><div class="st">Acurácia — Resultado Diário</div><div class="ss">${acc.totalInv.toLocaleString()} inventariados · ${acc.totalFalt.toLocaleString()} faltantes · ${cfg.week}</div></div></div>
-  <div class="alert i"><div class="ai">💡</div><div><div class="at">Por que a accuracy geral (${accG}%) difere da média visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>${acc.totalInv.toLocaleString()} inventariados ÷ (${acc.totalInv.toLocaleString()} + ${acc.totalFalt.toLocaleString()}) = ${accG}%</strong>. O primeiro dia costuma ter volume inventariado muito maior, elevando a média ponderada.</div></div></div>
-  <div class="chart-wrap">
-    <div class="chart-head"><span class="chart-title">📅 % Accuracy Diária — ${cfg.week}</span><span class="chart-note">Inventariado Planificado ÷ (Inventariado + Faltante) · Base2</span></div>
-    <div class="chart-body"><canvas id="cAcc"></canvas></div>
-    <div class="chart-legend">
-      <div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>% Accuracy diária</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--rd);border-radius:2px;width:14px;height:2px;"></div>Meta 80%</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--or);border-radius:2px;width:14px;height:2px;"></div>Geral ${accG}%</div>
-    </div>
-    <div style="padding:0 14px 12px">
-      <table class="dsumm">
-        ${("<thead><tr><th>Indicador</th>" + days.map(function(d){ return "<th>"+d.label+"</th>"; }).join("") + "</tr></thead>")}
-        <tbody>
-          ${("<tr><td>Inventariado</td>" + days.map(function(d){ return '<td class="mono">'+d.inv.toLocaleString()+"</td>"; }).join("") + "</tr>")}
-          ${("<tr><td>Faltantes</td>" + days.map(function(d){ var fc=d.falt>1200?"var(--rd)":"inherit"; return '<td class="mono" style="color:'+fc+'">'+d.falt.toLocaleString()+"</td>"; }).join("") + "</tr>")}
-          ${("<tr><td>% Accuracy</td>" + days.map(function(d){ return '<td class="mono" style="color:'+clrAcc(d.acc)+'">'+d.acc.toFixed(1)+"%</td>"; }).join("") + "</tr>")}
-          ${("<tr><td>vs Meta 80%</td>" + days.map(function(d){ var mc=d.acc>=80?"var(--gn)":"var(--rd)"; var sg=d.acc>=80?"+":"-"; return '<td class="mono" style="color:'+mc+'">'+sg+Math.abs(d.acc-80).toFixed(1)+"pp</td>"; }).join("") + "</tr>")}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">Faltantes por Zona</span><span class="cc">${acc.totalFalt.toLocaleString()} total</span></div>
-      <table><thead><tr><th>Zona</th><th class="tr">Volume</th><th class="tr">%</th><th class="tc">Status</th></tr></thead><tbody>
-        ${acc.porZona.map(function(zv){ var z=zv[0],v=zv[1]; var sev=v/acc.totalFalt>0.3?"Critico":v/acc.totalFalt>0.1?"Atencao":"OK"; var cls=v/acc.totalFalt>0.3?"cr":v/acc.totalFalt>0.1?"w":"ok"; return '<tr><td>'+z+'</td><td class="tr mono">'+v.toLocaleString()+'</td><td class="tr mono">'+fmtPct(v/acc.totalFalt*100)+'</td><td class="tc"><span class="tag '+cls+'">'+sev+"</span></td></tr>"; }).join("")}
-      </tbody></table>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Ações — Acurácia ${cfg.week}</span></div>
-      <div style="padding:4px 14px 8px">
-        <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Contagem emergencial nas zonas críticas (PS / For Returns)</div><div class="adesc">Designar operador fixo para bipar cada pacote na entrada. Validar via Query3. Compartilhar base com LP.</div><div class="ameta"><span class="achip">Problem Solving</span><span class="achip">Prazo: D+1</span></div></div></div>
-        <div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Acionar TechOps para pacotes com erro sistêmico</div><div class="adesc">Não contabilizar como perda operacional. Abrir ticket com IDs afetados.</div><div class="ameta"><span class="achip">TechOps</span><span class="achip">Prazo: D+3</span></div></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DESLOCADOS -->
-<div id="deslocados" class="tab">
-  <div class="sh"><div><div class="st">Deslocados — Resultado Diário</div><div class="ss">${desloc.total.toLocaleString()} pacotes fora da zona · Meta ≤5% · ${cfg.week}</div></div></div>
-  <div class="kr">
-    <div class="kc ${desloc.pct<=5?'cg':'cr'}"><div class="kl">% Deslocados</div><div class="kv ${desloc.pct<=5?'g':'r'}">${fmtPct(desloc.pct)}</div><div class="km">Meta ≤5%</div><span class="tag ${desloc.pct<=5?'ok':'cr'}">${desloc.pct<=5?'OK':'Acima da meta'}</span></div>
-    <div class="kc cb"><div class="kl">Total</div><div class="kv b">${desloc.total.toLocaleString()}</div><div class="km">Semana ${cfg.week}</div></div>
-    <div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">${(desloc.total-desloc.naoCorrigidos).toLocaleString()}</div><div class="km">${fmtPct((desloc.total-desloc.naoCorrigidos)/desloc.total*100)}</div><span class="tag ok">✓</span></div>
-    <div class="kc co"><div class="kl">Não Corrigidos</div><div class="kv o">${desloc.naoCorrigidos}</div><div class="km">Risco semana seguinte</div><span class="tag w">Ação D+1</span></div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">Top Fluxos de Deslocamento</span></div>
-      <table><thead><tr><th>#</th><th>Fluxo</th><th class="tr">Volume</th></tr></thead>
-      <tbody>${fluxoRows}</tbody></table>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores</span></div>
-      <table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Não Cor.</th><th class="tr">% N/C</th></tr></thead>
-      <tbody>${desOpsRows}</tbody></table>
-    </div>
-  </div>
-  <div class="card"><div style="padding:4px 14px 8px">
-    <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Corrigir ${desloc.naoCorrigidos} deslocados pendentes + reforçar passagem de turno fim de semana</div><div class="adesc">Priorizar operadores com maior % de não correção. Feedback 1:1 com líder de turno.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div>
-  </div></div>
-</div>
-
-<!-- BPP -->
-<div id="bpp" class="tab">
-  <div class="sh"><div><div class="st">BPP — % Bruto + Tendência</div><div class="ss">% BPP = Cashout USD ÷ GMV USD · ${cfg.week}</div></div></div>
-  <div class="trow">${trendCards}</div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">MLP — % BPP Bruto ${cfg.week}</span></div>
-      <table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th><th class="tr">% Lost</th><th class="tr">% Dmg</th></tr></thead>
-      <tbody>${mlpRows}</tbody></table>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Classificação ${cfg.week}</span><span class="cc">${bpp.total.toLocaleString()} ocorrências</span></div>
-      <table><thead><tr><th>Tipo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead>
-      ${bpp.tipoMap.map(function(tv){ var t=tv[0],v=tv[1]; return '<tr><td>'+t+'</td><td class="tr mono">'+v+'</td><td class="tr mono">'+fmtPct(v/bpp.total*100)+"</td></tr>"; }).join("")}
-    </div>
-  </div>
-  <div class="sub-sh"><span class="sub-title">👤 Top 3 Drivers por Transportadora</span></div>
-  <div class="card"><div class="ch"><span class="ct">Drivers Ofensores — ${cfg.week}</span><span class="cc">Node ID · Tramo · Status</span></div>
-    <table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Lost</th><th class="tr">Dmg</th><th class="tr">PNR</th><th class="tr">Cashout USD</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead>
-    <tbody>${driverRows}</tbody></table>
-  </div>
-  <div class="card"><div style="padding:4px 14px 8px">
-    <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reunião com MLP de maior % BPP + acionamento LP para drivers com alto cashout</div><div class="adesc">Acionar LP para pacotes com cashout &gt;USD 100 (WI obrigatório). Verificar drivers com status blocked gerando BPP.</div><div class="ameta"><span class="achip">LP</span><span class="achip">Prazo: D+1</span></div></div></div>
-  </div></div>
-</div>
-
-<!-- POKA YOKE -->
-<div id="pokayoke" class="tab">
-  <div class="sh"><div><div class="st">Poka Yoke — Etiquetagem + Sorting · ${cfg.week}</div><div class="ss">Total: ${(pk.sort.total+pk.et.total).toLocaleString()} erros</div></div></div>
-  <div class="kr">
-    <div class="kc cr"><div class="kl">Total</div><div class="kv r">${(pk.sort.total+pk.et.total).toLocaleString()}</div><div class="km">Etiquetagem + Sorting</div></div>
-    <div class="kc co"><div class="kl">Etiquetagem</div><div class="kv o">${pk.et.total.toLocaleString()}</div><div class="km">${pk.et.ops.length} operadores</div></div>
-    <div class="kc cr"><div class="kl">Sorting</div><div class="kv r">${pk.sort.total.toLocaleString()}</div><div class="km">${pk.sort.ops.length} operadores</div></div>
-  </div>
-  <div class="sub-sh"><span class="sub-title">📦 Sorting</span></div>
-  <div class="chart-wrap">
-    <div class="chart-head"><span class="chart-title">📅 Erros de Sorting por Dia</span></div>
-    <div class="chart-body"><canvas id="cSort"></canvas></div>
-    <div class="chart-legend">
-      <div class="leg"><div class="leg-dot" style="background:var(--rd)"></div>QR s/ Poka Yoke</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--or)"></div>Gaiola Errada</div>
-      <div class="leg"><div class="leg-dot" style="background:var(--y)"></div>Saída Forçada</div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">Sorting — Motivos</span></div>
-      <table><thead><tr><th>Motivo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead>
-      ${pk.sort.motivos.map(function(mv){ var m=mv[0],v=mv[1]; return '<tr><td>'+m+'</td><td class="tr mono">'+v+'</td><td class="tr mono">'+fmtPct(v/pk.sort.total*100)+"</td></tr>"; }).join("")}
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores — Sorting</span></div>
-      <table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">QR s/PK</th><th class="tr">Gaiola</th><th class="tr">Saída F.</th><th class="tr">Pac.Div.</th><th class="tc">Perfil</th></tr></thead>
-      <tbody>${sortOpsRows}</tbody></table>
-    </div>
-  </div>
-  <div class="divider"></div>
-  <div class="sub-sh"><span class="sub-title">🏷️ Etiquetagem</span><span class="sub-badge">${pk.et.total.toLocaleString()} IDs únicos</span></div>
-  <div class="alert w"><div class="ai">⚠️</div><div><div class="at">Distribuição diária limitada — coluna Hora com formato inconsistente</div><div class="ab">Total semanal confiável. Para granularidade diária, consultar <strong>Looker PK</strong>.</div></div></div>
-  <div class="card"><div class="ch"><span class="ct">Top 20 Operadores — Etiquetagem</span></div>
-    <table><thead><tr><th>#</th><th>Operador</th><th class="tr">IDs Únicos</th><th class="tr">Sem Cob.</th><th class="tr">Com Cob.</th><th class="tr">% Sem Cob.</th><th class="tc">Nível</th></tr></thead>
-    <tbody>${etOpsRows}</tbody></table>
-  </div>
-  <div class="card"><div style="padding:4px 14px 8px">
-    <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reciclagem — Sorting (saídas forçadas) + Etiquetagem (sem cobertura PK)</div><div class="adesc">Priorizar operadores com ≥2 semanas consecutivas. Saída forçada = risco disciplinar imediato.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div>
-    <div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Mapear pontos sem cobertura PK e acionar TechOps</div><div class="ameta"><span class="achip">Prazo: D+3</span></div></div></div>
-  </div></div>
-</div>
-
-<!-- ADUANAS -->
-<div id="aduana" class="tab">
-  <div class="sh"><div><div class="st">Aduanas — Correlação com Processos Operacionais</div><div class="ss">${aduana.total.toLocaleString()} IDs auditados · ${cfg.week}</div></div></div>
-  <div class="kr">
-    <div class="kc cb"><div class="kl">IDs Auditados</div><div class="kv b">${aduana.total.toLocaleString()}</div></div>
-    <div class="kc cg"><div class="kl">Sem rastro de falha</div><div class="kv g">${(aduana.total-aduana.comFalha).toLocaleString()}</div><div class="km">${fmtPct((aduana.total-aduana.comFalha)/aduana.total*100)}</div></div>
-    <div class="kc co"><div class="kl">Com ≥1 falha correlata</div><div class="kv o">${aduana.comFalha.toLocaleString()}</div><div class="km">${fmtPct(aduana.comFalha/aduana.total*100)}</div></div>
-    <div class="kc cr"><div class="kl">Cadeia ≥3 processos</div><div class="kv r">${aduana.cadeia.length}</div></div>
-    <div class="kc cr"><div class="kl">Faltante + BPP</div><div class="kv r">${aduana.faltBpp}</div><div class="km">Perdido E ressarcido</div></div>
-    <div class="kc co"><div class="kl">Faltante + PK</div><div class="kv o">${aduana.faltSortEt}</div><div class="km">Raiz operacional confirmada</div></div>
-  </div>
-  <div class="chart-wrap">
-    <div class="chart-head"><span class="chart-title">📅 Aduanas por Dia — Volume + % Faltante</span></div>
-    <div class="chart-body"><canvas id="cAdDia"></canvas></div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">Aduana por MLP — Correlação</span></div>
-      <table><thead><tr><th>#</th><th>MLP</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tr">Sort.PK</th><th class="tr">Desloc.</th></tr></thead>
-      <tbody>${adMlpRows}</tbody></table>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Pacotes com Cadeia de Falha (Score ≥3)</span></div>
-      <table><thead><tr><th>ID Pacote</th><th class="tc">Score</th><th class="tc">Falt</th><th class="tc">BPP</th><th class="tc">Sort</th><th class="tc">Etiq</th><th class="tc">Desl</th><th>MLP</th></tr></thead>
-      <tbody>${cadeiaRows}</tbody></table>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ch"><span class="ct">Para MAIS — Maior Volume de Aduanas</span></div>
-      <table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">Desloc.</th><th class="tr">Sort.PK</th><th class="tr">Score/ID</th></tr></thead>
-      <tbody>${adUsVol}</tbody></table>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Para MENOS — Maior % Faltante</span><span class="cc">≥10 aduanas</span></div>
-      <table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tc">Risco</th></tr></thead>
-      <tbody>${adUsFalt}</tbody></table>
-    </div>
-  </div>
-  <div class="card"><div style="padding:4px 14px 8px">
-    <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Investigar ${aduana.cadeia.length} pacotes com cadeia de falha — verificar ${aduana.faltBpp} com faltante + BPP</div><div class="adesc">Pacotes com BPP gerado E faltante no inventário: risco de ressarcimento indevido. Acionar LP.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div>
-    <div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Feedback para operadores com alta taxa de faltante na bipagem de aduanas</div><div class="adesc">Taxa elevada indica bipagem sem conferência física. Confrontar com ROTA_LOG dos documentos.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div>
-  </div></div>
-</div>
-
-</div><!-- /content -->
-<div class="footer"><strong>${cfg.svc} — ${cfg.svcName}</strong> · Demonstrativo Semanal de Inventário · <strong>${cfg.week} · ${cfg.dateStart} a ${cfg.dateEnd}</strong></div>
-`;
-}
-
-// ══════════════════════════════════════════
-//  NAVEGAÇÃO E CHARTS
-// ══════════════════════════════════════════
-function showTab(id, btn) {
-  document.querySelectorAll('.tab').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el) el.classList.add('active');
-  if(btn) btn.classList.add('active');
-  setTimeout(drawAllCharts,60);
-}
-
-function exportarAcoes() {
-  if(!D.cfg) return;
-  const cfg = D.cfg, desloc = D.desloc, bpp = D.bpp, pk = D.pk, aduana = D.aduana;
-  const now = new Date();
-  const dataAb = now.toLocaleDateString('pt-BR');
-  const mes = now.getMonth() + 1;
-
-  const topMlp = bpp.mlpList.length > 0 ? bpp.mlpList[0] : null;
-  const topSort = pk.sort.ops.length > 0 ? pk.sort.ops[0] : null;
-  const topEt   = pk.et.ops.length > 0   ? pk.et.ops[0]   : null;
-  const topAdFalt = [...D.aduana.usersTop].filter(u=>u.total>=10).sort((a,b)=>b.pctFalt-a.pctFalt)[0] || null;
-
-  const acoes = [
-    // ACCURACY
-    ['INVENTARIO - Accuracy',
-     'Contagem emergencial + bipagem em tempo real nas zonas criticas (PS / For Returns)',
-     '', '', '', 'Em andamento', '', 'PS com accuracy critica. Designar operador fixo. Validar via Query3.'],
-    ['INVENTARIO - Accuracy',
-     'Acionar TechOps para pacotes com erro sistemico (SHP con 2.0)',
-     '', '', '', 'Em andamento', '', 'Nao contabilizar como perda operacional. Abrir ticket com IDs.'],
-    // DESLOCADOS
-    ['INVENTARIO - Deslocados',
-     'Corrigir ' + desloc.naoCorrigidos + ' deslocados pendentes + reforca passagem de turno fim de semana',
-     '', '', '', 'Em andamento', '', 'Priorizar operadores com maior % de nao correcao. Feedback 1:1 com lider.'],
-    // BPP
-    ['BPP',
-     'Reuniao com MLP de maior % BPP Bruto + acionamento LP para drivers com alto cashout',
-     '', '', '', 'Em andamento', '', 'Acionar LP para pacotes com cashout >USD 100 (WI obrigatorio). Verificar drivers blocked.'],
-  ];
-
-  if (topMlp) {
-    const pctStr = topMlp.pct != null ? topMlp.pct.toFixed(2) + '%' : 'N/A';
-    acoes.push([
-      'BPP',
-      'Reuniao de desempenho - ' + topMlp.mlp + ' (' + pctStr + ' BPP)',
-      '', '', '', 'Em andamento', '',
-      'Top MLP em % BPP Bruto da ' + cfg.week + '. Cashout: USD ' + fmtUsd(topMlp.cashout) + '.'
-    ]);
+  var byUser={}, byMlp={}, byDay={};
+  for (var i=0;i<master.length;i++) {
+    var m=master[i];
+    if (!byUser[m.usuario]) byUser[m.usuario]={total:0,falt:0,bpp:0,sort:0,score:0};
+    byUser[m.usuario].total++; byUser[m.usuario].falt+=m.falt?1:0; byUser[m.usuario].bpp+=m.bpp?1:0; byUser[m.usuario].sort+=m.sort?1:0; byUser[m.usuario].score+=m.score;
+    var mk=m.mlp||'Sem MLP';
+    if (!byMlp[mk]) byMlp[mk]={total:0,falt:0,bpp:0,sort:0,desloc:0};
+    byMlp[mk].total++; byMlp[mk].falt+=m.falt?1:0; byMlp[mk].bpp+=m.bpp?1:0; byMlp[mk].sort+=m.sort?1:0; byMlp[mk].desloc+=m.desloc?1:0;
+    if (!byDay[m.data]) byDay[m.data]={total:0,falt:0};
+    byDay[m.data].total++; byDay[m.data].falt+=m.falt?1:0;
   }
 
-  acoes.push(
-    ['POKA YOKE - Sorting',
-     'Reciclagem operadores criticos de sorting - saidas forcadas + QR sem cobertura + gaiola errada',
-     '', '', '', 'Em andamento', '',
-     'Top ofensor: ' + (topSort ? topSort.op : '-') + ' (' + (topSort ? topSort.total : 0) + ' erros). Saida forcada = risco disciplinar.'],
-    ['POKA YOKE - Etiquetagem',
-     'Reciclagem operadores criticos de etiquetagem - sem cobertura PK',
-     '', '', '', 'Em andamento', '',
-     'Top ofensor: ' + (topEt ? topEt.op : '-') + ' (' + (topEt ? topEt.total : 0) + ' erros). Bipar gaiola antes do QR, 1 pacote por vez.'],
-    ['POKA YOKE',
-     'Mapear pontos sem cobertura PK e acionar TechOps/Infra',
-     '', '', '', 'Em andamento', '',
-     'QR_PROBLEM_WITHOUT_POKAYOKE recorrente. Goleiro manual enquanto aguarda regularizacao.'],
-    ['INVENTARIO - Aduanas',
-     'Investigar ' + aduana.cadeia.length + ' pacotes com cadeia de falha (score 3+) - ' + aduana.faltBpp + ' com faltante + BPP gerado',
-     '', '', '', 'Em andamento', '',
-     'Risco de BPP pago indevidamente. Acionar LP para pacotes com cashout relevante.'],
-    ['INVENTARIO - Aduanas',
-     'Feedback para operadores com alta taxa de faltante na bipagem de aduanas (Para MENOS)',
-     '', '', '', 'Em andamento', '',
-     'Taxa elevada indica bipagem sem conferencia fisica. Confrontar com ROTA_LOG dos documentos.']
-  );
+  var users = Object.keys(byUser).map(function(k){ return {u:k,total:byUser[k].total,falt:byUser[k].falt,bpp:byUser[k].bpp,sort:byUser[k].sort,score:byUser[k].score,pctFalt:byUser[k].total>0?Math.round(byUser[k].falt/byUser[k].total*1000)/10:0}; });
+  users.sort(function(a,b){ return b.total-a.total; });
+  var mlpAd = Object.keys(byMlp).map(function(k){ return {mlp:k,total:byMlp[k].total,falt:byMlp[k].falt,bpp:byMlp[k].bpp,sort:byMlp[k].sort,desloc:byMlp[k].desloc,pctFalt:byMlp[k].total>0?Math.round(byMlp[k].falt/byMlp[k].total*1000)/10:0}; });
+  mlpAd.sort(function(a,b){ return b.total-a.total; });
+  var adDays = Object.keys(byDay).sort().map(function(k){ return {dt:k,total:byDay[k].total,falt:byDay[k].falt,pctFalt:byDay[k].total>0?Math.round(byDay[k].falt/byDay[k].total*1000)/10:0}; });
 
-  if (topAdFalt) {
-    acoes.push([
-      'INVENTARIO - Aduanas',
-      'Op. ' + topAdFalt.u + ' com ' + topAdFalt.pctFalt.toFixed(1) + '% de faltante em ' + topAdFalt.total + ' aduanas',
-      '', '', '', 'Em andamento', '',
-      'Maior taxa para menos da ' + cfg.week + '. Verificar se bipa sem conferencia fisica.'
-    ]);
-  }
+  var cadeia = master.filter(function(m){ return m.score>=3; });
+  return { total:ids.length, comFalha:master.filter(function(m){return m.score>0;}).length, cadeia:cadeia.slice(0,20), faltBpp:master.filter(function(m){return m.falt&&m.bpp;}).length, faltPk:master.filter(function(m){return m.falt&&(m.sort||m.et);}).length, users:users.slice(0,20), mlp:mlpAd, byDay:adDays };
+}
 
-  const headers = ['DATA ABERTURA','Mes','WEEK','INDICADOR','ACAO','RESPONSAVEL','DATA PROGRAMADA','REPROGRAMADA','STATUS','DATA CONCLUSAO','COMENTARIOS'];
+// ── EXPORTAR AÇÕES ──────────────────────────
+function exportAcoes(aba) {
+  if (!D) return;
+  var cfg=D.cfg, acc=D.acc, desloc=D.desloc, bpp=D.bpp, pk=D.pk, aduana=D.aduana;
+  var hoje = new Date().toLocaleDateString('pt-BR');
+  var mes = new Date().getMonth()+1;
+  var topMlp = bpp.mlpList.length>0 ? bpp.mlpList[0] : null;
+  var topSort = pk.sort.ops.length>0 ? pk.sort.ops[0] : null;
+  var topEt = pk.et.ops.length>0 ? pk.et.ops[0] : null;
+  var topAdFalt = D.aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0] || null;
 
-  const csvRows = acoes.map(function(a) {
-    const row = [dataAb, mes, cfg.week].concat(a);
-    return row.map(function(c) {
-      return '"' + String(c || '').replace(/"/g, '""') + '"';
-    }).join(';');
+  var acoesPorAba = {
+    accuracy: [
+      ['INVENTARIO - Accuracy','Contagem emergencial nas zonas criticas (PS / For Returns) — bipar cada pacote na entrada','','','','Em andamento','','PS com accuracy critica. Designar operador fixo. Validar via Query3.'],
+      ['INVENTARIO - Accuracy','Acionar TechOps para pacotes com erro sistemico (SHP con 2.0)','','','','Em andamento','','Nao contabilizar como perda operacional. Abrir ticket com IDs afetados.']
+    ],
+    deslocados: [
+      ['INVENTARIO - Deslocados','Corrigir ' + desloc.naoCorrigidos + ' deslocados pendentes + reforca passagem de turno fim de semana','','','','Em andamento','','Priorizar operadores com maior % de nao correcao. Feedback 1:1 com lider.']
+    ],
+    bpp: [
+      ['BPP','Reuniao com MLP de maior % BPP Bruto + acionamento LP para drivers com alto cashout','','','','Em andamento','','Acionar LP para cashout >USD 100 (WI). Verificar drivers blocked.'],
+      topMlp ? ['BPP','Reuniao de desempenho — ' + topMlp.mlp + ' (' + (topMlp.pct ? topMlp.pct.toFixed(2) : '?') + '% BPP)','','','','Em andamento','','Top MLP ' + cfg.week + '. Cashout USD ' + fmtN(topMlp.cashout) + '.'] : null
+    ].filter(Boolean),
+    pokayoke: [
+      ['POKA YOKE - Sorting','Reciclagem critica — saidas forcadas + QR sem cobertura + gaiola errada','','','','Em andamento','','Top ofensor sorting: ' + (topSort ? topSort.op : '-') + ' (' + (topSort ? topSort.total : 0) + ' erros). Saida forcada = risco disciplinar.'],
+      ['POKA YOKE - Etiquetagem','Reciclagem critica — operadores sem cobertura PK','','','','Em andamento','','Top ofensor etiquetagem: ' + (topEt ? topEt.op : '-') + ' (' + (topEt ? topEt.total : 0) + ' erros).'],
+      ['POKA YOKE','Mapear pontos sem cobertura PK e acionar TechOps/Infra','','','','Em andamento','','QR_PROBLEM_WITHOUT_POKAYOKE recorrente. Goleiro manual enquanto aguarda.']
+    ],
+    aduana: [
+      ['INVENTARIO - Aduanas','Investigar ' + aduana.cadeia.length + ' pacotes com cadeia de falha (score 3+) — ' + aduana.faltBpp + ' com faltante+BPP','','','','Em andamento','','Risco de BPP pago indevidamente. Acionar LP.'],
+      ['INVENTARIO - Aduanas','Feedback para operadores com alta taxa de faltante na bipagem (Para MENOS)','','','','Em andamento','','Taxa elevada indica bipagem sem conferencia fisica.'],
+      topAdFalt ? ['INVENTARIO - Aduanas','Op. ' + topAdFalt.u + ' — ' + topAdFalt.pctFalt + '% faltante em ' + topAdFalt.total + ' aduanas','','','','Em andamento','','Maior taxa para menos ' + cfg.week + '.'] : null
+    ].filter(Boolean)
+  };
+
+  var acoes = aba === 'todas' ? [].concat(acoesPorAba.accuracy, acoesPorAba.deslocados, acoesPorAba.bpp, acoesPorAba.pokayoke, acoesPorAba.aduana) : (acoesPorAba[aba] || []);
+
+  var headers = ['DATA ABERTURA','Mes','WEEK','INDICADOR','ACAO','RESPONSAVEL','DATA PROGRAMADA','REPROGRAMADA','STATUS','DATA CONCLUSAO','COMENTARIOS'];
+  var csvRows = acoes.map(function(a) {
+    var row = [hoje, mes, cfg.week].concat(a);
+    return row.map(function(c){ return '"' + String(c||'').replace(/"/g,'""') + '"'; }).join(';');
   });
+  var csv = '\uFEFF' + headers.map(function(h){return '"'+h+'"';}).join(';') + '\n' + csvRows.join('\n');
 
-  const csvContent = '\uFEFF' + headers.map(function(h){ return '"'+h+'"'; }).join(';') + '\n' + csvRows.join('\n');
-
-  const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Acoes_' + cfg.svc + '_' + cfg.week + '_' + now.toISOString().slice(0,10) + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download='Acoes_'+cfg.svc+'_'+cfg.week+'_'+aba+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// ── NAVEGAÇÃO ────────────────────────────────
+function showTab(id, btn) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+  var nbs = document.querySelectorAll('.nb');
+  for (var i=0; i<nbs.length; i++) nbs[i].classList.remove('active');
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+  setTimeout(drawAllCharts, 60);
 }
 
 function resetDemo() {
   document.getElementById('demoScreen').style.display='none';
   document.getElementById('demoScreen').innerHTML='';
   document.getElementById('uploadScreen').style.display='flex';
-  LOADED=0; Object.keys(RAW).forEach(k=>delete RAW[k]);
-  document.querySelectorAll('.up-item').forEach(el=>el.classList.remove('loaded'));
-  document.querySelectorAll('.up-status').forEach(el=>el.textContent='⬆ Aguardando');
-  document.getElementById('upProgress').style.width='0%';
+  RAW={}; LOADED=0; D=null;
+  var items=document.querySelectorAll('.up-item'); for(var i=0;i<items.length;i++) items[i].classList.remove('ok');
+  var sts=document.querySelectorAll('.up-st'); for(var i=0;i<sts.length;i++) sts[i].textContent='Aguardando';
+  document.getElementById('upFill').style.width='0%';
   document.getElementById('upLabel').textContent='0 de 7 arquivos carregados';
   document.getElementById('btnGo').disabled=true;
 }
 
-function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+// ── HELPERS DE FORMATAÇÃO ────────────────────
+function fmtPct(n) { return typeof n==='number' ? n.toFixed(1)+'%' : '--'; }
+function fmtN(n) { return typeof n==='number' ? n.toLocaleString('pt-BR',{maximumFractionDigits:2}) : '--'; }
+function clrAcc(v) { return v>=80 ? 'var(--gn)' : v>=70 ? 'var(--or)' : 'var(--rd)'; }
+function clrPct(v,ok,warn) { return v<=ok ? 'var(--gn)' : v<=warn ? 'var(--or)' : 'var(--rd)'; }
 
-function setupCanvas(id,h){
-  const el=document.getElementById(id); if(!el) return null;
-  const dpr=window.devicePixelRatio||1, W=el.parentElement.clientWidth-2;
-  el.width=Math.round(W*dpr); el.height=Math.round(h*dpr);
-  el.style.width=W+'px'; el.style.height=h+'px';
-  const ctx=el.getContext('2d'); ctx.scale(dpr,dpr);
-  return{ctx,W,H:h};
-}
-
-function drawGrid(ctx,pad,W,H,maxV,steps,fmt){
-  const ch=H-pad.t-pad.b;
-  for(let i=0;i<=steps;i++){
-    const y=pad.t+ch*(1-i/steps);
-    ctx.strokeStyle='rgba(48,54,61,0.7)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-    ctx.fillStyle=cv('--td');ctx.font='9px Inter';ctx.textAlign='right';
-    ctx.fillText(fmt?fmt(maxV*i/steps):Math.round(maxV*i/steps),pad.l-4,y+3);
+// ── GERAÇÃO DO HTML ──────────────────────────
+function gerarDemo() {
+  try {
+    processar();
+  } catch(e) {
+    alert('Erro ao processar os dados: ' + e.message + '\n\nVerifique se os arquivos estao corretos e na ordem certa.');
+    return;
   }
+  renderDemo();
 }
 
-function drawXLabels(ctx,labels,pad,W,H){
-  const n=labels.length,gap=(W-pad.l-pad.r)/n;
-  ctx.fillStyle=cv('--td');ctx.font='9px Inter';ctx.textAlign='center';
-  labels.forEach((l,i)=>ctx.fillText(l,pad.l+i*gap+gap/2,H-4));
-}
 
-function lineChart(id,labels,data,color,fill,goalLines,minV,maxV,fmt){
-  const s=setupCanvas(id,130);if(!s)return;
-  const{ctx,W,H}=s, pad={t:16,r:12,b:22,l:44};
-  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b,n=labels.length,gap=cw/n,range=maxV-minV;
-  drawGrid(ctx,pad,W,H,maxV,4,fmt);
-  if(goalLines) goalLines.forEach(gl=>{
-    const y=pad.t+ch*(1-(gl.val-minV)/range);
-    ctx.strokeStyle=gl.color;ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-    ctx.setLineDash([]);ctx.fillStyle=gl.color;ctx.font='bold 9px Inter';ctx.textAlign='left';
-    ctx.fillText(gl.label,pad.l+4,y-3);
-  });
-  if(fill){
-    ctx.beginPath();
-    data.forEach((v,i)=>{const x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-(v-minV)/range);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.lineTo(pad.l+(n-1)*gap+gap/2,pad.t+ch);ctx.lineTo(pad.l+gap/2,pad.t+ch);
-    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+
+// ── RENDER DO DEMONSTRATIVO ──────────────────
+function renderDemo() {
+  var d = D;
+  var cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
+
+  // Botão de export por aba
+  function btnExp(aba) {
+    return '<button class="btn-export-aba" onclick="exportAcoes(\''+aba+'\')">📥 Exportar Ações</button>';
   }
-  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([]);ctx.lineJoin='round';ctx.lineCap='round';
-  ctx.beginPath();
-  data.forEach((v,i)=>{const x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-(v-minV)/range);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  ctx.stroke();
-  data.forEach((v,i)=>{
-    const x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-(v-minV)/range);
-    ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-    ctx.fillText(fmt?fmt(v):v,x,y-6);
-  });
-  drawXLabels(ctx,labels,pad,W,H);
+
+  // Helper de tag
+  function tag(cls,txt) { return '<span class="tag '+cls+'">'+txt+'</span>'; }
+  function rn(i) { var cls=i<3?'r'+(i+1):''; return '<span class="rn '+cls+'">'+(i+1)+'</span>'; }
+
+  // ── ACCURACY ROWS ──
+  var accDayHead = '<thead><tr><th>Indicador</th>';
+  var accInvRow = '<tr><td>Inventariado</td>';
+  var accFaltRow = '<tr><td>Faltantes</td>';
+  var accPctRow = '<tr><td>% Accuracy</td>';
+  var accMetaRow = '<tr><td>vs Meta 80%</td>';
+  for (var i=0; i<acc.days.length; i++) {
+    var day=acc.days[i];
+    accDayHead += '<th>'+day.label+'</th>';
+    accInvRow += '<td class="mono">'+day.inv.toLocaleString()+'</td>';
+    var fclr = day.falt>1200 ? 'color:var(--rd)' : '';
+    accFaltRow += '<td class="mono" style="'+fclr+'">'+day.falt.toLocaleString()+'</td>';
+    accPctRow += '<td class="mono" style="color:'+clrAcc(day.acc)+'">'+day.acc.toFixed(1)+'%</td>';
+    var gap = day.acc-80; var gclr = gap>=0?'var(--gn)':'var(--rd)'; var sg = gap>=0?'+':'-';
+    accMetaRow += '<td class="mono" style="color:'+gclr+'">'+sg+Math.abs(gap).toFixed(1)+'pp</td>';
+  }
+  accDayHead += '</tr></thead>';
+  accInvRow += '</tr>'; accFaltRow += '</tr>'; accPctRow += '</tr>'; accMetaRow += '</tr>';
+
+  var zonaRows = acc.porZona.map(function(zv,i) {
+    var z=zv[0],v=zv[1]; var pct=acc.totalFalt>0?v/acc.totalFalt*100:0;
+    var sev=pct>30?'Critico':pct>10?'Atencao':'OK'; var cls=pct>30?'cr':pct>10?'w':'ok';
+    return '<tr'+(i===0?' class="rh"':'')+'><td>'+z+'</td><td class="tr mono">'+v.toLocaleString()+'</td><td class="tr mono">'+fmtPct(pct)+'</td><td class="tc">'+tag(cls,sev)+'</td></tr>';
+  }).join('');
+
+  // ── DESLOC ──
+  var fluxoRows = desloc.fluxos.map(function(f,i) {
+    return '<tr><td>'+rn(i)+'</td><td>'+f[0]+'</td><td class="tr mono">'+f[1]+'</td></tr>';
+  }).join('');
+  var desOpRows = desloc.ops.map(function(o,i) {
+    var pnc = o.total>0?Math.round(o.nc/o.total*1000)/10:0;
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+o.id+'</strong></td><td class="tr mono" style="color:'+(o.total>80?'var(--rd)':o.total>40?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono" style="color:'+(o.nc>5?'var(--or)':'inherit')+'">'+o.nc+'</td><td class="tr mono">'+pnc.toFixed(1)+'%</td></tr>';
+  }).join('');
+
+  // ── BPP TEND ──
+  var tendCards = bpp.tend.map(function(t,i) {
+    var isCur = i===bpp.tend.length-1;
+    var prev = i>0?bpp.tend[i-1]:null;
+    var chg = prev&&prev.pct>0?((t.pct-prev.pct)/prev.pct*100):null;
+    var chgTxt = chg!==null?(chg<0?'<span style="color:var(--gn)">v -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">^ +'+chg.toFixed(1)+'%</span>'):'&mdash;';
+    var vclr = t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
+    return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtPct(t.pct)+'</div><div class="ts2">Cashout/GMV</div><div class="td2">'+chgTxt+'</div></div>';
+  }).join('');
+
+  var mlpRows = bpp.mlpList.map(function(m,i) {
+    var pclr = m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
+    var pctS = m.pct!==null?fmtPct(m.pct):'N/A';
+    return '<tr'+(i<2?' class="'+(i===0?'rh':'wh')+'"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+pctS+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td><td class="tr mono">'+fmtPct(m.total>0?m.lost/m.total*100:0)+'</td><td class="tr mono">'+fmtPct(m.total>0?m.dmg/m.total*100:0)+'</td></tr>';
+  }).join('');
+
+  var tipoRows = bpp.tipos.map(function(t) {
+    return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(bpp.total>0?t[1]/bpp.total*100:0)+'</td></tr>';
+  }).join('');
+
+  var driverRows = bpp.mlpList.filter(function(m){return m.top3&&m.top3.length>0;}).map(function(m) {
+    return m.top3.map(function(drv,di) {
+      var mlpCell = di===0 ? '<td rowspan="'+m.top3.length+'"><strong>'+m.mlp+'</strong></td>' : '';
+      var stClr = drv.status==='blocked'?'var(--rd)':'var(--gn)';
+      return '<tr class="'+(di===0?'wh':'')+'">'+mlpCell+'<td class="mono">'+drv.id+'</td><td class="tr mono">'+drv.total+'</td><td class="tr mono">'+drv.lost+'</td><td class="tr mono">'+drv.dmg+'</td><td class="tr mono">'+drv.pnr+'</td><td class="tr mono">'+fmtN(drv.cashout)+'</td><td class="mono" style="font-size:9px">'+drv.node+'</td><td><span class="tag i" style="font-size:8px">'+drv.tramo+'</span></td><td><span class="tag" style="font-size:8px;color:'+stClr+'">'+drv.status+'</span></td></tr>';
+    }).join('');
+  }).join('');
+
+  // ── PK SORT OPS ──
+  var sortOpsRows = pk.sort.ops.map(function(o,i) {
+    var perfil = o.saida>=20?tag('cr','Saida Forc.'):(o.gaiola&&o.total>0&&o.gaiola/o.total>0.6)?tag('cr','Gaiola crit.'):(o.qr_sem&&o.total>0&&o.qr_sem/o.total>0.6)?tag('w','QR dominante'):tag('w','Misto');
+    return '<tr><td>'+rn(i)+'</td><td>'+o.op+'</td><td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono">'+o.qr_sem+'</td><td class="tr mono">'+o.gaiola+'</td><td class="tr mono" style="color:'+(o.saida>=20?'var(--rd)':'inherit')+'">'+o.saida+'</td><td class="tr mono">'+o.div+'</td><td class="tc">'+perfil+'</td></tr>';
+  }).join('');
+
+  var sortMotRows = pk.sort.motivos.map(function(m) {
+    return '<tr><td>'+m[0]+'</td><td class="tr mono">'+m[1]+'</td><td class="tr mono">'+fmtPct(pk.sort.total>0?m[1]/pk.sort.total*100:0)+'</td></tr>';
+  }).join('');
+
+  var etOpsRows = pk.et.ops.map(function(o,i) {
+    var pct = o.total>0?Math.round(o.sem_pk/o.total*1000)/10:0;
+    return '<tr><td>'+rn(i)+'</td><td>'+o.op+'</td><td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono">'+o.sem_pk+'</td><td class="tr mono">'+o.com_pk+'</td><td class="tr mono">'+pct.toFixed(1)+'%</td><td class="tc">'+tag(pct>=80?'cr':'w',pct>=80?'Critico':'Alto')+'</td></tr>';
+  }).join('');
+
+  // ── ADUANA ──
+  var cadeiaRows = aduana.cadeia.map(function(m) {
+    var y='<td class="tc" style="color:var(--rd)">&#10003;</td>', n='<td class="tc">&mdash;</td>';
+    return '<tr><td class="mono">'+m.id+'</td><td class="tc"><strong style="color:'+(m.score>=4?'var(--rd)':'var(--or)')+'">'+m.score+'</strong></td>'+(m.falt?y:n)+(m.bpp?y:n)+(m.sort?y:n)+(m.et?y:n)+(m.desloc?y:n)+'<td style="font-size:10px">'+m.mlp+'</td></tr>';
+  }).join('');
+
+  var adMlpRows = aduana.mlp.map(function(m,i) {
+    var pclr = m.pctFalt>=30?'var(--rd)':m.pctFalt>=15?'var(--or)':'inherit';
+    return '<tr><td>'+rn(i)+'</td><td>'+m.mlp+'</td><td class="tr mono">'+m.total+'</td><td class="tr mono" style="color:'+pclr+'">'+m.falt+'</td><td class="tr mono" style="color:'+pclr+'">'+fmtPct(m.pctFalt)+'</td><td class="tr mono">'+m.bpp+'</td><td class="tr mono">'+m.sort+'</td><td class="tr mono">'+m.desloc+'</td></tr>';
+  }).join('');
+
+  var adUsVolRows = aduana.users.slice(0,10).map(function(u,i) {
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td><td class="tr mono">'+u.total+'</td><td class="tr mono">'+u.falt+'</td><td class="tr mono">'+u.sort+'</td><td class="tr mono" style="font-family:\'JetBrains Mono\',monospace;font-size:10px">'+(u.total>0?Math.round(u.score/u.total*100)/100:0)+'</td></tr>';
+  }).join('');
+
+  var adUsFaltArr = aduana.users.filter(function(u){return u.total>=10;}).slice(0).sort(function(a,b){return b.pctFalt-a.pctFalt;}).slice(0,10);
+  var adUsFaltRows = adUsFaltArr.map(function(u,i) {
+    var pclr = u.pctFalt>=30?'var(--rd)':u.pctFalt>=15?'var(--or)':'inherit';
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td><td class="tr mono">'+u.total+'</td><td class="tr mono" style="color:'+pclr+'">'+u.falt+'</td><td class="tr mono" style="color:'+pclr+'">'+fmtPct(u.pctFalt)+'</td><td class="tr mono">'+u.bpp+'</td><td class="tc">'+tag(u.pctFalt>=30?'cr':u.pctFalt>=15?'w':'ok',u.pctFalt>=30?'Alto':u.pctFalt>=15?'Medio':'Baixo')+'</td></tr>';
+  }).join('');
+
+  // ── RESUMO KPIs e ABERTURA ──
+  var bppChg = bpp.tend.length>1?((bpp.tend[bpp.tend.length-1].pct-bpp.tend[bpp.tend.length-2].pct)/bpp.tend[bpp.tend.length-2].pct*100):null;
+  var bppPrevPct = bpp.tend.length>1?bpp.tend[bpp.tend.length-2].pct:null;
+
+  var topAdFalt2 = aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0];
+
+  // ── MONTAR HTML FINAL ──
+  var html = '\
+<div class="sticky-top">\
+  <div class="header">\
+    <div class="hbrand"><div class="logo">ML</div><div><div class="bname">'+cfg.svc+' \xb7 '+cfg.svcName+'</div><div class="bsub">Demonstrativo Semanal de Invent\xe1rio</div></div></div>\
+    <div class="hinfo">\
+      <div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>\
+      <div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>\
+      <div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>\
+      <div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtPct(bpp.pct)+'</div></div>\
+    </div>\
+    <div class="hright"><span class="wchip">'+cfg.week+'</span><span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span><button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button></div>\
+  </div>\
+  <div class="nav">\
+    <button class="nb active" onclick="showTab(\'resumo\',this)">\ud83d\udcca Resumo</button>\
+    <button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>\
+    <button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>\
+    <button class="nb" onclick="showTab(\'bpp\',this)">\ud83d\udcb8 BPP</button>\
+    <button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>\
+    <button class="nb" onclick="showTab(\'aduana\',this)">\ud83d\udd17 Aduanas</button>\
+  </div>\
+</div>\
+<div class="content">\
+\
+<!-- RESUMO -->\
+<div id="resumo" class="tab active">\
+  <div class="sh"><div><div class="st">Resumo Executivo \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</div></div></div>\
+  <div style="background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:12px;">\
+    <div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">\ud83d\udccb Abertura de Reuni\xe3o \u2014 '+cfg.svc+' '+cfg.week+'</div>\
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+      <div style="display:flex;flex-direction:column;gap:10px;">\
+        <div style="background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;">\
+          <div style="font-size:9px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u2705 Destaques positivos</div>\
+          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">'+fmtPct(desloc.pct)+'</strong> '+(desloc.pct<=5?'dentro da meta':'acima da meta')+', com <strong style="color:var(--gn)">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</strong> de corre\xe7\xe3o no turno.'+(bppChg!==null&&bppChg<0?' BPP Bruto caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior &mdash; de '+fmtPct(bppPrevPct)+' para <strong style="color:var(--y)">'+fmtPct(bpp.pct)+'</strong>.':'')+'</p>\
+        </div>\
+        <div style="background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;">\
+          <div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u26a0\ufe0f Alerta operacional</div>\
+          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Poka Yoke com <strong style="color:var(--rd)">'+(pk.sort.total+pk.et.total).toLocaleString()+'</strong> erros na semana &mdash; '+pk.sort.total.toLocaleString()+' no sorting e '+pk.et.total.toLocaleString()+' na etiquetagem. Ra\xedz operacional confirmada no cruzamento com aduanas.</p>\
+        </div>\
+      </div>\
+      <div style="background:rgba(52,131,250,.07);border:1px solid rgba(52,131,250,.25);border-radius:6px;padding:10px 12px;">\
+        <div style="font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\ud83d\udd17 Oportunidade \u2014 Aduanas '+cfg.week+'</div>\
+        <p style="font-size:11.5px;line-height:1.75;color:var(--tm);margin-bottom:8px;">Auditamos <strong style="color:var(--tx)">'+aduana.total.toLocaleString()+'</strong> IDs nas aduanas. <strong style="color:var(--rd)">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</strong> apresentaram ao menos uma falha correlata.</p>\
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">\
+          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+aduana.cadeia.length+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia &ge;3 processos</div></div>\
+          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+aduana.faltBpp+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP gerado</div></div>\
+          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+(aduana.mlp[0]?fmtPct(aduana.mlp[0].pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">'+(aduana.mlp[0]?aduana.mlp[0].mlp:'--')+' maior faltante</div></div>\
+          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+(topAdFalt2?fmtPct(topAdFalt2.pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior taxa faltante (op.)</div></div>\
+        </div>\
+        <p style="font-size:10.5px;color:var(--td);">Detalhe completo na aba <strong style="color:var(--bl)">\ud83d\udd17 Aduanas</strong>.</p>\
+      </div>\
+    </div>\
+  </div>\
+  <div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta \u2014 ponto de aten\xe7\xe3o priorit\xe1rio</div><div class="ab">Accuracy <strong>com POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>\
+  <div class="kr" style="grid-template-columns:repeat(4,1fr);">\
+    <div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=80?'ok':'cr',acc.geral>=80?'OK':'Abaixo da meta')+'</div>\
+    <div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>\
+    <div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'Dentro da meta':'Acima da meta')+'</div>\
+    <div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtPct(bpp.pct)+'</div><div class="km">Cashout / GMV \xb7 '+(bppChg!==null?(bppChg<0?'v -'+Math.abs(bppChg).toFixed(1)+'% vs ant.':'^  +'+bppChg.toFixed(1)+'% vs ant.'):cfg.week)+'</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>\
+  </div>\
+</div>\
+\
+<!-- ACURACIA -->\
+<div id="accuracy" class="tab">\
+  <div class="sh"><div><div class="st">Acur\xe1cia \u2014 Resultado Di\xe1rio</div><div class="ss">'+acc.totalInv.toLocaleString()+' inventariados \xb7 '+acc.totalFalt.toLocaleString()+' faltantes \xb7 '+cfg.week+'</div></div>'+btnExp('accuracy')+'</div>\
+  <div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Por que a accuracy geral ('+acc.geral.toFixed(1)+'%) difere da m\xe9dia visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>'+acc.totalInv.toLocaleString()+' \xf7 ('+acc.totalInv.toLocaleString()+' + '+acc.totalFalt.toLocaleString()+') = '+acc.geral.toFixed(1)+'%</strong>. O primeiro dia tem volume inventariado muito maior, elevando a m\xe9dia ponderada.</div></div></div>\
+  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 % Accuracy Di\xe1ria \u2014 '+cfg.week+'</span><span class="chart-note">Inventariado Planificado &divide; (Inventariado + Faltante) \xb7 Base2</span></div><div class="chart-body"><canvas id="cAcc"></canvas></div>\
+  <div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>% Accuracy</div><div class="leg"><div class="leg-dot" style="background:var(--rd);border-radius:2px;width:14px;height:2px;"></div>Meta 80%</div><div class="leg"><div class="leg-dot" style="background:var(--or);border-radius:2px;width:14px;height:2px;"></div>Geral '+acc.geral.toFixed(1)+'%</div></div>\
+  <div style="padding:0 14px 12px"><table class="dsumm"><'+accDayHead+accInvRow+accFaltRow+accPctRow+accMetaRow+'</tbody></table></div></div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">Faltantes por Zona</span><span class="cc">'+acc.totalFalt.toLocaleString()+' total</span></div><table><thead><tr><th>Zona</th><th class="tr">Volume</th><th class="tr">%</th><th class="tc">Status</th></tr></thead><tbody>'+zonaRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">A\xe7\xf5es \u2014 Acur\xe1cia '+cfg.week+'</span></div><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Contagem emergencial nas zonas cr\xedticas (PS / For Returns)</div><div class="adesc">Designar operador fixo para bipar cada pacote na entrada. Validar via Query3.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div><div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Acionar TechOps para pacotes com erro sist\xeamico</div><div class="adesc">N\xe3o contabilizar como perda operacional. Abrir ticket com IDs.</div><div class="ameta"><span class="achip">Prazo: D+3</span></div></div></div></div></div>\
+  </div>\
+</div>\
+\
+<!-- DESLOCADOS -->\
+<div id="deslocados" class="tab">\
+  <div class="sh"><div><div class="st">Deslocados \u2014 Resultado Di\xe1rio</div><div class="ss">'+desloc.total.toLocaleString()+' pacotes fora da zona \xb7 Meta &le;5% \xb7 '+cfg.week+'</div></div>'+btnExp('deslocados')+'</div>\
+  <div class="kr">\
+    <div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'OK':'Acima da meta')+'</div>\
+    <div class="kc cb"><div class="kl">Total</div><div class="kv b">'+desloc.total.toLocaleString()+'</div></div>\
+    <div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>\
+    <div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>\
+  </div>\
+  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Deslocados por Dia \u2014 '+cfg.week+'</span></div><div class="chart-body"><canvas id="cDes"></canvas></div></div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">Top Fluxos</span></div><table><thead><tr><th>#</th><th>Fluxo</th><th class="tr">Volume</th></tr></thead><tbody>'+fluxoRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">N\xe3o Cor.</th><th class="tr">% N/C</th></tr></thead><tbody>'+desOpRows+'</tbody></table></div>\
+  </div>\
+  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Corrigir '+desloc.naoCorrigidos+' deslocados pendentes + refor\xe7ar passagem de turno fim de semana</div><div class="adesc">Priorizar operadores com maior % de n\xe3o corre\xe7\xe3o. Feedback 1:1 com l\xedder.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div></div></div>\
+</div>\
+\
+<!-- BPP -->\
+<div id="bpp" class="tab">\
+  <div class="sh"><div><div class="st">BPP \u2014 % Bruto + Tend\xeancia</div><div class="ss">% BPP = Cashout USD &divide; GMV USD \xb7 '+cfg.week+'</div></div>'+btnExp('bpp')+'</div>\
+  <div class="trow">'+tendCards+'</div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">MLP \u2014 % BPP Bruto '+cfg.week+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th><th class="tr">% Lost</th><th class="tr">% Dmg</th></tr></thead><tbody>'+mlpRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">Classifica\xe7\xe3o '+cfg.week+'</span><span class="cc">'+bpp.total.toLocaleString()+' ocorr\xeancias</span></div><table><thead><tr><th>Tipo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+tipoRows+'</tbody></table></div>\
+  </div>\
+  <div class="sub-sh"><span class="sub-title">\ud83d\udc64 Top 3 Drivers por Transportadora</span></div>\
+  <div class="card"><div class="ch"><span class="ct">Drivers Ofensores \u2014 '+cfg.week+'</span><span class="cc">Node ID \xb7 Tramo \xb7 Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Lost</th><th class="tr">Dmg</th><th class="tr">PNR</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody>'+driverRows+'</tbody></table></div>\
+  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reuni\xe3o com MLP de maior % BPP + acionamento LP para drivers com alto cashout</div><div class="adesc">Acionar LP para cashout &gt;USD 100 (WI). Verificar drivers blocked gerando BPP.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div></div></div>\
+</div>\
+\
+<!-- POKA YOKE -->\
+<div id="pokayoke" class="tab">\
+  <div class="sh"><div><div class="st">Poka Yoke \u2014 Etiquetagem + Sorting \xb7 '+cfg.week+'</div><div class="ss">Total: '+(pk.sort.total+pk.et.total).toLocaleString()+' erros</div></div>'+btnExp('pokayoke')+'</div>\
+  <div class="kr">\
+    <div class="kc cr"><div class="kl">Total</div><div class="kv r">'+(pk.sort.total+pk.et.total).toLocaleString()+'</div></div>\
+    <div class="kc co"><div class="kl">Etiquetagem</div><div class="kv o">'+pk.et.total.toLocaleString()+'</div><div class="km">'+pk.et.ops.length+' operadores</div></div>\
+    <div class="kc cr"><div class="kl">Sorting</div><div class="kv r">'+pk.sort.total.toLocaleString()+'</div><div class="km">'+pk.sort.ops.length+' operadores</div></div>\
+  </div>\
+  <div class="sub-sh"><span class="sub-title">\ud83d\udce6 Sorting</span></div>\
+  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Erros de Sorting por Dia</span></div><div class="chart-body"><canvas id="cSort"></canvas></div>\
+  <div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--rd)"></div>QR s/ PK</div><div class="leg"><div class="leg-dot" style="background:var(--or)"></div>Gaiola Errada</div><div class="leg"><div class="leg-dot" style="background:var(--y)"></div>Sa\xedda For\xe7ada</div></div></div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">Motivos</span></div><table><thead><tr><th>Motivo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+sortMotRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores \u2014 Sorting</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">QR s/PK</th><th class="tr">Gaiola</th><th class="tr">Sa\xedda F.</th><th class="tr">Pac.Div.</th><th class="tc">Perfil</th></tr></thead><tbody>'+sortOpsRows+'</tbody></table></div>\
+  </div>\
+  <div class="divider"></div>\
+  <div class="sub-sh"><span class="sub-title">\ud83c\udff7\ufe0f Etiquetagem</span><span class="sub-badge">'+pk.et.total.toLocaleString()+' IDs \xfanicos</span></div>\
+  <div class="alert w"><div class="ai">\u26a0\ufe0f</div><div><div class="at">Distribui\xe7\xe3o di\xe1ria limitada</div><div class="ab">Coluna Hora com formato inconsistente. Total semanal confi\xe1vel. Para di\xe1rio, consultar Looker PK.</div></div></div>\
+  <div class="card"><div class="ch"><span class="ct">Top 20 Operadores \u2014 Etiquetagem</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">IDs \xfanicos</th><th class="tr">Sem Cob.</th><th class="tr">Com Cob.</th><th class="tr">% Sem Cob.</th><th class="tc">N\xedvel</th></tr></thead><tbody>'+etOpsRows+'</tbody></table></div>\
+  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reciclagem \u2014 sorting (sa\xeddas for\xe7adas) + etiquetagem (sem cobertura PK)</div><div class="adesc">Priorizar reincidentes. Sa\xedda for\xe7ada = risco disciplinar imediato.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div><div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Mapear pontos sem cobertura PK e acionar TechOps/Infra</div><div class="ameta"><span class="achip">Prazo: D+3</span></div></div></div></div></div>\
+</div>\
+\
+<!-- ADUANAS -->\
+<div id="aduana" class="tab">\
+  <div class="sh"><div><div class="st">Aduanas \u2014 Correla\xe7\xe3o com Processos</div><div class="ss">'+aduana.total.toLocaleString()+' IDs auditados \xb7 '+cfg.week+'</div></div>'+btnExp('aduana')+'</div>\
+  <div class="kr">\
+    <div class="kc cb"><div class="kl">IDs Auditados</div><div class="kv b">'+aduana.total.toLocaleString()+'</div></div>\
+    <div class="kc cg"><div class="kl">Sem rastro de falha</div><div class="kv g">'+(aduana.total-aduana.comFalha).toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?(aduana.total-aduana.comFalha)/aduana.total*100:0)+'</div></div>\
+    <div class="kc co"><div class="kl">Com &ge;1 falha correlata</div><div class="kv o">'+aduana.comFalha.toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</div></div>\
+    <div class="kc cr"><div class="kl">Cadeia &ge;3 processos</div><div class="kv r">'+aduana.cadeia.length+'</div></div>\
+    <div class="kc cr"><div class="kl">Faltante + BPP</div><div class="kv r">'+aduana.faltBpp+'</div><div class="km">Perdido E ressarcido</div></div>\
+    <div class="kc co"><div class="kl">Faltante + PK</div><div class="kv o">'+aduana.faltPk+'</div><div class="km">Ra\xedz operacional confirmada</div></div>\
+  </div>\
+  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Aduanas por Dia \u2014 Volume + % Faltante</span></div><div class="chart-body"><canvas id="cAdDia"></canvas></div></div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">Aduana por MLP</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tr">Sort.PK</th><th class="tr">Desloc.</th></tr></thead><tbody>'+adMlpRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">Cadeia de Falha (Score &ge;3)</span></div><table><thead><tr><th>ID Pacote</th><th class="tc">Score</th><th class="tc">Falt</th><th class="tc">BPP</th><th class="tc">Sort</th><th class="tc">Etiq</th><th class="tc">Desl</th><th>MLP</th></tr></thead><tbody>'+cadeiaRows+'</tbody></table></div>\
+  </div>\
+  <div class="g2">\
+    <div class="card"><div class="ch"><span class="ct">Para MAIS \u2014 Maior Volume</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">Sort.PK</th><th class="tr">Score/ID</th></tr></thead><tbody>'+adUsVolRows+'</tbody></table></div>\
+    <div class="card"><div class="ch"><span class="ct">Para MENOS \u2014 Maior % Faltante</span><span class="cc">&ge;10 aduanas</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tc">Risco</th></tr></thead><tbody>'+adUsFaltRows+'</tbody></table></div>\
+  </div>\
+  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha \u2014 verificar '+aduana.faltBpp+' com faltante + BPP</div><div class="adesc">Risco de BPP pago indevidamente. Acionar LP.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Feedback para operadores com alta taxa de faltante na bipagem (Para MENOS)</div><div class="adesc">Taxa elevada indica bipagem sem confer\xeancia f\xedsica. Confrontar com ROTA_LOG.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div></div></div>\
+</div>\
+\
+</div>\
+<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
+
+  document.getElementById('demoScreen').innerHTML = html;
+  document.getElementById('uploadScreen').style.display = 'none';
+  document.getElementById('demoScreen').style.display = 'block';
+  setTimeout(function() {
+    showTab('resumo', document.querySelector('.nb'));
+    drawAllCharts();
+  }, 80);
 }
 
-function stackedBar(id,datasets,labels,maxV){
-  const s=setupCanvas(id,130);if(!s)return;
-  const{ctx,W,H}=s,pad={t:18,r:12,b:22,l:44};
-  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b,n=labels.length,gap=cw/n,bw=gap*0.6;
-  const totals=labels.map((_,i)=>datasets.reduce((s,d)=>s+Math.max(0,d.data[i]||0),0));
-  const mx=maxV||Math.max(...totals)*1.18;
-  drawGrid(ctx,pad,W,H,mx,4,null);
-  labels.forEach((l,i)=>{
-    const x=pad.l+i*gap+(gap-bw)/2;let base=pad.t+ch;
-    datasets.forEach(ds=>{
-      const v=Math.max(0,ds.data[i]||0);if(v===0)return;
-      const bh=ch*(v/mx);base-=bh;
-      ctx.fillStyle=ds.color;ctx.beginPath();ctx.rect(x,base,bw,bh);ctx.fill();
+
+// ── CHARTS ──────────────────────────────────
+function drawAllCharts() {
+  if (!D) return;
+  var acc = D.acc, desloc = D.desloc, bpp = D.bpp, pk = D.pk, aduana = D.aduana;
+
+  // Accuracy
+  var dL = acc.days.map(function(d){ return d.label; });
+  var dAcc = acc.days.map(function(d){ return d.acc; });
+  lineChart('cAcc', dL, dAcc, cv('--bl'), 'rgba(52,131,250,0.08)',
+    [{val:80,color:cv('--rd'),label:'Meta 80%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
+    55, 95, function(v){ return v.toFixed(1)+'%'; });
+
+  // Deslocados — barras simples com % por dia
+  (function(){
+    var s = setupCanvas('cDes', 130); if(!s) return;
+    var ctx=s.ctx, W=s.W, H=s.H, pad={t:16,r:12,b:22,l:44};
+    var cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+    var arr = desloc.byDay;
+    if (!arr || arr.length===0) return;
+    var n = arr.length, gap = cw/n, bw = gap*0.55;
+    var maxV = 20;
+    grid(ctx,pad,W,H,maxV,4,function(v){ return v.toFixed(0)+'%'; });
+    // linha meta 5%
+    var gy = pad.t + ch*(1-5/maxV);
+    ctx.strokeStyle=cv('--or'); ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(W-pad.r,gy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=cv('--or'); ctx.font='bold 9px Inter'; ctx.textAlign='left';
+    ctx.fillText('Meta 5%', pad.l+4, gy-3);
+    arr.forEach(function(d,i) {
+      var inv = acc.days[i] ? acc.days[i].inv : 1;
+      var pct = inv>0 ? d.total/inv*100 : 0;
+      var x = pad.l+i*gap+(gap-bw)/2;
+      var bh = ch*(Math.min(pct,maxV)/maxV);
+      ctx.fillStyle = pct>5?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
+      ctx.beginPath(); ctx.rect(x,pad.t+ch-bh,bw,bh); ctx.fill();
+      ctx.fillStyle=cv('--tx'); ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+      ctx.fillText(pct.toFixed(1)+'%',x+bw/2,pad.t+ch-bh-3);
+      // nc
+      var ncPct = d.total>0?d.nc/d.total*100:0;
+      if (ncPct>0) {
+        ctx.fillStyle='rgba(232,168,56,0.8)';
+        ctx.font='8px JetBrains Mono'; ctx.fillText(ncPct.toFixed(0)+'%nc',x+bw/2,pad.t+ch-bh-13);
+      }
     });
-    const tot=totals[i],topY=pad.t+ch*(1-tot/mx);
-    ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-    ctx.fillText(tot,x+bw/2,topY-3);
-  });
-  drawXLabels(ctx,labels,pad,W,H);
+    xlabels(ctx,arr.map(function(d){ return d.dt.slice(5).replace('-','/'); }),pad,W,H);
+  })();
+
+  // Sorting stacked
+  (function(){
+    var dayKeys = Object.keys(pk.sort.byDay).sort();
+    if (dayKeys.length===0) return;
+    var labels = dayKeys.map(function(k){ return k.slice(5).replace('-','/'); });
+    var ds = [
+      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].qr_sem||0; }), color:'rgba(248,81,73,0.85)'},
+      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].gaiola||0; }), color:'rgba(232,168,56,0.85)'},
+      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].saida||0; }), color:'rgba(255,230,0,0.75)'}
+    ];
+    stackedBar('cSort', ds, labels);
+  })();
+
+  // Aduanas — dual (barras volume + linha % faltante)
+  (function(){
+    var arr = aduana.byDay;
+    if (!arr || arr.length===0) return;
+    var s = setupCanvas('cAdDia', 130); if(!s) return;
+    var ctx=s.ctx, W=s.W, H=s.H, pad={t:16,r:40,b:22,l:44};
+    var cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+    var n=arr.length, gap=cw/n, bw=gap*0.55;
+    var maxBar = Math.max.apply(null, arr.map(function(d){ return d.total; }))*1.2;
+    var maxLine = 35;
+    grid(ctx,pad,W,H,maxBar,4,null);
+    arr.forEach(function(d,i) {
+      var x=pad.l+i*gap+(gap-bw)/2, bh=ch*(d.total/maxBar);
+      ctx.fillStyle='rgba(52,131,250,0.6)'; ctx.beginPath(); ctx.rect(x,pad.t+ch-bh,bw,bh); ctx.fill();
+      ctx.fillStyle=cv('--tx'); ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+      ctx.fillText(d.total,x+bw/2,pad.t+ch-bh-3);
+    });
+    ctx.strokeStyle=cv('--rd'); ctx.lineWidth=2; ctx.setLineDash([]); ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    arr.forEach(function(d,i) {
+      var x=pad.l+i*gap+gap/2, y=pad.t+ch*(1-d.pctFalt/maxLine);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    arr.forEach(function(d,i) {
+      var x=pad.l+i*gap+gap/2, y=pad.t+ch*(1-d.pctFalt/maxLine);
+      var c=d.pctFalt>=20?cv('--rd'):d.pctFalt>=10?cv('--or'):cv('--gn');
+      ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=c; ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+      ctx.fillText(d.pctFalt.toFixed(1)+'%',x,y-6);
+    });
+    ctx.fillStyle=cv('--td'); ctx.font='9px Inter'; ctx.textAlign='left';
+    ctx.fillText('% falt',W-pad.r+3,pad.t+10);
+    xlabels(ctx,arr.map(function(d){ return d.dt.slice(5).replace('-','/'); }),pad,W,H);
+  })();
 }
 
-function dualChart(id,labels,bars,barColor,line,lineColor,maxBar,maxLine){
-  const s=setupCanvas(id,130);if(!s)return;
-  const{ctx,W,H}=s,pad={t:16,r:40,b:22,l:44};
-  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b,n=labels.length,gap=cw/n,bw=gap*0.55;
-  drawGrid(ctx,pad,W,H,maxBar,4,null);
-  bars.forEach((v,i)=>{
-    const x=pad.l+i*gap+(gap-bw)/2,bh=ch*(v/maxBar);
-    ctx.fillStyle=barColor;ctx.beginPath();ctx.rect(x,pad.t+ch-bh,bw,bh);ctx.fill();
-    ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-    ctx.fillText(v,x+bw/2,pad.t+ch-bh-3);
-  });
-  ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
-  ctx.beginPath();
-  line.forEach((v,i)=>{
-    const x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-v/maxLine);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  line.forEach((v,i)=>{
-    const x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-v/maxLine);
-    ctx.fillStyle=v>=20?cv('--rd'):v>=10?cv('--or'):cv('--gn');
-    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=v>=20?cv('--rd'):v>=10?cv('--or'):cv('--tx');
-    ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-    ctx.fillText(parseFloat(v).toFixed(1)+'%',x,y-6);
-  });
-  ctx.fillStyle=cv('--td');ctx.font='9px Inter';ctx.textAlign='left';
-  ctx.fillText('% falt',W-pad.r+3,pad.t+10);
-  drawXLabels(ctx,labels,pad,W,H);
-}
+var _resizeTimer;
+window.addEventListener('resize', function(){ clearTimeout(_resizeTimer); _resizeTimer=setTimeout(drawAllCharts,150); });
 
-function drawAllCharts(){
-  if(!D.acc) return;
-  const days=D.acc.days;
-  const dL=days.map(d=>d.label);
-  const dAcc=days.map(d=>parseFloat(d.acc.toFixed(1)));
-  const accG=parseFloat(D.acc.geral.toFixed(1));
-
-  lineChart('cAcc',dL,dAcc,cv('--bl'),'rgba(52,131,250,0.08)',
-    [{val:80,color:cv('--rd'),label:'Meta 80%'},{val:accG,color:cv('--or'),label:'Geral '+accG+'%'}],
-    55,95,v=>v.toFixed(1)+'%');
-
-  // Sorting
-  const sortDays=Object.entries(D.pk.sort.byDay).sort((a,b)=>a[0].localeCompare(b[0]));
-  stackedBar('cSort',[
-    {data:sortDays.map(([,v])=>v.qr_sem),color:'rgba(248,81,73,0.85)'},
-    {data:sortDays.map(([,v])=>v.gaiola),color:'rgba(232,168,56,0.85)'},
-    {data:sortDays.map(([,v])=>v.saida),color:'rgba(255,230,0,0.75)'},
-  ],sortDays.map(([d])=>d.slice(5).replace('-','/')));
-
-  // Aduanas
-  const adDays=Object.entries(D.aduana.byDay).sort((a,b)=>a[0].localeCompare(b[0]));
-  dualChart('cAdDia',
-    adDays.map(([d])=>d.slice(5).replace('-','/')),
-    adDays.map(([,v])=>v.total),'rgba(52,131,250,0.6)',
-    adDays.map(([,v])=>v.total>0?parseFloat((v.falt/v.total*100).toFixed(1)):0),
-    cv('--rd'),
-    Math.max(...adDays.map(([,v])=>v.total))*1.2,35);
-}
-
-let rt;
-window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(drawAllCharts,150);});
 </script>
-</head>
-<body>
-
-<div id="loadingOverlay">
-  <div class="load-spinner"></div>
-  <div class="load-text">Processando bases de dados...</div>
-  <div class="load-step" id="loadStep">Aguarde</div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     TELA DE UPLOAD
-══════════════════════════════════════════ -->
-<div id="uploadScreen">
-  <div class="up-wrap">
-    <div class="up-logo">
-      <div class="up-logobox">ML</div>
-      <div>
-        <div class="up-title">Demonstrativo Semanal de Inventário</div>
-        <div class="up-sub">Carregue os arquivos da semana para gerar o relatório</div>
-      </div>
-    </div>
-
-    <div class="up-card">
-      <!-- SEMANA E SVC -->
-      <div class="up-section">Configuração da semana</div>
-      <div class="up-week">
-        <div class="up-field">
-          <label>SVC</label>
-          <input type="text" id="cfgSvc" value="SSP15" placeholder="Ex: SSP15">
-        </div>
-        <div class="up-field">
-          <label>Nome do SVC</label>
-          <input type="text" id="cfgSvcName" value="Santos" placeholder="Ex: Santos">
-        </div>
-        <div class="up-field">
-          <label>Semana (W)</label>
-          <input type="text" id="cfgWeek" value="W32" placeholder="Ex: W32">
-        </div>
-        <div class="up-field">
-          <label>Data início</label>
-          <input type="date" id="cfgDateStart" value="2026-08-02">
-        </div>
-        <div class="up-field">
-          <label>Data fim</label>
-          <input type="date" id="cfgDateEnd" value="2026-08-08">
-        </div>
-        <div class="up-field">
-          <label>Semana BPP (código)</label>
-          <input type="text" id="cfgBppWeek" value="2026-32" placeholder="Ex: 2026-32">
-        </div>
-      </div>
-
-      <!-- ARQUIVOS -->
-      <div class="up-section">Arquivos da semana</div>
-      <div class="up-grid">
-        <div class="up-item" id="item-base2">
-          <input type="file" accept=".csv" onchange="loadFile('base2',this)">
-          <div class="up-name">🎯 Base 2 — Inventário</div>
-          <div class="up-desc">BASE_2_INVENTARIO_SVC_Wxx.csv</div>
-          <span class="up-status" id="st-base2">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-falt">
-          <input type="file" accept=".csv" onchange="loadFile('falt',this)">
-          <div class="up-name">📋 Waterfall Faltantes</div>
-          <div class="up-desc">CONTEOS_INVENTORY_LATAM_ACCURACY_Wxx.csv</div>
-          <span class="up-status" id="st-falt">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-desloc">
-          <input type="file" accept=".csv" onchange="loadFile('desloc',this)">
-          <div class="up-name">🔄 Deslocados</div>
-          <div class="up-desc">Deslocados_SVC_Wxx.csv</div>
-          <span class="up-status" id="st-desloc">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-bpp">
-          <input type="file" accept=".csv" onchange="loadFile('bpp',this)">
-          <div class="up-name">💸 BPP 4 Semanas</div>
-          <div class="up-desc">BPP_SVC_ULTIMAS_4_SEMANAS.csv · sep=;</div>
-          <span class="up-status" id="st-bpp">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-et">
-          <input type="file" accept=".csv" onchange="loadFile('et',this)">
-          <div class="up-name">🏷️ PK Etiquetagem</div>
-          <div class="up-desc">Erros_Etiquetagem_Poka_Yoke_Wxx.csv</div>
-          <span class="up-status" id="st-et">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-sort">
-          <input type="file" accept=".csv" onchange="loadFile('sort',this)">
-          <div class="up-name">📦 PK Sorting</div>
-          <div class="up-desc">Erros_Sorting_Poka_Yoke_Wxx.csv</div>
-          <span class="up-status" id="st-sort">⬆ Aguardando</span>
-        </div>
-        <div class="up-item" id="item-aduana">
-          <input type="file" accept=".csv" onchange="loadFile('aduana',this)">
-          <div class="up-name">🔗 Aduanas</div>
-          <div class="up-desc">Aduanas_SVC_Wxx.csv</div>
-          <span class="up-status" id="st-aduana">⬆ Aguardando</span>
-        </div>
-      </div>
-
-      <!-- PROGRESS -->
-      <div class="up-progress">
-        <div class="up-pbar"><div class="up-pfill" id="upProgress"></div></div>
-        <div class="up-plabel" id="upLabel">0 de 7 arquivos carregados</div>
-      </div>
-
-      <button class="btn-go" id="btnGo" onclick="gerarDemo()" id="btnGo" disabled disabled>
-        ⚡ Gerar Demonstrativo
-      </button>
-      <div class="up-note">Os arquivos são processados localmente no seu navegador — nenhum dado é enviado a servidores.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     TELA DO DEMONSTRATIVO (gerada pelo JS)
-══════════════════════════════════════════ -->
-<div id="demoScreen"></div>
-
-
-
 </body>
 </html>
