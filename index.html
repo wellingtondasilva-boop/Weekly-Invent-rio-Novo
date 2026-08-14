@@ -711,7 +711,7 @@ function exportAcoes(aba) {
     ],
     bpp: [
       ['BPP','Reuniao com MLP de maior % BPP Bruto + acionamento LP para drivers com alto cashout','','','','Em andamento','','Acionar LP para cashout >USD 100 (WI). Verificar drivers blocked.'],
-      topMlp ? ['BPP','Reuniao de desempenho — ' + topMlp.mlp + ' (' + (topMlp.pct ? topMlp.pct.toFixed(2) : '?') + '% BPP)','','','','Em andamento','','Top MLP ' + cfg.week + '. Cashout USD ' + fmtN(topMlp.cashout) + '.'] : null
+      topMlp ? ['BPP','Reuniao de desempenho — ' + topMlp.mlp + ' (' + (topMlp.pct ? topMlp.pct.toFixed(3) : '?') + '% BPP)','','','','Em andamento','','Top MLP ' + cfg.week + '. Cashout USD ' + fmtN(topMlp.cashout) + '.'] : null
     ].filter(Boolean),
     pokayoke: [
       ['POKA YOKE - Sorting','Reciclagem critica — saidas forcadas + QR sem cobertura + gaiola errada','','','','Em andamento','','Top ofensor sorting: ' + (topSort ? topSort.op : '-') + ' (' + (topSort ? topSort.total : 0) + ' erros). Saida forcada = risco disciplinar.'],
@@ -768,6 +768,7 @@ function resetDemo() {
 
 // ── HELPERS DE FORMATAÇÃO ────────────────────
 function fmtPct(n) { return typeof n==='number' ? n.toFixed(1)+'%' : '--'; }
+function fmtBpp(n) { return typeof n==='number' ? n.toFixed(3)+'%' : '--'; }
 function fmtN(n) { return typeof n==='number' ? n.toLocaleString('pt-BR',{maximumFractionDigits:2}) : '--'; }
 function clrAcc(v) { return v>=80 ? 'var(--gn)' : v>=70 ? 'var(--or)' : 'var(--rd)'; }
 function clrPct(v,ok,warn) { return v<=ok ? 'var(--gn)' : v<=warn ? 'var(--or)' : 'var(--rd)'; }
@@ -840,12 +841,12 @@ function renderDemo() {
     var chg = prev&&prev.pct>0?((t.pct-prev.pct)/prev.pct*100):null;
     var chgTxt = chg!==null?(chg<0?'<span style="color:var(--gn)">v -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">^ +'+chg.toFixed(1)+'%</span>'):'&mdash;';
     var vclr = t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
-    return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtPct(t.pct)+'</div><div class="ts2">Cashout/GMV</div><div class="td2">'+chgTxt+'</div></div>';
+    return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout/GMV</div><div class="td2">'+chgTxt+'</div></div>';
   }).join('');
 
   var mlpRows = bpp.mlpList.map(function(m,i) {
     var pclr = m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
-    var pctS = m.pct!==null?fmtPct(m.pct):'N/A';
+    var pctS = m.pct!==null?fmtBpp(m.pct):'N/A';
     return '<tr'+(i<2?' class="'+(i===0?'rh':'wh')+'"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+pctS+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td><td class="tr mono">'+fmtPct(m.total>0?m.lost/m.total*100:0)+'</td><td class="tr mono">'+fmtPct(m.total>0?m.dmg/m.total*100:0)+'</td></tr>';
   }).join('');
 
@@ -912,7 +913,7 @@ function renderDemo() {
       <div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>\
       <div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>\
       <div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>\
-      <div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtPct(bpp.pct)+'</div></div>\
+      <div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.pct)+'</div></div>\
     </div>\
     <div class="hright"><span class="wchip">'+cfg.week+'</span><span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span><button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button></div>\
   </div>\
@@ -936,7 +937,7 @@ function renderDemo() {
       <div style="display:flex;flex-direction:column;gap:10px;">\
         <div style="background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;">\
           <div style="font-size:9px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u2705 Destaques positivos</div>\
-          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">'+fmtPct(desloc.pct)+'</strong> '+(desloc.pct<=5?'dentro da meta':'acima da meta')+', com <strong style="color:var(--gn)">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</strong> de corre\xe7\xe3o no turno.'+(bppChg!==null&&bppChg<0?' BPP Bruto caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior &mdash; de '+fmtPct(bppPrevPct)+' para <strong style="color:var(--y)">'+fmtPct(bpp.pct)+'</strong>.':'')+'</p>\
+          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">'+fmtPct(desloc.pct)+'</strong> '+(desloc.pct<=5?'dentro da meta':'acima da meta')+', com <strong style="color:var(--gn)">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</strong> de corre\xe7\xe3o no turno.'+(bppChg!==null&&bppChg<0?' BPP Bruto caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior &mdash; de '+fmtPct(bppPrevPct)+' para <strong style="color:var(--y)">'+fmtBpp(bpp.pct)+'</strong>.':'')+'</p>\
         </div>\
         <div style="background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;">\
           <div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u26a0\ufe0f Alerta operacional</div>\
@@ -961,7 +962,7 @@ function renderDemo() {
     <div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=80?'ok':'cr',acc.geral>=80?'OK':'Abaixo da meta')+'</div>\
     <div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>\
     <div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'Dentro da meta':'Acima da meta')+'</div>\
-    <div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtPct(bpp.pct)+'</div><div class="km">Cashout / GMV \xb7 '+(bppChg!==null?(bppChg<0?'v -'+Math.abs(bppChg).toFixed(1)+'% vs ant.':'^  +'+bppChg.toFixed(1)+'% vs ant.'):cfg.week)+'</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>\
+    <div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.pct)+'</div><div class="km">Cashout / GMV \xb7 '+(bppChg!==null?(bppChg<0?'v -'+Math.abs(bppChg).toFixed(1)+'% vs ant.':'^  +'+bppChg.toFixed(1)+'% vs ant.'):cfg.week)+'</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>\
   </div>\
 </div>\
 \
