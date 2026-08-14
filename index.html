@@ -365,6 +365,8 @@ function onFile(key, inp) {
 }
 
 function parseCSV(txt, sep) {
+  // Remover BOM UTF-8 se presente
+  if (txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1);
   var lines = txt.replace(/\r/g, '').split('\n');
   var rows = [];
   for (var i = 0; i < lines.length; i++) {
@@ -522,7 +524,7 @@ function calcBPP(cfg) {
     var r = rows[i];
     var wk = r['Values_Dates']||'';
     if (!wkAll[wk]) wkAll[wk] = {real:[],gmv:[]};
-    if (r['F_CLASIFICATION']===' Visualizar GMV') {
+    if (r['F_CLASIFICATION']==='Visualizar GMV') {
       wkAll[wk].gmv.push(r);
       if (wk === cfg.bppWeek) wkGmv.push(r);
     } else {
