@@ -67,6 +67,7 @@ body.day{--dk:#F0F2F5;--sf:#FFFFFF;--sf2:#F0F2F5;--sf3:#E1E4E8;--br:rgba(200,210
 .snb.damaged{--sc:var(--or)}.snb.damaged.active{background:var(--or);border-color:var(--or);color:#000}
 .snb.pnr{--sc:var(--pu)}.snb.pnr.active{background:var(--pu);border-color:var(--pu)}
 .snb.stolen{--sc:#FF6B6B}.snb.stolen.active{background:#FF6B6B;border-color:#FF6B6B}
+.snb.fraud{--sc:var(--pu)}.snb.fraud.active{background:var(--pu);border-color:var(--pu)}
 .snb.empty{--sc:var(--cy)}.snb.empty.active{background:var(--cy);border-color:var(--cy);color:#000}
 .snb.delayed{--sc:var(--td)}.snb.delayed.active{background:var(--td);border-color:var(--td)}
 .snb.dnr{--sc:#888}.snb.dnr.active{background:#888;border-color:#888}
@@ -508,19 +509,19 @@ function calcBPP(cfg){
   // Detectar coluna GMV
   for(var i=0;i<rows.length;i++){if(rows[i]['TOTALGMV']!==undefined){gmvCol='TOTALGMV';break;}if(rows[i]['TotalGMV (std)']!==undefined){gmvCol='TotalGMV (std)';break;}}
 
-  // Separar por semana e por tramo
+  // Separar por semana e por tramo — usando coluna Color Details
   var byWk={};
   for(var i=0;i<rows.length;i++){
     var r=rows[i]; var wk=r['Values_Dates']||'';
-    var lgRaw=(r['Clasificacion LG']||'').trim();
-    var isGmv=(lgRaw==='VISUALIZAR GMV'||lgRaw==='');
-    var tramo=isGmv?'GMV':lgRaw.split(' ')[0];
+    var cdRaw=(r['Color Details']||'').trim();
+    var isGmv=(cdRaw==='Visualizar GMV'||cdRaw===''||cdRaw==='VISUALIZAR GMV');
+    var tramo=isGmv?'GMV':cdRaw;
     if(!byWk[wk]) byWk[wk]={gmv:[],tramos:{}};
     if(isGmv){byWk[wk].gmv.push(r);}
     else{if(!byWk[wk].tramos[tramo]) byWk[wk].tramos[tramo]=[];byWk[wk].tramos[tramo].push(r);}
   }
 
-  var TRAMO_LIST=['LOST','DAMAGED','PNR','STOLEN','EMPTY','DELAYED','DNR'];
+  var TRAMO_LIST=['LOST','DAMAGED','FRAUD','STOLEN','DELAYED'];
   var wkCur=cfg.bppWeek;
   var wkData=byWk[wkCur]||{gmv:[],tramos:{}};
   var gmvRows=wkData.gmv;
@@ -761,6 +762,89 @@ function rotaChips(rotas){if(!rotas||rotas.length===0) return '<span style="colo
 function btnExp(aba){return '<button class="btn-export-aba" onclick="exportAcoes(\''+aba+'\')">&#128229; Exportar A&ccedil;&otilde;es</button>';}
 
 
+
+// ── AÇÕES POR TRAMO BPP ──────────────────────────────
+function tramoAcoes(tramo, td, cfg) {
+  var topMlp = td.mlpList.length > 0 ? td.mlpList[0] : null;
+  var topDrv = null;
+  if (topMlp && topMlp.top3 && topMlp.top3.length > 0) topDrv = topMlp.top3[0];
+
+  var mlpInfo = topMlp ? topMlp.mlp + ' (cashout USD ' + fmtN(topMlp.cashout) + ', ' + topMlp.total + ' ocorr.)' : '—';
+  var drvInfo = topDrv ? 'Driver ' + topDrv.id + ' — Node: ' + topDrv.node + ' — Tramo: ' + topDrv.tramo + ' — Status: ' + topDrv.status : '—';
+
+  var acoes = {
+    LOST: [
+      {p:'p1', titulo:'Acionar LP para pacotes Lost com cashout acumulado elevado — ' + mlpInfo,
+       desc:'Todo pacote Lost com cashout > USD 100 deve ter ticket LP aberto (WI obrigatória). Verificar se houve sinal de roubo ou falha operacional antes de baixar como Lost.',
+       prazo:'D+1', resp:'Analista BPP'},
+      {p:'p1', titulo:'Investigar drivers com recorrência de Lost — ' + drvInfo,
+       desc:'Driver com padrão recorrente de Lost pode indicar falso entregue, desvio de rota ou fraude. Cruzar com dados de GPS e assinatura do destinatário.',
+       prazo:'D+2', resp:'LP / Coord. MLP'},
+      {p:'p2', titulo:'Verificar pacotes Lost On Way — origem XD ou FBM não expediu',
+       desc:'Lost On Way pode indicar que o pacote nunca saiu da origem. Acionar XD/FBM para confirmação de expedição antes de gerar BPP Duplo.',
+       prazo:'D+3', resp:'Coord. Log.'}
+    ],
+    DAMAGED: [
+      {p:'p1', titulo:'Levantar causa raiz do Damaged — embalagem frágil x manuseio incorreto — ' + mlpInfo,
+       desc:'Distinguir Damaged Embalaje (falha de embalagem de origem) de Damaged On Route (manuseio do driver). Cada causa tem tratativa diferente: seller x MLP.',
+       prazo:'D+1', resp:'Analista BPP'},
+      {p:'p1', titulo:'Reunião com MLP com maior cashout Damaged — ' + mlpInfo,
+       desc:'Apresentar detalhamento por tipo (On Route x At Station x Embalaje). Exigir plano de ação com prazo. Registrar no sistema de parceiros.',
+       prazo:'D+2', resp:'Coord. MLP'},
+      {p:'p2', titulo:'Acionar recondicionamento para pacotes Damaged reaproveitáveis',
+       desc:'Pacote danificado que pode ser recondicionado deve retornar ao fluxo — não gerar BPP. Verificar com PS se o recondicionamento foi registrado no módulo.',
+       prazo:'D+2', resp:'Lider PS'}
+    ],
+    FRAUD: [
+      {p:'p1', titulo:'Acionar LP imediatamente para todos os casos de Fraud — ' + td.total + ' ocorrências na ' + cfg.week,
+       desc:'PNR (Pacote Não Recebido), Empty Box e DNR são categorias de fraude. Exigem acionamento imediato de LP independente do valor. Coletar evidências: foto, assinatura, GPS.',
+       prazo:'D+1', resp:'LP / Segurança'},
+      {p:'p1', titulo:'Investigar concentração de Fraud por driver — ' + drvInfo,
+       desc:'Padrão de PNR ou Empty Box no mesmo driver é sinal forte de fraude intencional. Solicitar bloqueio preventivo do driver enquanto LP investiga.',
+       prazo:'D+1', resp:'LP + Coord. MLP'},
+      {p:'p2', titulo:'Cruzar casos de Fraud com endereços e destinatários recorrentes',
+       desc:'Fraude pode ser organizada por ponto de entrega ou destinatário. Identificar padrões geográficos para acionamento de investigação mais ampla.',
+       prazo:'D+3', resp:'LP'}
+    ],
+    STOLEN: [
+      {p:'p1', titulo:'Acionar LP e Segurança Patrimonial para todos os casos Stolen — ' + td.total + ' ocorr. na ' + cfg.week,
+       desc:'Stolen On Route indica assalto ao driver ou desvio na entrega. Stolen ENE indica furto durante expedição. Ambos exigem BO e acionamento imediato de LP.',
+       prazo:'D+1', resp:'LP / Segurança'},
+      {p:'p1', titulo:'Verificar rotas com maior concentração de Stolen e avaliar suspensão temporária',
+       desc:'Rotas com recorrência de Stolen podem indicar área de risco. Avaliar redesenho de rota ou escolta até LP concluir investigação.',
+       prazo:'D+2', resp:'Coord. Rotas / LP'},
+      {p:'p2', titulo:'Auditar procedimento de handshake no place para rotas ofensoras',
+       desc:'Stolen em NEX pode indicar falha no handshake — pacote saiu do SVC mas não chegou ao place. Verificar QR de saída e confirmação do place.',
+       prazo:'D+3', resp:'Coord. NEX'}
+    ],
+    DELAYED: [
+      {p:'p1', titulo:'Verificar pacotes Delayed On Way e Delayed At Station — risco de BPP por prazo',
+       desc:'Pacote parado há mais de 3 dias gera BPP por delay. Identificar causa: problema na rota, pacote retido em aduana, falha de handoff entre SVC.',
+       prazo:'D+1', resp:'Coord. Log.'},
+      {p:'p1', titulo:'Revisar promessas de entrega para pacotes buffer próximos do vencimento',
+       desc:'Buffer Promessa que não sai na data gera Delayed e BPP. Verificar área buffered ao fim do dia e garantir saída na data da etiqueta.',
+       prazo:'D+1', resp:'Lider Buffer'},
+      {p:'p2', titulo:'Alinhar com MLP ' + mlpInfo + ' sobre pacotes Delayed On Route',
+       desc:'Delayed On Route pode indicar falha na entrega e nova tentativa não programada. Exigir relatório de tentativas e novo SLA do MLP.',
+       prazo:'D+3', resp:'Coord. MLP'}
+    ]
+  };
+
+  var lista = acoes[tramo] || [];
+  if (lista.length === 0) return '';
+
+  var rows = lista.map(function(a) {
+    return '<div class="arow"><div class="aprio '+a.p+'">'+a.p.toUpperCase().slice(0,2)+'</div>'
+      +'<div><div class="atitle">'+a.titulo+'</div>'
+      +'<div class="adesc">'+a.desc+'</div>'
+      +'<div class="ameta"><span class="achip">Prazo: '+a.prazo+'</span><span class="achip resp">'+a.resp+'</span></div>'
+      +'</div></div>';
+  }).join('');
+
+  return '<div class="card" style="margin-top:8px"><div class="ch"><span class="ct">&#9889; Ações — '+tramo+' · '+cfg.week+'</span>'+btnExp('bpp')+'</div><div style="padding:4px 14px 8px">'+rows+'</div></div>';
+}
+
+
 function renderDemo(){
   var d=D, cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
 
@@ -829,8 +913,8 @@ function renderDemo(){
   }
 
   // ── SUBPAINEIS BPP ──
-  var tramoColors={LOST:'cr',DAMAGED:'or',PNR:'p',STOLEN:'cr',EMPTY:'c',DELAYED:'i',DNR:'w'};
-  var tramoIcons={LOST:'&#128683;',DAMAGED:'&#128227;',PNR:'&#128274;',STOLEN:'&#128373;',EMPTY:'&#128230;',DELAYED:'&#8987;',DNR:'&#128257;'};
+  var tramoColors={LOST:'cr',DAMAGED:'or',FRAUD:'p',STOLEN:'cr',DELAYED:'i'};
+  var tramoIcons={LOST:'&#128683;',DAMAGED:'&#128227;',FRAUD:'&#128274;',STOLEN:'&#128373;',DELAYED:'&#8987;'};
 
   var subNavBtns=bpp.tramoDisp.map(function(tr,i){
     var cls=tr.toLowerCase(); var icon=tramoIcons[tr]||'';
@@ -852,6 +936,7 @@ function renderDemo(){
       +'<div class="card"><div class="ch"><span class="ct">Classifica&ccedil;&atilde;o '+tr+'</span><span class="cc">'+td.total+' ocorr.</span></div><table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead><tbody>'+tipoRows(td.tipos,td.total)+'</tbody></table></div>'
       +'</div>'
       +'<div class="card"><div class="ch"><span class="ct">Top Drivers &mdash; '+tr+'</span><span class="cc">Node ID &middot; Tramo &middot; Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody>'+driverTable(td.mlpList)+'</tbody></table></div>'
+      +tramoAcoes(tr,td,cfg)
       +'</div>';
   }).join('');
 
