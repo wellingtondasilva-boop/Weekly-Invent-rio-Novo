@@ -7,141 +7,149 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-:root{--y:#FFE600;--bl:#3483FA;--dk:#0D1117;--sf:#161B22;--sf2:#21262D;--sf3:#30363D;--br:rgba(48,54,61,0.9);--tx:#E6EDF3;--td:#7D8590;--tm:#B1BAC4;--gn:#3FB950;--rd:#F85149;--or:#E8A838;--pu:#BC8CFF;--cy:#39D2C0;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
-.sticky-top{position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(0,0,0,.6);}
-.header{background:var(--sf);border-bottom:1px solid var(--br);padding:0 32px;display:flex;align-items:stretch;}
-.hbrand{display:flex;align-items:center;gap:12px;padding:12px 18px 12px 0;border-right:1px solid var(--br);margin-right:16px;}
-.logo{width:30px;height:30px;background:var(--y);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#000;flex-shrink:0;}
-.bname{font-size:13px;font-weight:700;line-height:1.2;}.bsub{font-size:10px;color:var(--td);}
-.hinfo{display:flex;align-items:center;gap:18px;flex:1;}
-.hkpi{text-align:center;}.hkl{font-size:9px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;}
-.hkv{font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-top:2px;}
-.hkv.r{color:var(--rd);}.hkv.g{color:var(--gn);}.hkv.y{color:var(--y);}.hkv.b{color:var(--bl);}
-.hright{margin-left:auto;display:flex;align-items:center;gap:8px;padding:12px 0;}
-.wchip{background:var(--y);color:#000;font-weight:800;font-size:11px;padding:4px 10px;border-radius:5px;}
-.pchip{background:var(--sf2);color:var(--tm);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--br);}
-.nav{background:var(--sf);border-bottom:1px solid var(--br);padding:0 32px;display:flex;overflow-x:auto;scrollbar-width:none;}
-.nav::-webkit-scrollbar{display:none;}
-.nb{background:none;border:none;color:var(--td);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
-.nb:hover{color:var(--tx);}.nb.active{color:var(--y);border-bottom-color:var(--y);}
-.bdg{background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;}
-.bdg.w{background:var(--or);color:#000;}.bdg.ok{background:var(--gn);}
-.content{padding:20px 32px;max-width:1360px;margin:0 auto;}
-.tab{display:none;}.tab.active{display:block;}
-.sh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
-.st{font-size:17px;font-weight:700;}.ss{font-size:11px;color:var(--td);margin-top:3px;}
-.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
-.kc{background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:12px 14px;position:relative;overflow:hidden;}
-.kc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.kc.cr::after{background:var(--rd);}.kc.cg::after{background:var(--gn);}.kc.co::after{background:var(--or);}.kc.cb::after{background:var(--bl);}.kc.cy::after{background:var(--y);}
-.kl{font-size:9px;color:var(--td);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
-.kv{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;margin:5px 0 3px;line-height:1;}
-.kv.r{color:var(--rd);}.kv.g{color:var(--gn);}.kv.o{color:var(--or);}.kv.b{color:var(--bl);}.kv.y{color:var(--y);}
-.km{font-size:10px;color:var(--td);line-height:1.4;}
-.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase;margin-top:4px;}
-.tag.ok{background:rgba(63,185,80,.15);color:var(--gn);}.tag.w{background:rgba(232,168,56,.18);color:var(--or);}.tag.cr{background:rgba(248,81,73,.15);color:var(--rd);}.tag.i{background:rgba(52,131,250,.15);color:var(--bl);}
-.card{background:var(--sf);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:12px;}
-.ch{padding:10px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;}
-.ct{font-size:12px;font-weight:600;}.cc{font-size:10px;color:var(--td);}
-table{width:100%;border-collapse:collapse;}
-th{background:var(--sf2);padding:7px 11px;text-align:left;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.4px;}
-td{padding:8px 11px;font-size:11px;border-bottom:1px solid var(--br);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(255,255,255,.02);}
-.mono{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;}
-.tr{text-align:right;}.tc{text-align:center;}
-.rh{background:rgba(248,81,73,.06)!important;}.wh{background:rgba(232,168,56,.05)!important;}
-.bw{display:flex;align-items:center;gap:6px;}
-.bb{flex:1;height:4px;background:var(--sf3);border-radius:2px;min-width:40px;}
-.bf{height:100%;border-radius:2px;transition:width .6s ease;}
-.bv{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;min-width:30px;text-align:right;}
-.alert{border-radius:8px;padding:10px 14px;margin-bottom:12px;border-left:3px solid;display:flex;gap:10px;}
-.alert.cr{background:rgba(248,81,73,.07);border-color:var(--rd);}
-.alert.w{background:rgba(232,168,56,.07);border-color:var(--or);}
-.alert.ok{background:rgba(63,185,80,.07);border-color:var(--gn);}
-.alert.i{background:rgba(52,131,250,.07);border-color:var(--bl);}
-.ai{font-size:14px;padding-top:1px;flex-shrink:0;}
-.at{font-size:11px;font-weight:700;margin-bottom:3px;}
-.ab{font-size:11px;color:var(--tm);line-height:1.5;}
-.ab strong{color:var(--tx);}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
-.trow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
-.tc2{background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:12px 13px;text-align:center;}
-.tc2.cur{border-color:var(--y);}
-.twk{font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.tv{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;margin:5px 0 2px;}
-.ts2{font-size:9px;color:var(--td);}.td2{font-size:10px;margin-top:4px;font-weight:600;}
-.rn{width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:var(--sf3);color:var(--td);flex-shrink:0;}
-.rn.r1{background:rgba(248,81,73,.2);color:var(--rd);}.rn.r2{background:rgba(232,168,56,.2);color:var(--or);}.rn.r3{background:rgba(255,230,0,.15);color:var(--y);}
-.divider{height:1px;background:var(--br);margin:16px 0;}
-.sub-sh{display:flex;align-items:center;gap:8px;margin:14px 0 10px;}
-.sub-title{font-size:13px;font-weight:700;}
-.sub-badge{background:var(--sf2);border:1px solid var(--br);border-radius:5px;padding:2px 8px;font-size:10px;color:var(--tm);}
-.arow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--br);}
-.arow:last-child{border-bottom:none;}
-.aprio{min-width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
-.aprio.p1{background:rgba(248,81,73,.2);color:var(--rd);}.aprio.p2{background:rgba(232,168,56,.2);color:var(--or);}.aprio.p3{background:rgba(255,230,0,.15);color:var(--y);}
-.atitle{font-size:12px;font-weight:600;margin-bottom:3px;}
-.adesc{font-size:10px;color:var(--td);line-height:1.5;}
-.adesc strong{color:var(--tm);}
-.ameta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;}
-.achip{font-size:9px;padding:2px 7px;border-radius:3px;background:var(--sf2);color:var(--tm);border:1px solid var(--br);}
-.footer{text-align:center;padding:20px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:22px;}
-.footer strong{color:var(--tm);}
-.chart-wrap{background:var(--sf);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:12px;}
-.chart-head{padding:10px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
-.chart-title{font-size:12px;font-weight:600;}.chart-note{font-size:10px;color:var(--td);}
-.chart-body{padding:14px 14px 4px;}
-.chart-legend{display:flex;gap:12px;flex-wrap:wrap;padding:5px 14px 10px;}
-.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--tm);}
-.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.dsumm{width:100%;border-collapse:collapse;font-size:10px;}
-.dsumm th{background:var(--sf2);padding:5px 8px;text-align:center;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.4px;}
-.dsumm th:first-child{text-align:left;}
-.dsumm td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--br);}
-.dsumm td:first-child{text-align:left;font-weight:600;font-size:10px;}
-.dsumm tr:last-child td{border-bottom:none;}
-.note{font-size:9px;color:var(--td);padding:4px 14px 10px;font-style:italic;}
-@media(max-width:768px){
-  .content{padding:12px;}.header,.nav{padding-left:12px;padding-right:12px;}
-  .g2,.g3{grid-template-columns:1fr;}.trow{grid-template-columns:1fr 1fr;}.hinfo{display:none;}
-}
-
-#uploadScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--dk);}
-#demoScreen{display:none;}
-.up-wrap{width:100%;max-width:760px;}
-.up-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
-.up-logobox{width:40px;height:40px;background:var(--y);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#000;}
-.up-title{font-size:20px;font-weight:800;}.up-sub{font-size:11px;color:var(--td);margin-top:3px;}
-.up-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:24px;}
-.up-section{font-size:10px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
-.up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px;}
-.up-item{background:var(--sf2);border:1.5px dashed var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative;}
-.up-item:hover{border-color:var(--bl);}
-.up-item.ok{border-style:solid;border-color:var(--gn);background:rgba(63,185,80,.05);}
-.up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.up-name{font-size:11px;font-weight:600;margin-bottom:3px;}.up-hint{font-size:9px;color:var(--td);margin-bottom:7px;}
-.up-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);display:inline-block;}
-.up-item.ok .up-st{background:rgba(63,185,80,.15);color:var(--gn);}
-.up-cfg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-.up-field label{display:block;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.up-field input{width:100%;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;outline:none;}
-.up-field input:focus{border-color:var(--bl);}
-.up-pbar{height:3px;background:var(--sf3);border-radius:2px;margin-bottom:5px;}
-.up-pfill{height:100%;background:var(--bl);border-radius:2px;width:0%;transition:width .4s;}
-.up-plabel{font-size:10px;color:var(--td);margin-bottom:16px;}
-.btn-go{width:100%;padding:12px;background:var(--y);color:#000;font-family:'Inter',sans-serif;font-size:13px;font-weight:800;border:none;border-radius:8px;cursor:pointer;}
-.btn-go:disabled{opacity:.3;cursor:not-allowed;}.btn-go:not(:disabled):hover{opacity:.88;}
-.up-note{text-align:center;font-size:10px;color:var(--td);margin-top:10px;}
-.btn-export-aba{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.3);color:var(--gn);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;}
-.btn-export-aba:hover{background:rgba(63,185,80,.25);}
-.btn-reload{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;}
-.btn-reload:hover{color:var(--tx);}
+:root{--y:#FFE600;--bl:#3483FA;--sf:#161B22;--sf2:#21262D;--sf3:#30363D;--br:rgba(48,54,61,0.9);--tx:#E6EDF3;--td:#7D8590;--tm:#B1BAC4;--gn:#3FB950;--rd:#F85149;--or:#E8A838;--pu:#BC8CFF;--cy:#39D2C0;--dk:#0D1117}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh}
+/* TEMA DIA */
+body.day{--dk:#F0F2F5;--sf:#FFFFFF;--sf2:#F0F2F5;--sf3:#E1E4E8;--br:rgba(200,210,220,0.9);--tx:#1A1A2E;--td:#57606A;--tm:#444D56;--y:#E6C200}
+/* UPLOAD */
+#uploadScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--dk)}
+#demoScreen{display:none}
+.up-wrap{width:100%;max-width:780px}
+.up-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.up-logobox{width:40px;height:40px;background:var(--y);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#000}
+.up-title{font-size:20px;font-weight:800}.up-sub{font-size:11px;color:var(--td);margin-top:3px}
+.up-card{background:var(--sf);border:1px solid var(--br);border-radius:10px;padding:24px}
+.up-section{font-size:10px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:20px}
+.up-item{background:var(--sf2);border:1.5px dashed var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative}
+.up-item:hover{border-color:var(--bl)}.up-item.ok{border-style:solid;border-color:var(--gn);background:rgba(63,185,80,.05)}
+.up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.up-name{font-size:11px;font-weight:600;margin-bottom:3px}.up-hint{font-size:9px;color:var(--td);margin-bottom:7px}
+.up-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);display:inline-block}
+.up-item.ok .up-st{background:rgba(63,185,80,.15);color:var(--gn)}
+.up-cfg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.up-field label{display:block;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.up-field input{width:100%;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;outline:none}
+.up-field input:focus{border-color:var(--bl)}
+.up-pbar{height:3px;background:var(--sf3);border-radius:2px;margin-bottom:5px}
+.up-pfill{height:100%;background:var(--bl);border-radius:2px;width:0%;transition:width .4s}
+.up-plabel{font-size:10px;color:var(--td);margin-bottom:16px}
+.btn-go{width:100%;padding:12px;background:var(--y);color:#000;font-family:'Inter',sans-serif;font-size:13px;font-weight:800;border:none;border-radius:8px;cursor:pointer}
+.btn-go:disabled{opacity:.3;cursor:not-allowed}.btn-go:not(:disabled):hover{opacity:.88}
+.up-note{text-align:center;font-size:10px;color:var(--td);margin-top:10px}
+/* HEADER */
+.sticky-top{position:sticky;top:0;z-index:100;background:var(--sf);border-bottom:1px solid var(--br)}
+.header{display:flex;align-items:center;gap:16px;padding:10px 20px;flex-wrap:wrap}
+.hbrand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.logo{width:32px;height:32px;background:var(--y);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#000;flex-shrink:0}
+.bname{font-size:13px;font-weight:700}.bsub{font-size:9px;color:var(--td)}
+.hinfo{display:flex;gap:12px;flex:1;justify-content:center;flex-wrap:wrap}
+.hkpi{text-align:center}.hkl{font-size:8px;color:var(--td);text-transform:uppercase;letter-spacing:.4px}
+.hkv{font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.hkv.r{color:var(--rd)}.hkv.g{color:var(--gn)}.hkv.y{color:var(--y)}.hkv.b{color:var(--bl)}
+.hright{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap}
+.wchip{background:var(--y);color:#000;font-size:11px;font-weight:800;padding:3px 10px;border-radius:12px}
+.pchip{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-size:10px;padding:3px 8px;border-radius:10px}
+.btn-reload{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer}
+.btn-reload:hover{color:var(--tx)}
+.btn-theme{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer}
+.btn-theme:hover{color:var(--tx)}
+/* NAV */
+.nav{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--br);overflow-x:auto}
+.nb{background:none;border:none;color:var(--td);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.nb:hover{color:var(--tx)}.nb.active{color:var(--y);border-bottom-color:var(--y);font-weight:700}
+/* SUB-NAV BPP */
+.subnav{display:flex;gap:4px;padding:8px 0 4px;flex-wrap:wrap}
+.snb{background:var(--sf2);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:4px 12px;border-radius:14px;cursor:pointer;transition:all .15s}
+.snb:hover{color:var(--tx);border-color:var(--bl)}.snb.active{background:var(--bl);border-color:var(--bl);color:#fff}
+.snb.lost{--sc:var(--rd)}.snb.lost.active{background:var(--rd);border-color:var(--rd)}
+.snb.damaged{--sc:var(--or)}.snb.damaged.active{background:var(--or);border-color:var(--or);color:#000}
+.snb.pnr{--sc:var(--pu)}.snb.pnr.active{background:var(--pu);border-color:var(--pu)}
+.snb.stolen{--sc:#FF6B6B}.snb.stolen.active{background:#FF6B6B;border-color:#FF6B6B}
+.snb.empty{--sc:var(--cy)}.snb.empty.active{background:var(--cy);border-color:var(--cy);color:#000}
+.snb.delayed{--sc:var(--td)}.snb.delayed.active{background:var(--td);border-color:var(--td)}
+.snb.dnr{--sc:#888}.snb.dnr.active{background:#888;border-color:#888}
+/* CONTEÚDO */
+.content{padding:16px 20px 40px;max-width:1400px;margin:0 auto}
+.tab{display:none}.tab.active{display:block}
+.subpanel{display:none}.subpanel.active{display:block}
+.sh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px}
+.st{font-size:16px;font-weight:800}.ss{font-size:11px;color:var(--td);margin-top:2px}
+.sub-sh{display:flex;align-items:center;gap:10px;margin:16px 0 10px}
+.sub-title{font-size:13px;font-weight:700}.sub-badge{font-size:10px;color:var(--td);background:var(--sf2);border:1px solid var(--br);padding:2px 8px;border-radius:8px}
+/* CARDS */
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.kc{background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:12px 14px;border-left:3px solid}
+.kc.cr{border-left-color:var(--rd)}.kc.cg{border-left-color:var(--gn)}.kc.cy{border-left-color:var(--y)}
+.kc.cb{border-left-color:var(--bl)}.kc.co{border-left-color:var(--or)}.kc.cp{border-left-color:var(--pu)}
+.kl{font-size:9px;color:var(--td);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.kv{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.kv.r{color:var(--rd)}.kv.g{color:var(--gn)}.kv.y{color:var(--y)}.kv.b{color:var(--bl)}.kv.o{color:var(--or)}
+.km{font-size:9px;color:var(--td);margin-bottom:6px}
+/* TENDÊNCIA */
+.trow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.tc2{background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:12px 14px}
+.tc2.cur{border-color:var(--y)}.twk{font-size:9px;color:var(--td);margin-bottom:4px}
+.tv{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.ts2{font-size:8px;color:var(--td)}.td2{font-size:10px;margin-top:4px}
+/* TABLES */
+.card{background:var(--sf);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--br)}
+.ct{font-size:12px;font-weight:700}.cc{font-size:10px;color:var(--td)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.4px;padding:7px 10px;border-bottom:1px solid var(--br);text-align:left}
+td{padding:6px 10px;border-bottom:1px solid rgba(48,54,61,0.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04)}
+.tr{text-align:right}.tc{text-align:center}.mono{font-family:'JetBrains Mono',monospace;font-size:10px}
+.rn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:700;background:var(--sf2);color:var(--td)}
+.rn.r1{background:var(--y);color:#000}.rn.r2{background:var(--sf3);color:var(--tx)}.rn.r3{background:rgba(232,168,56,.3);color:var(--or)}
+/* TAGS */
+.tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:.3px}
+.tag.ok{background:rgba(63,185,80,.15);color:var(--gn)}.tag.cr{background:rgba(248,81,73,.15);color:var(--rd)}
+.tag.w{background:rgba(232,168,56,.15);color:var(--or)}.tag.i{background:rgba(52,131,250,.15);color:var(--bl)}
+.tag.p{background:rgba(188,140,255,.15);color:var(--pu)}.tag.c{background:rgba(57,210,192,.15);color:var(--cy)}
+/* CHARTS */
+.chart-wrap{background:var(--sf);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--br)}
+.chart-title{font-size:12px;font-weight:700}.chart-note{font-size:9px;color:var(--td)}
+.chart-body{padding:8px 14px}.chart-body canvas{width:100%!important}
+.chart-legend{display:flex;gap:14px;padding:4px 14px 10px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--td)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+/* SUMMARY TABLE */
+.dsumm{width:100%;font-size:10px}.dsumm th{font-size:8px;padding:5px 8px}.dsumm td{padding:5px 8px}
+/* G2 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+/* AÇÕES */
+.arow{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)}
+.arow:last-child{border-bottom:none}
+.aprio{flex-shrink:0;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
+.aprio.p1{background:var(--rd)}.aprio.p2{background:var(--or)}.aprio.p3{background:var(--bl)}
+.atitle{font-size:11px;font-weight:600;margin-bottom:3px}.adesc{font-size:10px;color:var(--td);margin-bottom:4px}
+.ameta{display:flex;gap:6px;flex-wrap:wrap}.achip{font-size:9px;background:var(--sf2);border:1px solid var(--br);padding:2px 7px;border-radius:8px;color:var(--td)}
+.achip.resp{color:var(--bl);border-color:rgba(52,131,250,.3);background:rgba(52,131,250,.08)}
+/* ALERT */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid;margin-bottom:8px}
+.alert.cr{background:rgba(248,81,73,.07);border-color:rgba(248,81,73,.25)}
+.alert.w{background:rgba(232,168,56,.07);border-color:rgba(232,168,56,.25)}
+.alert.i{background:rgba(52,131,250,.07);border-color:rgba(52,131,250,.2)}
+.ai{font-size:14px;flex-shrink:0;margin-top:1px}.at{font-size:11px;font-weight:700;margin-bottom:3px}.ab{font-size:10px;color:var(--td)}
+/* LEGENDA PK */
+.pk-legend{display:flex;gap:12px;flex-wrap:wrap;padding:8px 14px;background:var(--sf2);border-top:1px solid var(--br)}
+.pk-leg-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--tm)}
+.pk-leg-dot{width:10px;height:10px;border-radius:3px}
+/* EXPORT BTN */
+.btn-export-aba{background:rgba(63,185,80,.15);border:1px solid rgba(63,185,80,.3);color:var(--gn);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.btn-export-aba:hover{background:rgba(63,185,80,.25)}
+/* ROTA CHIP */
+.rota-chip{font-size:8px;background:rgba(52,131,250,.1);color:var(--bl);border:1px solid rgba(52,131,250,.2);padding:1px 6px;border-radius:6px;font-family:'JetBrains Mono',monospace;display:inline-block;margin:1px}
+/* DIVIDER */
+.divider{height:1px;background:var(--br);margin:12px 0}
+/* FOOTER */
+.footer{text-align:center;padding:16px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:24px}
 
 </style>
 </head>
@@ -161,12 +169,12 @@ tr:hover td{background:rgba(255,255,255,.02);}
         <div class="up-field"><label>Semana</label><input id="cfgWeek" value="W32"></div>
         <div class="up-field"><label>Data início</label><input id="cfgStart" value="02/08/2026"></div>
         <div class="up-field"><label>Data fim</label><input id="cfgEnd" value="08/08/2026"></div>
-        <div class="up-field"><label>Código BPP (AAAA-SS)</label><input id="cfgBpp" value="2026-32"></div>
+        <div class="up-field"><label>Cód. BPP (AAAA-SS)</label><input id="cfgBpp" value="2026-32"></div>
       </div>
       <div class="up-section">Arquivos — clique ou arraste</div>
       <div class="up-grid">
         <div class="up-item" id="ui-base2"><input type="file" accept=".csv" onchange="onFile('base2',this)"><div class="up-name">01 · Base 2 Inventário</div><div class="up-hint">BASE_2_INVENTARIO_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-base2">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-falt"><input type="file" accept=".csv" onchange="onFile('falt',this)"><div class="up-name">02 · Waterfall Faltantes</div><div class="up-hint">CONTEOS_INVENTORY_LATAM_Wxx.csv · sep=,</div><span class="up-st" id="st-falt">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-falt"><input type="file" accept=".csv" onchange="onFile('falt',this)"><div class="up-name">02 · Waterfall Faltantes</div><div class="up-hint">CONTEOS_LATAM_Wxx.csv · sep=,</div><span class="up-st" id="st-falt">⬆ Aguardando</span></div>
         <div class="up-item" id="ui-desloc"><input type="file" accept=".csv" onchange="onFile('desloc',this)"><div class="up-name">03 · Deslocados</div><div class="up-hint">Deslocados_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-desloc">⬆ Aguardando</span></div>
         <div class="up-item" id="ui-bpp"><input type="file" accept=".csv" onchange="onFile('bpp',this)"><div class="up-name">04 · BPP 4 Semanas</div><div class="up-hint">BPP_SVC_4SEMANAS.csv · sep=;</div><span class="up-st" id="st-bpp">⬆ Aguardando</span></div>
         <div class="up-item" id="ui-et"><input type="file" accept=".csv" onchange="onFile('et',this)"><div class="up-name">05 · PK Etiquetagem</div><div class="up-hint">PK_ETIQUETAGEM_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-et">⬆ Aguardando</span></div>
@@ -180,7 +188,6 @@ tr:hover td{background:rgba(255,255,255,.02);}
     </div>
   </div>
 </div>
-
 <div id="demoScreen"></div>
 
 <script>
@@ -333,839 +340,881 @@ function stackedBar(id, datasets, labels, maxV) {
 
 
 
-// ══════════════════════════════════════════════
-// ENGINE DE PROCESSAMENTO — DEMONSTRATIVO SVC
-// Arquitetura: CSV → Python → JSON embutido → render JS
-// ══════════════════════════════════════════════
+var RAW={}, LOADED=0, D=null;
 
-var RAW = {};
-var LOADED = 0;
-var D = null; // dados processados (JSON embutido ou processados dos CSVs)
-
-// ── UPLOAD ──────────────────────────────────
-function onFile(key, inp) {
-  var file = inp.files[0];
-  if (!file) return;
-  var sep = (key === 'bpp') ? ';' : ',';
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      RAW[key] = parseCSV(e.target.result, sep);
-      document.getElementById('st-' + key).textContent = '✓ ' + file.name.slice(0, 25);
-      document.getElementById('ui-' + key).classList.add('ok');
-      LOADED++;
-      document.getElementById('upFill').style.width = (LOADED / 7 * 100) + '%';
-      document.getElementById('upLabel').textContent = LOADED + ' de 7 arquivos carregados';
-      if (LOADED === 7) document.getElementById('btnGo').disabled = false;
-    } catch(err) {
-      document.getElementById('st-' + key).textContent = '❌ Erro';
-    }
-  };
-  reader.readAsText(file, 'UTF-8');
+// ── TEMA ──
+function toggleTheme(){
+  document.body.classList.toggle('day');
+  var btn=document.getElementById('btnTheme');
+  btn.textContent = document.body.classList.contains('day') ? '🌙 Noite' : '☀️ Dia';
 }
 
-function parseCSV(txt, sep) {
-  // Remover BOM UTF-8 se presente
-  if (txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1);
-  var lines = txt.replace(/\r/g, '').split('\n');
-  var rows = [];
-  for (var i = 0; i < lines.length; i++) {
-    if (lines[i].trim()) rows.push(lines[i]);
-  }
-  if (rows.length < 2) return [];
-  var headers = splitLine(rows[0], sep);
-  var out = [];
-  for (var i = 1; i < rows.length; i++) {
-    var vals = splitLine(rows[i], sep);
-    var obj = {};
-    for (var j = 0; j < headers.length; j++) {
-      obj[headers[j].trim()] = (vals[j] || '').trim();
-    }
+// ── UPLOAD ──
+function onFile(key,inp){
+  var file=inp.files[0]; if(!file) return;
+  var sep=(key==='bpp')?';':',';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      RAW[key]=parseCSV(e.target.result,sep);
+      document.getElementById('st-'+key).textContent='✓ '+file.name.slice(0,28);
+      document.getElementById('ui-'+key).classList.add('ok');
+      LOADED++;
+      document.getElementById('upFill').style.width=(LOADED/7*100)+'%';
+      document.getElementById('upLabel').textContent=LOADED+' de 7 arquivos carregados';
+      if(LOADED===7) document.getElementById('btnGo').disabled=false;
+    }catch(err){ document.getElementById('st-'+key).textContent='❌ Erro: '+err.message; }
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function parseCSV(txt,sep){
+  if(txt.charCodeAt(0)===0xFEFF) txt=txt.slice(1);
+  var lines=txt.replace(/\r/g,'').split('\n');
+  var rows=[]; for(var i=0;i<lines.length;i++) if(lines[i].trim()) rows.push(lines[i]);
+  if(rows.length<2) return [];
+  var headers=splitLine(rows[0],sep);
+  var out=[];
+  for(var i=1;i<rows.length;i++){
+    var vals=splitLine(rows[i],sep), obj={};
+    for(var j=0;j<headers.length;j++) obj[headers[j].trim()]=(vals[j]||'').trim();
     out.push(obj);
   }
   return out;
 }
 
-function splitLine(line, sep) {
-  var res = [], cur = '', inQ = false;
-  for (var i = 0; i < line.length; i++) {
-    var c = line[i];
-    if (c === '"') { inQ = !inQ; }
-    else if (c === sep && !inQ) { res.push(cur); cur = ''; }
-    else { cur += c; }
+function splitLine(line,sep){
+  var res=[],cur='',inQ=false;
+  for(var i=0;i<line.length;i++){
+    var c=line[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===sep&&!inQ){res.push(cur);cur='';}
+    else{cur+=c;}
   }
-  res.push(cur);
-  return res;
+  res.push(cur); return res;
 }
 
-// ── PROCESSAMENTO ────────────────────────────
-function processar() {
-  var cfg = {
-    svc: document.getElementById('cfgSvc').value || 'SSP15',
-    svcName: document.getElementById('cfgNome').value || 'Santos',
-    week: document.getElementById('cfgWeek').value || 'W32',
-    dateStart: document.getElementById('cfgStart').value || '',
-    dateEnd: document.getElementById('cfgEnd').value || '',
-    bppWeek: document.getElementById('cfgBpp').value || '2026-32'
+// ── PROCESSAMENTO ──
+function tousd(s){var v=parseFloat(String(s||'').trim().replace(',','.'));return isNaN(v)?0:v;}
+function groupBy(arr,key){var m={};for(var i=0;i<arr.length;i++){var k=arr[i][key]||'';m[k]=(m[k]||0)+1;}return m;}
+function topN(obj,n){var a=Object.keys(obj).map(function(k){return[k,obj[k]];});a.sort(function(a,b){return b[1]-a[1];});return a.slice(0,n||a.length);}
+
+function processar(){
+  var cfg={
+    svc:document.getElementById('cfgSvc').value||'SSP15',
+    svcName:document.getElementById('cfgNome').value||'Santos',
+    week:document.getElementById('cfgWeek').value||'W32',
+    dateStart:document.getElementById('cfgStart').value||'',
+    dateEnd:document.getElementById('cfgEnd').value||'',
+    bppWeek:document.getElementById('cfgBpp').value||'2026-32'
   };
-
-  var acc = calcAccuracy(cfg);
-  var desloc = calcDeslocados(cfg, acc.totalInv);
-  var bpp = calcBPP(cfg);
-  var pk = calcPK();
-  var aduana = calcAduanas(acc, bpp, pk, desloc);
-
-  D = { cfg: cfg, acc: acc, desloc: desloc, bpp: bpp, pk: pk, aduana: aduana };
+  var acc=calcAccuracy(cfg);
+  var desloc=calcDeslocados(cfg,acc.totalInv);
+  var bpp=calcBPP(cfg);
+  var pk=calcPK();
+  var aduana=calcAduanas(acc,bpp,pk,desloc);
+  D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana};
 }
 
-function tousd(s) { var v = parseFloat(String(s).replace(',','.')); return isNaN(v) ? 0 : v; }
-function groupBy(arr, key) {
-  var m = {};
-  for (var i = 0; i < arr.length; i++) { var k = arr[i][key] || ''; m[k] = (m[k]||0)+1; }
-  return m;
-}
-function topN(obj, n) {
-  var arr = Object.keys(obj).map(function(k){ return [k, obj[k]]; });
-  arr.sort(function(a,b){ return b[1]-a[1]; });
-  return arr.slice(0, n || arr.length);
-}
-
-function calcAccuracy(cfg) {
-  var b2 = RAW.base2 || [];
-  var inv_rows = [], falt_rows = [];
-  for (var i = 0; i < b2.length; i++) {
-    var cl = b2[i]['CLASIFICACION'] || '';
-    if (cl === 'INVENTARIADO PLANIFICADO') inv_rows.push(b2[i]);
-    else if (cl === 'FALTANTE EN INVENTARIO') falt_rows.push(b2[i]);
+function calcAccuracy(cfg){
+  var b2=RAW.base2||[],inv_rows=[],falt_rows=[];
+  for(var i=0;i<b2.length;i++){
+    var cl=b2[i]['CLASIFICACION']||'';
+    if(cl==='INVENTARIADO PLANIFICADO') inv_rows.push(b2[i]);
+    else if(cl==='FALTANTE EN INVENTARIO') falt_rows.push(b2[i]);
   }
-
-  // Por dia
-  var inv_dia = {}, falt_dia = {};
-  for (var i = 0; i < inv_rows.length; i++) { var dt = inv_rows[i]['INIT_DTTM_LOCAL'] || ''; inv_dia[dt] = (inv_dia[dt]||0)+1; }
-  for (var i = 0; i < falt_rows.length; i++) { var dt = falt_rows[i]['INIT_DTTM_LOCAL'] || ''; falt_dia[dt] = (falt_dia[dt]||0)+1; }
-
-  var ptOrder = function(s) {
-    var months = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
-    var m = s.match(/(\d+)\s+de\s+(\w+)/i);
-    if (m) return months[m[2].toLowerCase().slice(0,3)] * 100 + parseInt(m[1]);
-    return 0;
-  };
-  var dayLabels = ['Dom 02','Seg 03','Ter 04','Qua 05','Qui 06','Sex 07','Sab 08'];
-  var dates = Object.keys(inv_dia).sort(function(a,b){ return ptOrder(a)-ptOrder(b); });
-  var days = [];
-  for (var i = 0; i < dates.length; i++) {
-    var dt = dates[i];
-    var inv = inv_dia[dt]||0, falt = falt_dia[dt]||0;
-    days.push({ label: dayLabels[i]||dt, inv: inv, falt: falt, acc: inv+falt>0 ? Math.round(inv/(inv+falt)*1000)/10 : 0 });
+  var inv_dia={},falt_dia={};
+  for(var i=0;i<inv_rows.length;i++){var dt=inv_rows[i]['INIT_DTTM_LOCAL']||'';inv_dia[dt]=(inv_dia[dt]||0)+1;}
+  for(var i=0;i<falt_rows.length;i++){var dt=falt_rows[i]['INIT_DTTM_LOCAL']||'';falt_dia[dt]=(falt_dia[dt]||0)+1;}
+  var ptOrder=function(s){var m={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};var x=s.match(/(\d+)\s+de\s+(\w+)/i);if(x)return m[x[2].toLowerCase().slice(0,3)]*100+parseInt(x[1]);return 0;};
+  var dayLabels=['Dom 02','Seg 03','Ter 04','Qua 05','Qui 06','Sex 07','Sab 08'];
+  var dates=Object.keys(inv_dia).sort(function(a,b){return ptOrder(a)-ptOrder(b);});
+  var days=[];
+  for(var i=0;i<dates.length;i++){
+    var dt=dates[i],inv=inv_dia[dt]||0,falt=falt_dia[dt]||0;
+    days.push({label:dayLabels[i]||dt,inv:inv,falt:falt,acc:inv+falt>0?Math.round(inv/(inv+falt)*1000)/10:0});
   }
-
-  var totalInv = inv_rows.length, totalFalt = falt_rows.length;
-  var geral = totalInv+totalFalt>0 ? Math.round(totalInv/(totalInv+totalFalt)*1000)/10 : 0;
-
-  var zonaMap = groupBy(falt_rows, 'SHP_ZONE_NAME');
-  var porZona = topN(zonaMap, 10).map(function(x){ return [x[0], x[1]]; });
-
-  // IDs para correlação
-  var ids_falt = {};
-  for (var i = 0; i < falt_rows.length; i++) ids_falt[falt_rows[i]['SHIPMENT']] = true;
-
-  return { geral: geral, totalInv: totalInv, totalFalt: totalFalt, days: days, porZona: porZona, ids_falt: ids_falt };
+  var totalInv=inv_rows.length,totalFalt=falt_rows.length;
+  var geral=totalInv+totalFalt>0?Math.round(totalInv/(totalInv+totalFalt)*1000)/10:0;
+  var zonaMap=groupBy(falt_rows,'SHP_ZONE_NAME');
+  var porZona=topN(zonaMap,10).map(function(x){return[x[0],x[1]];});
+  var ids_falt={};for(var i=0;i<falt_rows.length;i++) ids_falt[falt_rows[i]['SHIPMENT']]=true;
+  return{geral:geral,totalInv:totalInv,totalFalt:totalFalt,days:days,porZona:porZona,ids_falt:ids_falt};
 }
 
-function calcDeslocados(cfg, totalInv) {
-  var rows = RAW.desloc || [];
-  var total = rows.length;
-  var naoCorr = 0;
-  for (var i = 0; i < rows.length; i++) { if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') naoCorr++; }
-  var pct = totalInv > 0 ? Math.round(total/totalInv*1000)/10 : 0;
-
-  // Por dia
-  var byDay = {};
-  for (var i = 0; i < rows.length; i++) {
-    var dt = (rows[i]['SHP_INVENTORY_INIT_DTTM']||'').slice(0,10);
-    if (!byDay[dt]) byDay[dt] = {total:0,nc:0};
-    byDay[dt].total++;
-    if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') byDay[dt].nc++;
+function calcDeslocados(cfg,totalInv){
+  var rows=RAW.desloc||[],total=rows.length,naoCorr=0;
+  for(var i=0;i<rows.length;i++) if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') naoCorr++;
+  var pct=totalInv>0?Math.round(total/totalInv*1000)/10:0;
+  var byDay={};
+  for(var i=0;i<rows.length;i++){
+    var dt=(rows[i]['SHP_INVENTORY_INIT_DTTM']||'').slice(0,10);
+    if(!byDay[dt]) byDay[dt]={total:0,nc:0};
+    byDay[dt].total++; if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') byDay[dt].nc++;
   }
-  var byDayArr = Object.keys(byDay).sort().map(function(k){ return {dt:k,total:byDay[k].total,nc:byDay[k].nc}; });
-
-  // Fluxos
-  var fluxMap = {};
-  for (var i = 0; i < rows.length; i++) {
-    var k = (rows[i]['SHP_PLANNED_ZONE']||'?') + ' -> ' + (rows[i]['SHP_ZONE_NAME']||'?');
-    fluxMap[k] = (fluxMap[k]||0)+1;
-  }
-  var fluxos = topN(fluxMap, 10).map(function(x){ return [x[0],x[1]]; });
-
-  // Operadores
-  var opMap = {};
-  for (var i = 0; i < rows.length; i++) {
-    var op = rows[i]['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';
-    if (!opMap[op]) opMap[op] = {total:0,nc:0};
-    opMap[op].total++;
-    if (rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') opMap[op].nc++;
-  }
-  var ops = Object.keys(opMap).map(function(k){ return {id:k,total:opMap[k].total,nc:opMap[k].nc}; });
-  ops.sort(function(a,b){ return b.total-a.total; });
-  ops = ops.slice(0,20);
-
-  // IDs para correlação
-  var ids = {};
-  for (var i = 0; i < rows.length; i++) ids[rows[i]['SHP_SHIPMENT_ID']] = true;
-
-  return { total:total, naoCorrigidos:naoCorr, pct:pct, byDay:byDayArr, fluxos:fluxos, ops:ops, ids:ids };
+  var byDayArr=Object.keys(byDay).sort().map(function(k){return{dt:k,total:byDay[k].total,nc:byDay[k].nc};});
+  var fluxMap={};
+  for(var i=0;i<rows.length;i++){var k=(rows[i]['SHP_PLANNED_ZONE']||'?')+' -> '+(rows[i]['SHP_ZONE_NAME']||'?');fluxMap[k]=(fluxMap[k]||0)+1;}
+  var fluxos=topN(fluxMap,10).map(function(x){return[x[0],x[1]];});
+  var opMap={};
+  for(var i=0;i<rows.length;i++){var op=rows[i]['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';if(!opMap[op]) opMap[op]={total:0,nc:0};opMap[op].total++;if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') opMap[op].nc++;}
+  var ops=Object.keys(opMap).map(function(k){return{id:k,total:opMap[k].total,nc:opMap[k].nc};});
+  ops.sort(function(a,b){return b.total-a.total;}); ops=ops.slice(0,20);
+  var ids={};for(var i=0;i<rows.length;i++) ids[rows[i]['SHP_SHIPMENT_ID']]=true;
+  return{total:total,naoCorrigidos:naoCorr,pct:pct,byDay:byDayArr,fluxos:fluxos,ops:ops,ids:ids};
 }
 
-function calcBPP(cfg) {
-  var rows = RAW.bpp || [];
-  var wkReal = [], wkGmv = [], wkAll = {};
+function calcBPPTramo(rows,gmvRows,gmvCol){
+  var cashout=0; for(var i=0;i<rows.length;i++) cashout+=tousd(rows[i]['Bpp Cashout Usd']);
+  var gmv=0; for(var i=0;i<gmvRows.length;i++) gmv+=tousd(gmvRows[i][gmvCol]);
+  var pct=gmv>0?Math.round(cashout/gmv*1000000)/10000:0;
+  var mlpMap={};
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
+    if(!mlpMap[mlp]) mlpMap[mlp]={total:0,cashout:0,gmv:0,drivers:{}};
+    mlpMap[mlp].total++; mlpMap[mlp].cashout+=tousd(r['Bpp Cashout Usd']);
+    var drv=r['Driver Id']||'';
+    if(drv&&drv!=='nan'){
+      if(!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,node:'',tramo:'',status:''};
+      var d=mlpMap[mlp].drivers[drv]; d.total++; d.cashout+=tousd(r['Bpp Cashout Usd']);
+      if(r['NODE_ID']) d.node=r['NODE_ID'];
+      if(r['NODES_LM']) d.tramo=r['NODES_LM'];
+      if(r['Driver Status']) d.status=r['Driver Status'];
+    }
+  }
+  for(var i=0;i<gmvRows.length;i++){
+    var r=gmvRows[i];
+    var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
+    if(mlpMap[mlp]) mlpMap[mlp].gmv+=tousd(r[gmvCol]);
+  }
+  var mlpList=Object.keys(mlpMap).map(function(mlp){
+    var v=mlpMap[mlp]; var p=v.gmv>0?Math.round(v.cashout/v.gmv*1000000)/10000:null;
+    var top3=Object.keys(v.drivers).map(function(k){return{id:k,total:v.drivers[k].total,cashout:Math.round(v.drivers[k].cashout*100)/100,node:v.drivers[k].node,tramo:v.drivers[k].tramo,status:v.drivers[k].status};});
+    top3.sort(function(a,b){return b.total-a.total;}); top3=top3.slice(0,3);
+    return{mlp:mlp,total:v.total,cashout:Math.round(v.cashout*100)/100,gmv:Math.round(v.gmv*100)/100,pct:p,top3:top3};
+  });
+  mlpList.sort(function(a,b){return(b.pct||0)-(a.pct||0);});
+  var tipoMap={};
+  for(var i=0;i<rows.length;i++){var fc=rows[i]['Clasificacion LG']||'?';tipoMap[fc]=(tipoMap[fc]||0)+1;}
+  var tipos=topN(tipoMap,10).map(function(x){return[x[0],x[1]];});
+  return{cashout:Math.round(cashout*100)/100,gmv:Math.round(gmv*100)/100,pct:pct,total:rows.length,mlpList:mlpList,tipos:tipos};
+}
 
-  for (var i = 0; i < rows.length; i++) {
-    var r = rows[i];
-    var wk = r['Values_Dates']||'';
-    if (!wkAll[wk]) wkAll[wk] = {real:[],gmv:[]};
-    if (r['F_CLASIFICATION']==='Visualizar GMV') {
-      wkAll[wk].gmv.push(r);
-      if (wk === cfg.bppWeek) wkGmv.push(r);
-    } else {
-      wkAll[wk].real.push(r);
-      if (wk === cfg.bppWeek) wkReal.push(r);
+function calcBPP(cfg){
+  var rows=RAW.bpp||[];
+  var ALL_WKS={};
+  var gmvCol='TOTALGMV';
+  // Detectar coluna GMV
+  for(var i=0;i<rows.length;i++){if(rows[i]['TOTALGMV']!==undefined){gmvCol='TOTALGMV';break;}if(rows[i]['TotalGMV (std)']!==undefined){gmvCol='TotalGMV (std)';break;}}
+
+  // Separar por semana e por tramo
+  var byWk={};
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i]; var wk=r['Values_Dates']||'';
+    var lgRaw=(r['Clasificacion LG']||'').trim();
+    var isGmv=(lgRaw==='VISUALIZAR GMV'||lgRaw==='');
+    var tramo=isGmv?'GMV':lgRaw.split(' ')[0];
+    if(!byWk[wk]) byWk[wk]={gmv:[],tramos:{}};
+    if(isGmv){byWk[wk].gmv.push(r);}
+    else{if(!byWk[wk].tramos[tramo]) byWk[wk].tramos[tramo]=[];byWk[wk].tramos[tramo].push(r);}
+  }
+
+  var TRAMO_LIST=['LOST','DAMAGED','PNR','STOLEN','EMPTY','DELAYED','DNR'];
+  var wkCur=cfg.bppWeek;
+  var wkData=byWk[wkCur]||{gmv:[],tramos:{}};
+  var gmvRows=wkData.gmv;
+
+  // Geral
+  var allReal=[];
+  for(var t in wkData.tramos) for(var i=0;i<wkData.tramos[t].length;i++) allReal.push(wkData.tramos[t][i]);
+  var geralData=calcBPPTramo(allReal,gmvRows,gmvCol);
+
+  // Por tramo
+  var tramoData={};
+  var tramoDisp=[];
+  for(var ti=0;ti<TRAMO_LIST.length;ti++){
+    var tr=TRAMO_LIST[ti];
+    var trRows=wkData.tramos[tr]||[];
+    if(trRows.length>0){
+      tramoData[tr]=calcBPPTramo(trRows,gmvRows,gmvCol);
+      tramoDisp.push(tr);
     }
   }
 
-  var cashout = 0;
-  for (var i = 0; i < wkReal.length; i++) cashout += tousd(wkReal[i]['Bpp Cashout Usd']);
-  var gmvTotal = 0;
-  var gmvCol = rows.length > 0 && rows[0]['TOTALGMV'] !== undefined ? 'TOTALGMV' : 'TotalGMV (std)';
-  for (var i = 0; i < wkGmv.length; i++) gmvTotal += tousd(wkGmv[i][gmvCol]);
-  var pct = gmvTotal > 0 ? Math.round(cashout/gmvTotal*1000000)/10000 : 0;
-
-  // Tendência
-  var tend = Object.keys(wkAll).sort().map(function(wk) {
-    var co = 0; for (var i = 0; i < wkAll[wk].real.length; i++) co += tousd(wkAll[wk].real[i]['Bpp Cashout Usd']);
-    var gm = 0; for (var i = 0; i < wkAll[wk].gmv.length; i++) gm += tousd(wkAll[wk].gmv[i][gmvCol]);
-    return {wk:wk, cashout:Math.round(co*100)/100, gmv:Math.round(gm*100)/100, pct:gm>0?Math.round(co/gm*1000000)/10000:0};
+  // Tendência geral
+  var tend=Object.keys(byWk).sort().map(function(wk){
+    var wr=[]; for(var t in byWk[wk].tramos) for(var i=0;i<byWk[wk].tramos[t].length;i++) wr.push(byWk[wk].tramos[t][i]);
+    var co=0; for(var i=0;i<wr.length;i++) co+=tousd(wr[i]['Bpp Cashout Usd']);
+    var gm=0; for(var i=0;i<byWk[wk].gmv.length;i++) gm+=tousd(byWk[wk].gmv[i][gmvCol]);
+    return{wk:wk,cashout:Math.round(co*100)/100,gmv:Math.round(gm*100)/100,pct:gm>0?Math.round(co/gm*1000000)/10000:0};
   });
 
-  // MLP
-  var mlpMap = {};
-  for (var i = 0; i < wkReal.length; i++) {
-    var r = wkReal[i];
-    var mlp = (r['MLP']||'').indexOf('Sin Asignar')>=0 ? 'SVC (' + cfg.svc + ')' : (r['MLP']||'Outros');
-    if (!mlpMap[mlp]) mlpMap[mlp] = {total:0,cashout:0,gmv:0,lost:0,dmg:0,pnr:0,drivers:{}};
-    mlpMap[mlp].total++;
-    mlpMap[mlp].cashout += tousd(r['Bpp Cashout Usd']);
-    var fc = r['F_CLASIFICATION']||'';
-    if (fc==='LOST') mlpMap[mlp].lost++;
-    if (fc==='DAMAGED') mlpMap[mlp].dmg++;
-    if (fc==='PNR C') mlpMap[mlp].pnr++;
-    var drv = r['Driver Id']||'';
-    if (drv && drv !== 'nan') {
-      if (!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,lost:0,dmg:0,pnr:0,node:'',tramo:'',status:'',aging:''};
-      var d = mlpMap[mlp].drivers[drv];
-      d.total++; d.cashout+=tousd(r['Bpp Cashout Usd']);
-      if (fc==='LOST') d.lost++;
-      if (fc==='DAMAGED') d.dmg++;
-      if (fc==='PNR C') d.pnr++;
-      if (r['NODE_ID']) d.node = r['NODE_ID'];
-      if (r['NODES_LM']) d.tramo = r['NODES_LM'];
-      if (r['Driver Status']) d.status = r['Driver Status'];
-      if (r['Driver Aging clas']) d.aging = r['Driver Aging clas'];
-    }
-  }
-  for (var i = 0; i < wkGmv.length; i++) {
-    var r = wkGmv[i];
-    var mlp = (r['MLP']||'').indexOf('Sin Asignar')>=0 ? 'SVC (' + cfg.svc + ')' : (r['MLP']||'Outros');
-    if (mlpMap[mlp]) mlpMap[mlp].gmv += tousd(r[gmvCol]);
+  // Tendência por tramo
+  var tendTramo={};
+  for(var ti=0;ti<tramoDisp.length;ti++){
+    var tr=tramoDisp[ti];
+    tendTramo[tr]=Object.keys(byWk).sort().map(function(wk){
+      var wr=byWk[wk].tramos[tr]||[];
+      var co=0; for(var i=0;i<wr.length;i++) co+=tousd(wr[i]['Bpp Cashout Usd']);
+      var gm=0; for(var i=0;i<byWk[wk].gmv.length;i++) gm+=tousd(byWk[wk].gmv[i][gmvCol]);
+      return{wk:wk,cashout:Math.round(co*100)/100,gmv:Math.round(gm*100)/100,pct:gm>0?Math.round(co/gm*1000000)/10000:0};
+    });
   }
 
-  var mlpList = Object.keys(mlpMap).map(function(mlp) {
-    var v = mlpMap[mlp];
-    var pctM = v.gmv > 0 ? Math.round(v.cashout/v.gmv*1000000)/10000 : null;
-    var top3 = Object.keys(v.drivers).map(function(k){ return {id:k, total:v.drivers[k].total, cashout:Math.round(v.drivers[k].cashout*100)/100, lost:v.drivers[k].lost, dmg:v.drivers[k].dmg, pnr:v.drivers[k].pnr, node:v.drivers[k].node, tramo:v.drivers[k].tramo, status:v.drivers[k].status, aging:v.drivers[k].aging}; });
-    top3.sort(function(a,b){ return b.total-a.total; });
-    return {mlp:mlp, total:v.total, cashout:Math.round(v.cashout*100)/100, gmv:Math.round(v.gmv*100)/100, lost:v.lost, dmg:v.dmg, pnr:v.pnr, pct:pctM, top3:top3.slice(0,3)};
-  });
-  mlpList.sort(function(a,b){ return (b.pct||0)-(a.pct||0); });
+  // IDs BPP
+  var ids_bpp={};
+  for(var t in wkData.tramos) for(var i=0;i<wkData.tramos[t].length;i++) ids_bpp[wkData.tramos[t][i]['Shipment']]=true;
 
-  // Tipos
-  var tipoMap = {};
-  for (var i = 0; i < wkReal.length; i++) { var fc = wkReal[i]['F_CLASIFICATION']||'?'; tipoMap[fc]=(tipoMap[fc]||0)+1; }
-  var tipos = topN(tipoMap,10).map(function(x){ return [x[0],x[1]]; });
-
-  // IDs
-  var ids_bpp = {};
-  for (var i = 0; i < wkReal.length; i++) ids_bpp[wkReal[i]['Shipment']] = true;
-
-  return { cashout:Math.round(cashout*100)/100, gmv:Math.round(gmvTotal*100)/100, pct:pct, total:wkReal.length, tend:tend, mlpList:mlpList, tipos:tipos, ids_bpp:ids_bpp };
+  return{geral:geralData,tramos:tramoData,tramoDisp:tramoDisp,tend:tend,tendTramo:tendTramo,ids_bpp:ids_bpp};
 }
 
-function calcPK() {
-  var sort = RAW.sort || [];
-  var et = RAW.et || [];
-
-  // Sorting por dia
-  var sortByDay = {};
-  for (var i = 0; i < sort.length; i++) {
-    var dt = (sort[i]['DATA_EVENTO']||'').slice(0,10);
-    var ev = sort[i]['EVENT_TYPE']||'';
-    if (!sortByDay[dt]) sortByDay[dt] = {total:0,qr_sem:0,gaiola:0,saida:0};
+function calcPK(){
+  var sort=RAW.sort||[],et=RAW.et||[];
+  var sortByDay={};
+  for(var i=0;i<sort.length;i++){
+    var dt=(sort[i]['DATA_EVENTO']||'').slice(0,10),ev=sort[i]['EVENT_TYPE']||'';
+    if(!sortByDay[dt]) sortByDay[dt]={total:0,qr_sem:0,gaiola:0,saida:0};
     sortByDay[dt].total++;
-    if (ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByDay[dt].qr_sem++;
-    else if (ev==='CONTAINER_MISMATCH') sortByDay[dt].gaiola++;
-    else if (ev==='FORCE_EXIT') sortByDay[dt].saida++;
+    if(ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByDay[dt].qr_sem++;
+    else if(ev==='CONTAINER_MISMATCH') sortByDay[dt].gaiola++;
+    else if(ev==='FORCE_EXIT') sortByDay[dt].saida++;
   }
-
-  // Sorting por operador
-  var sortByOp = {};
-  for (var i = 0; i < sort.length; i++) {
-    var op = sort[i]['OPERADOR']||'?', ev = sort[i]['EVENT_TYPE']||'';
-    if (!sortByOp[op]) sortByOp[op]={total:0,qr_sem:0,gaiola:0,saida:0,div:0};
+  var sortByOp={};
+  for(var i=0;i<sort.length;i++){
+    var op=sort[i]['OPERADOR']||'?',ev=sort[i]['EVENT_TYPE']||'',mot=sort[i]['MOTIVO_POKA_YOKE']||'Outros';
+    if(!sortByOp[op]) sortByOp[op]={total:0,qr_sem:0,gaiola:0,saida:0,div:0,motivos:{}};
     sortByOp[op].total++;
-    if (ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByOp[op].qr_sem++;
-    else if (ev==='CONTAINER_MISMATCH') sortByOp[op].gaiola++;
-    else if (ev==='FORCE_EXIT') sortByOp[op].saida++;
-    else if (ev==='SHIPMENT_MISMATCH') sortByOp[op].div++;
+    sortByOp[op].motivos[mot]=(sortByOp[op].motivos[mot]||0)+1;
+    if(ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByOp[op].qr_sem++;
+    else if(ev==='CONTAINER_MISMATCH') sortByOp[op].gaiola++;
+    else if(ev==='FORCE_EXIT') sortByOp[op].saida++;
+    else if(ev==='SHIPMENT_MISMATCH') sortByOp[op].div++;
   }
-  var sortOps = Object.keys(sortByOp).map(function(k){ return {op:k,total:sortByOp[k].total,qr_sem:sortByOp[k].qr_sem,gaiola:sortByOp[k].gaiola,saida:sortByOp[k].saida,div:sortByOp[k].div}; });
-  sortOps.sort(function(a,b){ return b.total-a.total; });
+  var sortOps=Object.keys(sortByOp).map(function(k){
+    var v=sortByOp[k];
+    var topMot=Object.keys(v.motivos).map(function(m){return[m,v.motivos[m]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
+    return{op:k,total:v.total,qr_sem:v.qr_sem,gaiola:v.gaiola,saida:v.saida,div:v.div,topMot:topMot};
+  });
+  sortOps.sort(function(a,b){return b.total-a.total;}); sortOps=sortOps.slice(0,20);
+  var motMap={};for(var i=0;i<sort.length;i++){var m=sort[i]['MOTIVO_POKA_YOKE']||'?';motMap[m]=(motMap[m]||0)+1;}
+  var sortMotivos=topN(motMap,10).map(function(x){return[x[0],x[1]];});
 
-  // Motivos
-  var motivoMap = {};
-  for (var i = 0; i < sort.length; i++) { var m = sort[i]['MOTIVO_POKA_YOKE']||'?'; motivoMap[m]=(motivoMap[m]||0)+1; }
-  var sortMotivos = topN(motivoMap, 10).map(function(x){ return [x[0],x[1]]; });
-
-  // Etiquetagem - dedup
-  var etSeen = {}, etDedup = [];
-  for (var i = 0; i < et.length; i++) { var k = (et[i]['ID']||'')+'|'+(et[i]['Usuario_Recebido']||''); if (!etSeen[k]) { etSeen[k]=true; etDedup.push(et[i]); } }
-  var etByOp = {};
-  for (var i = 0; i < etDedup.length; i++) {
-    var op = etDedup[i]['Usuario_Recebido']||'?';
-    if (!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0};
+  var etSeen={},etDedup=[];
+  for(var i=0;i<et.length;i++){var k=(et[i]['ID']||'')+'|'+(et[i]['Usuario_Recebido']||'');if(!etSeen[k]){etSeen[k]=true;etDedup.push(et[i]);}}
+  var etByOp={};
+  for(var i=0;i<etDedup.length;i++){
+    var r=etDedup[i],op=r['Usuario_Recebido']||'?',err=r['Erro']||'',mot=r['Motivo']||r['Erro']||'Outros';
+    if(!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0,motivos:{}};
     etByOp[op].total++;
-    if (etDedup[i]['Erro']==='QR_PROBLEM_WITHOUT_POKAYOKE') etByOp[op].sem_pk++;
-    else etByOp[op].com_pk++;
+    etByOp[op].motivos[mot]=(etByOp[op].motivos[mot]||0)+1;
+    if(err==='QR_PROBLEM_WITHOUT_POKAYOKE') etByOp[op].sem_pk++; else etByOp[op].com_pk++;
   }
-  var etOps = Object.keys(etByOp).map(function(k){ return {op:k,total:etByOp[k].total,sem_pk:etByOp[k].sem_pk,com_pk:etByOp[k].com_pk}; });
-  etOps.sort(function(a,b){ return b.total-a.total; });
+  var etOps=Object.keys(etByOp).map(function(k){
+    var v=etByOp[k];
+    var topMot=Object.keys(v.motivos).map(function(m){return[m,v.motivos[m]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
+    return{op:k,total:v.total,sem_pk:v.sem_pk,com_pk:v.com_pk,topMot:topMot};
+  });
+  etOps.sort(function(a,b){return b.total-a.total;}); etOps=etOps.slice(0,20);
+  var etMotMap={};for(var i=0;i<etDedup.length;i++){var e=etDedup[i]['Erro']||'?';etMotMap[e]=(etMotMap[e]||0)+1;}
+  var etMotivos=topN(etMotMap,5).map(function(x){return[x[0],x[1]];});
 
-  // IDs para correlação
-  var ids_sort = {}, ids_et = {};
-  for (var i = 0; i < sort.length; i++) ids_sort[sort[i]['ID_PACOTE']] = true;
-  for (var i = 0; i < etDedup.length; i++) ids_et[etDedup[i]['ID']] = true;
+  var ids_sort={},ids_et={};
+  for(var i=0;i<sort.length;i++) ids_sort[sort[i]['ID_PACOTE']]=true;
+  for(var i=0;i<etDedup.length;i++) ids_et[etDedup[i]['ID']]=true;
 
-  return { sort:{total:sort.length,byDay:sortByDay,ops:sortOps.slice(0,20),motivos:sortMotivos}, et:{total:etDedup.length,ops:etOps.slice(0,20)}, ids_sort:ids_sort, ids_et:ids_et };
+  return{sort:{total:sort.length,byDay:sortByDay,ops:sortOps,motivos:sortMotivos},
+         et:{total:etDedup.length,ops:etOps,motivos:etMotivos},ids_sort:ids_sort,ids_et:ids_et};
 }
 
-function calcAduanas(acc, bpp, pk, desloc) {
-  var rows = RAW.aduana || [];
-  var seen = {}, ids = [];
-  for (var i = 0; i < rows.length; i++) { var pid = rows[i]['ID_Pacote']||''; if (pid && !seen[pid]) { seen[pid]=rows[i]; ids.push(pid); } }
-
-  var master = ids.map(function(pid) {
-    var r = seen[pid];
-    var f=!!acc.ids_falt[pid], b=!!bpp.ids_bpp[pid], s=!!pk.ids_sort[pid], e=!!pk.ids_et[pid], d=!!desloc.ids[pid];
-    return {id:pid,mlp:r['MLP']||'',usuario:r['USUARIO_BIP']||'',data:(r['DATA_CRIACAO_AUDITORIA']||'').slice(0,10),falt:f,bpp:b,sort:s,et:e,desloc:d,score:+f+b+s+e+d};
+function calcAduanas(acc,bpp,pk,desloc){
+  var rows=RAW.aduana||[],seen={},ids=[];
+  for(var i=0;i<rows.length;i++){var pid=rows[i]['ID_Pacote']||'';if(pid&&!seen[pid]){seen[pid]=rows[i];ids.push(pid);}}
+  var master=ids.map(function(pid){
+    var r=seen[pid];
+    var f=!!acc.ids_falt[pid],b=!!bpp.ids_bpp[pid],s=!!pk.ids_sort[pid],e=!!pk.ids_et[pid],d=!!desloc.ids[pid];
+    var rota=r['ROTA_LOG']||'';
+    return{id:pid,mlp:r['MLP']||'',usuario:r['USUARIO_BIP']||'',data:(r['DATA_CRIACAO_AUDITORIA']||'').slice(0,10),rota:String(rota),falt:f,bpp:b,sort:s,et:e,desloc:d,score:+f+b+s+e+d};
   });
-
-  var byUser={}, byMlp={}, byDay={};
-  for (var i=0;i<master.length;i++) {
+  var byUser={},byMlp={},byDay={};
+  for(var i=0;i<master.length;i++){
     var m=master[i];
-    if (!byUser[m.usuario]) byUser[m.usuario]={total:0,falt:0,bpp:0,sort:0,score:0};
-    byUser[m.usuario].total++; byUser[m.usuario].falt+=m.falt?1:0; byUser[m.usuario].bpp+=m.bpp?1:0; byUser[m.usuario].sort+=m.sort?1:0; byUser[m.usuario].score+=m.score;
+    if(!byUser[m.usuario]) byUser[m.usuario]={total:0,falt:0,bpp:0,sort:0,score:0,rotas:{}};
+    byUser[m.usuario].total++; byUser[m.usuario].falt+=m.falt?1:0; byUser[m.usuario].bpp+=m.bpp?1:0;
+    byUser[m.usuario].sort+=m.sort?1:0; byUser[m.usuario].score+=m.score;
+    if(m.rota) byUser[m.usuario].rotas[m.rota]=true;
     var mk=m.mlp||'Sem MLP';
-    if (!byMlp[mk]) byMlp[mk]={total:0,falt:0,bpp:0,sort:0,desloc:0};
-    byMlp[mk].total++; byMlp[mk].falt+=m.falt?1:0; byMlp[mk].bpp+=m.bpp?1:0; byMlp[mk].sort+=m.sort?1:0; byMlp[mk].desloc+=m.desloc?1:0;
-    if (!byDay[m.data]) byDay[m.data]={total:0,falt:0};
+    if(!byMlp[mk]) byMlp[mk]={total:0,falt:0,bpp:0,sort:0,desloc:0,rotas:{}};
+    byMlp[mk].total++; byMlp[mk].falt+=m.falt?1:0; byMlp[mk].bpp+=m.bpp?1:0;
+    byMlp[mk].sort+=m.sort?1:0; byMlp[mk].desloc+=m.desloc?1:0;
+    if(m.rota) byMlp[mk].rotas[m.rota]=true;
+    if(!byDay[m.data]) byDay[m.data]={total:0,falt:0};
     byDay[m.data].total++; byDay[m.data].falt+=m.falt?1:0;
   }
-
-  var users = Object.keys(byUser).map(function(k){ return {u:k,total:byUser[k].total,falt:byUser[k].falt,bpp:byUser[k].bpp,sort:byUser[k].sort,score:byUser[k].score,pctFalt:byUser[k].total>0?Math.round(byUser[k].falt/byUser[k].total*1000)/10:0}; });
-  users.sort(function(a,b){ return b.total-a.total; });
-  var mlpAd = Object.keys(byMlp).map(function(k){ return {mlp:k,total:byMlp[k].total,falt:byMlp[k].falt,bpp:byMlp[k].bpp,sort:byMlp[k].sort,desloc:byMlp[k].desloc,pctFalt:byMlp[k].total>0?Math.round(byMlp[k].falt/byMlp[k].total*1000)/10:0}; });
-  mlpAd.sort(function(a,b){ return b.total-a.total; });
-  var adDays = Object.keys(byDay).sort().map(function(k){ return {dt:k,total:byDay[k].total,falt:byDay[k].falt,pctFalt:byDay[k].total>0?Math.round(byDay[k].falt/byDay[k].total*1000)/10:0}; });
-
-  var cadeia = master.filter(function(m){ return m.score>=3; });
-  return { total:ids.length, comFalha:master.filter(function(m){return m.score>0;}).length, cadeia:cadeia.slice(0,20), faltBpp:master.filter(function(m){return m.falt&&m.bpp;}).length, faltPk:master.filter(function(m){return m.falt&&(m.sort||m.et);}).length, users:users.slice(0,20), mlp:mlpAd, byDay:adDays };
+  var users=Object.keys(byUser).map(function(k){
+    var v=byUser[k]; var rotas=Object.keys(v.rotas).slice(0,3);
+    return{u:k,total:v.total,falt:v.falt,bpp:v.bpp,sort:v.sort,score:v.score,pctFalt:v.total>0?Math.round(v.falt/v.total*1000)/10:0,rotas:rotas};
+  });
+  users.sort(function(a,b){return b.total-a.total;});
+  var mlpAd=Object.keys(byMlp).map(function(k){
+    var v=byMlp[k]; var rotas=Object.keys(v.rotas).slice(0,3);
+    return{mlp:k,total:v.total,falt:v.falt,bpp:v.bpp,sort:v.sort,desloc:v.desloc,pctFalt:v.total>0?Math.round(v.falt/v.total*1000)/10:0,rotas:rotas};
+  });
+  mlpAd.sort(function(a,b){return b.total-a.total;});
+  var adDays=Object.keys(byDay).sort().map(function(k){return{dt:k,total:byDay[k].total,falt:byDay[k].falt,pctFalt:byDay[k].total>0?Math.round(byDay[k].falt/byDay[k].total*1000)/10:0};});
+  var cadeia=master.filter(function(m){return m.score>=3;});
+  return{total:ids.length,comFalha:master.filter(function(m){return m.score>0;}).length,cadeia:cadeia.slice(0,20),faltBpp:master.filter(function(m){return m.falt&&m.bpp;}).length,faltPk:master.filter(function(m){return m.falt&&(m.sort||m.et);}).length,users:users.slice(0,20),mlp:mlpAd,byDay:adDays};
 }
 
-// ── EXPORTAR AÇÕES ──────────────────────────
-function exportAcoes(aba) {
-  if (!D) return;
-  var cfg=D.cfg, acc=D.acc, desloc=D.desloc, bpp=D.bpp, pk=D.pk, aduana=D.aduana;
-  var hoje = new Date().toLocaleDateString('pt-BR');
-  var mes = new Date().getMonth()+1;
-  var topMlp = bpp.mlpList.length>0 ? bpp.mlpList[0] : null;
-  var topSort = pk.sort.ops.length>0 ? pk.sort.ops[0] : null;
-  var topEt = pk.et.ops.length>0 ? pk.et.ops[0] : null;
-  var topAdFalt = D.aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0] || null;
+// ── EXPORT AÇÕES ──
+function exportAcoes(aba){
+  if(!D) return;
+  var cfg=D.cfg,acc=D.acc,desloc=D.desloc,bpp=D.bpp,pk=D.pk,aduana=D.aduana;
+  var hoje=new Date().toLocaleDateString('pt-BR'),mes=new Date().getMonth()+1;
+  var topSort=pk.sort.ops.length>0?pk.sort.ops[0]:null;
+  var topEt=pk.et.ops.length>0?pk.et.ops[0]:null;
+  var topDesOp=desloc.ops.length>0?desloc.ops[0]:null;
+  var topAdFalt=aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0]||null;
+  var topMlpBpp=bpp.geral.mlpList.length>0?bpp.geral.mlpList[0]:null;
 
-  var acoesPorAba = {
-    accuracy: [
-      ['INVENTARIO - Accuracy','Contagem emergencial nas zonas criticas (PS / For Returns) — bipar cada pacote na entrada','','','','Em andamento','','PS com accuracy critica. Designar operador fixo. Validar via Query3.'],
-      ['INVENTARIO - Accuracy','Acionar TechOps para pacotes com erro sistemico (SHP con 2.0)','','','','Em andamento','','Nao contabilizar como perda operacional. Abrir ticket com IDs afetados.']
+  var acoesPorAba={
+    accuracy:[
+      ['INVENTARIO - Accuracy','Contagem emergencial nas zonas criticas (PS / For Returns) + bipar cada pacote na entrada','','D+1','','Em andamento','','PS com accuracy critica. Designar operador fixo. Validar via Query3.'],
+      ['INVENTARIO - Accuracy','Acionar TechOps para pacotes com erro sistemico (SHP con 2.0)','','D+3','','Em andamento','','Nao contabilizar como perda operacional. Abrir ticket com IDs afetados.']
     ],
-    deslocados: [
-      ['INVENTARIO - Deslocados','Corrigir ' + desloc.naoCorrigidos + ' deslocados pendentes + reforca passagem de turno fim de semana','','','','Em andamento','','Priorizar operadores com maior % de nao correcao. Feedback 1:1 com lider.']
-    ],
-    bpp: [
-      ['BPP','Reuniao com MLP de maior % BPP Bruto + acionamento LP para drivers com alto cashout','','','','Em andamento','','Acionar LP para cashout >USD 100 (WI). Verificar drivers blocked.'],
-      topMlp ? ['BPP','Reuniao de desempenho — ' + topMlp.mlp + ' (' + (topMlp.pct ? topMlp.pct.toFixed(3) : '?') + '% BPP)','','','','Em andamento','','Top MLP ' + cfg.week + '. Cashout USD ' + fmtN(topMlp.cashout) + '.'] : null
+    deslocados:[
+      ['INVENTARIO - Deslocados','Corrigir '+desloc.naoCorrigidos+' deslocados pendentes — reforcar passagem de turno','','D+1','','Em andamento','','Priorizar operadores com maior % de nao correcao.'],
+      topDesOp?['INVENTARIO - Deslocados','Feedback 1:1 — Op. '+topDesOp.id+' ('+topDesOp.total+' desl, '+topDesOp.nc+' nao corrigidos)','Lider de turno','D+2','','Em andamento','','Maior ofensor da semana. Verificar padrao de comportamento.']:null
     ].filter(Boolean),
-    pokayoke: [
-      ['POKA YOKE - Sorting','Reciclagem critica — saidas forcadas + QR sem cobertura + gaiola errada','','','','Em andamento','','Top ofensor sorting: ' + (topSort ? topSort.op : '-') + ' (' + (topSort ? topSort.total : 0) + ' erros). Saida forcada = risco disciplinar.'],
-      ['POKA YOKE - Etiquetagem','Reciclagem critica — operadores sem cobertura PK','','','','Em andamento','','Top ofensor etiquetagem: ' + (topEt ? topEt.op : '-') + ' (' + (topEt ? topEt.total : 0) + ' erros).'],
-      ['POKA YOKE','Mapear pontos sem cobertura PK e acionar TechOps/Infra','','','','Em andamento','','QR_PROBLEM_WITHOUT_POKAYOKE recorrente. Goleiro manual enquanto aguarda.']
+    bpp:[
+      ['BPP','Reuniao com MLP de maior % BPP + acionamento LP para drivers com alto cashout','Analista BPP','D+1','','Em andamento','','Acionar LP para cashout > USD 100.'],
+      topMlpBpp?['BPP','Alinhamento com '+topMlpBpp.mlp+' — cashout USD '+topMlpBpp.cashout.toFixed(2)+' — top ofensor '+cfg.week,'Analista BPP','D+2','','Em andamento','','Apresentar dados de Lost/Damaged/PNR por driver. Solicitar plano de acao.']:null
+    ].filter(Boolean),
+    pokayoke:[
+      ['POKA YOKE - Sorting','Reciclagem critica — '+( topSort?topSort.op+' ('+topSort.total+' erros)':'-' )+' — focar em saidas forcadas e gaiola errada','Lider Sorting','D+1','','Em andamento','','Saida forcada = risco disciplinar imediato. Bipar gaiola antes do QR.'],
+      ['POKA YOKE - Etiquetagem','Reciclagem critica — '+(topEt?topEt.op+' ('+topEt.total+' erros)':'-')+' — sem cobertura PK','Lider Etiquetagem','D+2','','Em andamento','','Ponto sem sensor PK. Goleiro manual enquanto aguarda TechOps.'],
+      ['POKA YOKE','Mapear pontos sem cobertura PK e abrir ticket TechOps/Infra','TechOps','D+3','','Em andamento','','QR_PROBLEM_WITHOUT_POKAYOKE recorrente indica gap de infraestrutura.']
     ],
-    aduana: [
-      ['INVENTARIO - Aduanas','Investigar ' + aduana.cadeia.length + ' pacotes com cadeia de falha (score 3+) — ' + aduana.faltBpp + ' com faltante+BPP','','','','Em andamento','','Risco de BPP pago indevidamente. Acionar LP.'],
-      ['INVENTARIO - Aduanas','Feedback para operadores com alta taxa de faltante na bipagem (Para MENOS)','','','','Em andamento','','Taxa elevada indica bipagem sem conferencia fisica.'],
-      topAdFalt ? ['INVENTARIO - Aduanas','Op. ' + topAdFalt.u + ' — ' + topAdFalt.pctFalt + '% faltante em ' + topAdFalt.total + ' aduanas','','','','Em andamento','','Maior taxa para menos ' + cfg.week + '.'] : null
+    aduana:[
+      ['INVENTARIO - Aduanas','Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha (score >= 3) — '+aduana.faltBpp+' com faltante+BPP','Analista Inv.','D+1','','Em andamento','','Risco de BPP pago indevidamente. Acionar LP para cashout relevante.'],
+      topAdFalt?['INVENTARIO - Aduanas','Feedback — Op. '+topAdFalt.u+' com '+topAdFalt.pctFalt+'% faltante em '+topAdFalt.total+' aduanas — Rotas: '+topAdFalt.rotas.slice(0,2).join(', '),'Lider Aduana','D+2','','Em andamento','','Bipagem sem conferencia fisica confirmada. Acompanhar proxima auditoria.']:null
     ].filter(Boolean)
   };
 
-  var acoes = aba === 'todas' ? [].concat(acoesPorAba.accuracy, acoesPorAba.deslocados, acoesPorAba.bpp, acoesPorAba.pokayoke, acoesPorAba.aduana) : (acoesPorAba[aba] || []);
-
-  var headers = ['DATA ABERTURA','Mes','WEEK','INDICADOR','ACAO','RESPONSAVEL','DATA PROGRAMADA','REPROGRAMADA','STATUS','DATA CONCLUSAO','COMENTARIOS'];
-  var csvRows = acoes.map(function(a) {
-    var row = [hoje, mes, cfg.week].concat(a);
-    return row.map(function(c){ return '"' + String(c||'').replace(/"/g,'""') + '"'; }).join(';');
+  var acoes=aba==='todas'?[].concat(acoesPorAba.accuracy,acoesPorAba.deslocados,acoesPorAba.bpp,acoesPorAba.pokayoke,acoesPorAba.aduana):(acoesPorAba[aba]||[]);
+  var headers=['DATA ABERTURA','Mes','WEEK','INDICADOR','ACAO','RESPONSAVEL','DATA PROGRAMADA','REPROGRAMADA','STATUS','DATA CONCLUSAO','COMENTARIOS'];
+  var csvRows=acoes.map(function(a){
+    var row=[hoje,mes,cfg.week].concat(a);
+    return row.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(';');
   });
-  var csv = '\uFEFF' + headers.map(function(h){return '"'+h+'"';}).join(';') + '\n' + csvRows.join('\n');
-
-  var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
+  var csv='\uFEFF'+headers.map(function(h){return'"'+h+'"';}).join(';')+'\n'+csvRows.join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
   a.href=url; a.download='Acoes_'+cfg.svc+'_'+cfg.week+'_'+aba+'.csv';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
-// ── NAVEGAÇÃO ────────────────────────────────
-function showTab(id, btn) {
-  var tabs = document.querySelectorAll('.tab');
-  for (var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
-  var nbs = document.querySelectorAll('.nb');
-  for (var i=0; i<nbs.length; i++) nbs[i].classList.remove('active');
-  var el = document.getElementById(id);
-  if (el) el.classList.add('active');
-  if (btn) btn.classList.add('active');
-  setTimeout(drawAllCharts, 60);
+// ── NAVEGAÇÃO ──
+function showTab(id,btn){
+  var tabs=document.querySelectorAll('.tab'); for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+  var nbs=document.querySelectorAll('.nb'); for(var i=0;i<nbs.length;i++) nbs[i].classList.remove('active');
+  var el=document.getElementById(id); if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+  setTimeout(drawAllCharts,60);
 }
 
-function resetDemo() {
+function showSubTab(tramo){
+  var panels=document.querySelectorAll('.subpanel'); for(var i=0;i<panels.length;i++) panels[i].classList.remove('active');
+  var btns=document.querySelectorAll('.snb'); for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+  var el=document.getElementById('bpp-'+tramo); if(el) el.classList.add('active');
+  var btn=document.getElementById('snb-'+tramo); if(btn) btn.classList.add('active');
+  setTimeout(drawAllCharts,60);
+}
+
+function resetDemo(){
   document.getElementById('demoScreen').style.display='none';
   document.getElementById('demoScreen').innerHTML='';
   document.getElementById('uploadScreen').style.display='flex';
   RAW={}; LOADED=0; D=null;
   var items=document.querySelectorAll('.up-item'); for(var i=0;i<items.length;i++) items[i].classList.remove('ok');
-  var sts=document.querySelectorAll('.up-st'); for(var i=0;i<sts.length;i++) sts[i].textContent='Aguardando';
+  var sts=document.querySelectorAll('.up-st'); for(var i=0;i<sts.length;i++) sts[i].textContent='\u2b06 Aguardando';
   document.getElementById('upFill').style.width='0%';
   document.getElementById('upLabel').textContent='0 de 7 arquivos carregados';
   document.getElementById('btnGo').disabled=true;
 }
 
-// ── HELPERS DE FORMATAÇÃO ────────────────────
-function fmtPct(n) { return typeof n==='number' ? n.toFixed(1)+'%' : '--'; }
-function fmtBpp(n) { return typeof n==='number' ? n.toFixed(3)+'%' : '--'; }
-function fmtN(n) { return typeof n==='number' ? n.toLocaleString('pt-BR',{maximumFractionDigits:2}) : '--'; }
-function clrAcc(v) { return v>=80 ? 'var(--gn)' : v>=70 ? 'var(--or)' : 'var(--rd)'; }
-function clrPct(v,ok,warn) { return v<=ok ? 'var(--gn)' : v<=warn ? 'var(--or)' : 'var(--rd)'; }
-
-// ── GERAÇÃO DO HTML ──────────────────────────
-function gerarDemo() {
-  try {
-    processar();
-  } catch(e) {
-    alert('Erro ao processar os dados: ' + e.message + '\n\nVerifique se os arquivos estao corretos e na ordem certa.');
-    return;
-  }
+function gerarDemo(){
+  try{ processar(); }
+  catch(e){ alert('Erro ao processar: '+e.message); return; }
   renderDemo();
 }
 
+// ── HELPERS ──
+function fmtPct(n){return typeof n==='number'?n.toFixed(1)+'%':'--';}
+function fmtBpp(n){return typeof n==='number'?n.toFixed(3)+'%':'--';}
+function fmtN(n){return typeof n==='number'?n.toLocaleString('pt-BR',{maximumFractionDigits:2}):'--';}
+function clrAcc(v){return v>=80?'var(--gn)':v>=70?'var(--or)':'var(--rd)';}
+function tag(cls,txt){return '<span class="tag '+cls+'">'+txt+'</span>';}
+function rn(i){var cls=i<3?'r'+(i+1):'';return '<span class="rn '+cls+'">'+(i+1)+'</span>';}
+function rotaChips(rotas){if(!rotas||rotas.length===0) return '<span style="color:var(--td);font-size:9px">—</span>';return rotas.map(function(r){return '<span class="rota-chip">'+r+'</span>';}).join('');}
+function btnExp(aba){return '<button class="btn-export-aba" onclick="exportAcoes(\''+aba+'\')">&#128229; Exportar A&ccedil;&otilde;es</button>';}
 
 
-// ── RENDER DO DEMONSTRATIVO ──────────────────
-function renderDemo() {
-  var d = D;
-  var cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
-
-  // Botão de export por aba
-  function btnExp(aba) {
-    return '<button class="btn-export-aba" onclick="exportAcoes(\''+aba+'\')">📥 Exportar Ações</button>';
-  }
-
-  // Helper de tag
-  function tag(cls,txt) { return '<span class="tag '+cls+'">'+txt+'</span>'; }
-  function rn(i) { var cls=i<3?'r'+(i+1):''; return '<span class="rn '+cls+'">'+(i+1)+'</span>'; }
+function renderDemo(){
+  var d=D, cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
 
   // ── ACCURACY ROWS ──
-  var accDayHead = '<thead><tr><th>Indicador</th>';
-  var accInvRow = '<tr><td>Inventariado</td>';
-  var accFaltRow = '<tr><td>Faltantes</td>';
-  var accPctRow = '<tr><td>% Accuracy</td>';
-  var accMetaRow = '<tr><td>vs Meta 80%</td>';
-  for (var i=0; i<acc.days.length; i++) {
+  var accHead='<thead><tr><th>Indicador</th>';
+  var rowInv='<tr><td>Inventariado</td>',rowFalt='<tr><td>Faltantes</td>',rowPct='<tr><td>% Accuracy</td>',rowMeta='<tr><td>vs Meta 80%</td>';
+  for(var i=0;i<acc.days.length;i++){
     var day=acc.days[i];
-    accDayHead += '<th>'+day.label+'</th>';
-    accInvRow += '<td class="mono">'+day.inv.toLocaleString()+'</td>';
-    var fclr = day.falt>1200 ? 'color:var(--rd)' : '';
-    accFaltRow += '<td class="mono" style="'+fclr+'">'+day.falt.toLocaleString()+'</td>';
-    accPctRow += '<td class="mono" style="color:'+clrAcc(day.acc)+'">'+day.acc.toFixed(1)+'%</td>';
-    var gap = day.acc-80; var gclr = gap>=0?'var(--gn)':'var(--rd)'; var sg = gap>=0?'+':'-';
-    accMetaRow += '<td class="mono" style="color:'+gclr+'">'+sg+Math.abs(gap).toFixed(1)+'pp</td>';
+    accHead+='<th>'+day.label+'</th>';
+    rowInv+='<td class="mono">'+day.inv.toLocaleString()+'</td>';
+    rowFalt+='<td class="mono" style="color:'+(day.falt>1200?'var(--rd)':'inherit')+'">'+day.falt.toLocaleString()+'</td>';
+    rowPct+='<td class="mono" style="color:'+clrAcc(day.acc)+'">'+day.acc.toFixed(1)+'%</td>';
+    var gap=day.acc-80; var sg=gap>=0?'+':'-'; var gc=gap>=0?'var(--gn)':'var(--rd)';
+    rowMeta+='<td class="mono" style="color:'+gc+'">'+sg+Math.abs(gap).toFixed(1)+'pp</td>';
   }
-  accDayHead += '</tr></thead>';
-  accInvRow += '</tr>'; accFaltRow += '</tr>'; accPctRow += '</tr>'; accMetaRow += '</tr>';
+  accHead+='</tr></thead>';
+  rowInv+='</tr>'; rowFalt+='</tr>'; rowPct+='</tr>'; rowMeta+='</tr>';
 
-  var zonaRows = acc.porZona.map(function(zv,i) {
-    var z=zv[0],v=zv[1]; var pct=acc.totalFalt>0?v/acc.totalFalt*100:0;
+  var zonaRows=acc.porZona.map(function(zv,i){
+    var z=zv[0],v=zv[1],pct=acc.totalFalt>0?v/acc.totalFalt*100:0;
     var sev=pct>30?'Critico':pct>10?'Atencao':'OK'; var cls=pct>30?'cr':pct>10?'w':'ok';
     return '<tr'+(i===0?' class="rh"':'')+'><td>'+z+'</td><td class="tr mono">'+v.toLocaleString()+'</td><td class="tr mono">'+fmtPct(pct)+'</td><td class="tc">'+tag(cls,sev)+'</td></tr>';
   }).join('');
 
   // ── DESLOC ──
-  var fluxoRows = desloc.fluxos.map(function(f,i) {
-    return '<tr><td>'+rn(i)+'</td><td>'+f[0]+'</td><td class="tr mono">'+f[1]+'</td></tr>';
-  }).join('');
-  var desOpRows = desloc.ops.map(function(o,i) {
-    var pnc = o.total>0?Math.round(o.nc/o.total*1000)/10:0;
-    return '<tr><td>'+rn(i)+'</td><td><strong>'+o.id+'</strong></td><td class="tr mono" style="color:'+(o.total>80?'var(--rd)':o.total>40?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono" style="color:'+(o.nc>5?'var(--or)':'inherit')+'">'+o.nc+'</td><td class="tr mono">'+pnc.toFixed(1)+'%</td></tr>';
-  }).join('');
-
-  // ── BPP TEND ──
-  var tendCards = bpp.tend.map(function(t,i) {
-    var isCur = i===bpp.tend.length-1;
-    var prev = i>0?bpp.tend[i-1]:null;
-    var chg = prev&&prev.pct>0?((t.pct-prev.pct)/prev.pct*100):null;
-    var chgTxt = chg!==null?(chg<0?'<span style="color:var(--gn)">v -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">^ +'+chg.toFixed(1)+'%</span>'):'&mdash;';
-    var vclr = t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
-    return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout/GMV</div><div class="td2">'+chgTxt+'</div></div>';
+  var fluxoRows=desloc.fluxos.map(function(f,i){return '<tr><td>'+rn(i)+'</td><td>'+f[0]+'</td><td class="tr mono">'+f[1]+'</td></tr>';}).join('');
+  var desOpRows=desloc.ops.map(function(o,i){
+    var pnc=o.total>0?Math.round(o.nc/o.total*1000)/10:0;
+    var ncClr=o.nc>5?'var(--or)':'inherit'; var totClr=o.total>80?'var(--rd)':o.total>40?'var(--or)':'inherit';
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+o.id+'</strong></td><td class="tr mono" style="color:'+totClr+'">'+o.total+'</td><td class="tr mono" style="color:'+ncClr+'">'+o.nc+'</td><td class="tr mono">'+pnc.toFixed(1)+'%</td></tr>';
   }).join('');
 
-  var mlpRows = bpp.mlpList.map(function(m,i) {
-    var pclr = m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
-    var pctS = m.pct!==null?fmtBpp(m.pct):'N/A';
-    return '<tr'+(i<2?' class="'+(i===0?'rh':'wh')+'"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+pctS+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td><td class="tr mono">'+fmtPct(m.total>0?m.lost/m.total*100:0)+'</td><td class="tr mono">'+fmtPct(m.total>0?m.dmg/m.total*100:0)+'</td></tr>';
-  }).join('');
-
-  var tipoRows = bpp.tipos.map(function(t) {
-    return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(bpp.total>0?t[1]/bpp.total*100:0)+'</td></tr>';
-  }).join('');
-
-  var driverRows = bpp.mlpList.filter(function(m){return m.top3&&m.top3.length>0;}).map(function(m) {
-    return m.top3.map(function(drv,di) {
-      var mlpCell = di===0 ? '<td rowspan="'+m.top3.length+'"><strong>'+m.mlp+'</strong></td>' : '';
-      var stClr = drv.status==='blocked'?'var(--rd)':'var(--gn)';
-      return '<tr class="'+(di===0?'wh':'')+'">'+mlpCell+'<td class="mono">'+drv.id+'</td><td class="tr mono">'+drv.total+'</td><td class="tr mono">'+drv.lost+'</td><td class="tr mono">'+drv.dmg+'</td><td class="tr mono">'+drv.pnr+'</td><td class="tr mono">'+fmtN(drv.cashout)+'</td><td class="mono" style="font-size:9px">'+drv.node+'</td><td><span class="tag i" style="font-size:8px">'+drv.tramo+'</span></td><td><span class="tag" style="font-size:8px;color:'+stClr+'">'+drv.status+'</span></td></tr>';
+  // ── BPP: tend cards ──
+  function tendCards(tend){
+    return tend.map(function(t,i){
+      var isCur=i===tend.length-1;
+      var prev=i>0?tend[i-1]:null;
+      var chg=prev&&prev.pct>0?(t.pct-prev.pct)/prev.pct*100:null;
+      var chgTxt=chg!==null?(chg<0?'<span style="color:var(--gn)">&#9660; -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">&#9650; +'+chg.toFixed(1)+'%</span>'):'&mdash;';
+      var vclr=t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
+      return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout / GMV</div><div class="td2">'+chgTxt+'</div></div>';
     }).join('');
+  }
+
+  function mlpTable(mlpList,totalGeral){
+    return mlpList.map(function(m,i){
+      var pclr=m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
+      return '<tr'+(i<1?' class="rh"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+fmtBpp(m.pct)+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td></tr>';
+    }).join('');
+  }
+
+  function driverTable(mlpList){
+    return mlpList.filter(function(m){return m.top3&&m.top3.length>0;}).map(function(m){
+      return m.top3.map(function(drv,di){
+        var mlpCell=di===0?'<td rowspan="'+m.top3.length+'"><strong>'+m.mlp+'</strong></td>':'';
+        var stClr=drv.status==='blocked'?'var(--rd)':'var(--gn)';
+        return '<tr class="'+(di===0?'wh':'')+'">'+mlpCell+'<td class="mono">'+drv.id+'</td><td class="tr mono">'+drv.total+'</td><td class="tr mono">'+fmtN(drv.cashout)+'</td><td class="mono" style="font-size:9px">'+drv.node+'</td><td><span class="tag i" style="font-size:8px">'+drv.tramo+'</span></td><td><span class="tag" style="font-size:8px;color:'+stClr+'">'+drv.status+'</span></td></tr>';
+      }).join('');
+    }).join('');
+  }
+
+  function tipoRows(tipos,total){
+    return tipos.map(function(t){
+      return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(total>0?t[1]/total*100:0)+'</td></tr>';
+    }).join('');
+  }
+
+  // ── SUBPAINEIS BPP ──
+  var tramoColors={LOST:'cr',DAMAGED:'or',PNR:'p',STOLEN:'cr',EMPTY:'c',DELAYED:'i',DNR:'w'};
+  var tramoIcons={LOST:'&#128683;',DAMAGED:'&#128227;',PNR:'&#128274;',STOLEN:'&#128373;',EMPTY:'&#128230;',DELAYED:'&#8987;',DNR:'&#128257;'};
+
+  var subNavBtns=bpp.tramoDisp.map(function(tr,i){
+    var cls=tr.toLowerCase(); var icon=tramoIcons[tr]||'';
+    return '<button class="snb '+cls+(i===0?' active':'')+'" id="snb-'+tr+'" onclick="showSubTab(\''+tr+'\')">'+icon+' '+tr+'</button>';
   }).join('');
 
-  // ── PK SORT OPS ──
-  var sortOpsRows = pk.sort.ops.map(function(o,i) {
-    var perfil = o.saida>=20?tag('cr','Saida Forc.'):(o.gaiola&&o.total>0&&o.gaiola/o.total>0.6)?tag('cr','Gaiola crit.'):(o.qr_sem&&o.total>0&&o.qr_sem/o.total>0.6)?tag('w','QR dominante'):tag('w','Misto');
-    return '<tr><td>'+rn(i)+'</td><td>'+o.op+'</td><td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono">'+o.qr_sem+'</td><td class="tr mono">'+o.gaiola+'</td><td class="tr mono" style="color:'+(o.saida>=20?'var(--rd)':'inherit')+'">'+o.saida+'</td><td class="tr mono">'+o.div+'</td><td class="tc">'+perfil+'</td></tr>';
+  var subPanels=bpp.tramoDisp.map(function(tr,i){
+    var td=bpp.tramos[tr]; var tt=bpp.tendTramo[tr]||[];
+    var vclr=td.pct>0.5?'var(--rd)':td.pct>0.35?'var(--or)':'var(--gn)';
+    return '<div class="subpanel'+(i===0?' active':'')+'" id="bpp-'+tr+'">'
+      +'<div class="kr" style="grid-template-columns:repeat(3,1fr);margin-top:8px;">'
+      +'<div class="kc cr"><div class="kl">% BPP '+tr+'</div><div class="kv" style="color:'+vclr+'">'+fmtBpp(td.pct)+'</div></div>'
+      +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o">'+fmtN(td.cashout)+'</div></div>'
+      +'<div class="kc cb"><div class="kl">Ocorrencias</div><div class="kv b">'+td.total+'</div></div>'
+      +'</div>'
+      +'<div class="trow">'+tendCards(tt)+'</div>'
+      +'<div class="g2">'
+      +'<div class="card"><div class="ch"><span class="ct">MLP &mdash; % BPP '+tr+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead><tbody>'+mlpTable(td.mlpList,td.total)+'</tbody></table></div>'
+      +'<div class="card"><div class="ch"><span class="ct">Classifica&ccedil;&atilde;o '+tr+'</span><span class="cc">'+td.total+' ocorr.</span></div><table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead><tbody>'+tipoRows(td.tipos,td.total)+'</tbody></table></div>'
+      +'</div>'
+      +'<div class="card"><div class="ch"><span class="ct">Top Drivers &mdash; '+tr+'</span><span class="cc">Node ID &middot; Tramo &middot; Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody>'+driverTable(td.mlpList)+'</tbody></table></div>'
+      +'</div>';
   }).join('');
 
-  var sortMotRows = pk.sort.motivos.map(function(m) {
+  // ── PK ──
+  var sortOpsRows=pk.sort.ops.map(function(o,i){
+    var perfil=o.saida>=20?tag('cr','Saida Forc.'):o.gaiola/o.total>0.5?tag('cr','Gaiola crit.'):o.qr_sem/o.total>0.5?tag('w','QR dominante'):tag('w','Misto');
+    var topMotStr=o.topMot.map(function(m){return '<div style="font-size:8px;color:var(--td)">'+m[0].slice(0,25)+' ('+m[1]+')</div>';}).join('');
+    return '<tr><td>'+rn(i)+'</td><td><strong style="font-size:10px">'+o.op+'</strong>'+topMotStr+'</td>'
+      +'<td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td>'
+      +'<td class="tr mono">'+o.qr_sem+'</td>'
+      +'<td class="tr mono">'+o.gaiola+'</td>'
+      +'<td class="tr mono" style="color:'+(o.saida>=20?'var(--rd)':'inherit')+'">'+o.saida+'</td>'
+      +'<td class="tr mono">'+o.div+'</td>'
+      +'<td class="tc">'+perfil+'</td></tr>';
+  }).join('');
+
+  var sortMotRows=pk.sort.motivos.map(function(m){
     return '<tr><td>'+m[0]+'</td><td class="tr mono">'+m[1]+'</td><td class="tr mono">'+fmtPct(pk.sort.total>0?m[1]/pk.sort.total*100:0)+'</td></tr>';
   }).join('');
 
-  var etOpsRows = pk.et.ops.map(function(o,i) {
-    var pct = o.total>0?Math.round(o.sem_pk/o.total*1000)/10:0;
-    return '<tr><td>'+rn(i)+'</td><td>'+o.op+'</td><td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td><td class="tr mono">'+o.sem_pk+'</td><td class="tr mono">'+o.com_pk+'</td><td class="tr mono">'+pct.toFixed(1)+'%</td><td class="tc">'+tag(pct>=80?'cr':'w',pct>=80?'Critico':'Alto')+'</td></tr>';
+  var etOpsRows=pk.et.ops.map(function(o,i){
+    var pct=o.total>0?Math.round(o.sem_pk/o.total*1000)/10:0;
+    var topMotStr=o.topMot.map(function(m){return '<div style="font-size:8px;color:var(--td)">'+m[0].slice(0,25)+' ('+m[1]+')</div>';}).join('');
+    return '<tr><td>'+rn(i)+'</td><td><strong style="font-size:10px">'+o.op+'</strong>'+topMotStr+'</td>'
+      +'<td class="tr mono" style="color:'+(o.total>200?'var(--rd)':o.total>100?'var(--or)':'inherit')+'">'+o.total+'</td>'
+      +'<td class="tr mono">'+o.sem_pk+'</td>'
+      +'<td class="tr mono">'+o.com_pk+'</td>'
+      +'<td class="tr mono">'+pct.toFixed(1)+'%</td>'
+      +'<td class="tc">'+tag(pct>=80?'cr':pct>=50?'w':'ok',pct>=80?'Critico':pct>=50?'Alto':'Baixo')+'</td></tr>';
+  }).join('');
+
+  var etMotRows=pk.et.motivos.map(function(m){
+    return '<tr><td>'+m[0]+'</td><td class="tr mono">'+m[1]+'</td><td class="tr mono">'+fmtPct(pk.et.total>0?m[1]/pk.et.total*100:0)+'</td></tr>';
   }).join('');
 
   // ── ADUANA ──
-  var cadeiaRows = aduana.cadeia.map(function(m) {
-    var y='<td class="tc" style="color:var(--rd)">&#10003;</td>', n='<td class="tc">&mdash;</td>';
-    return '<tr><td class="mono">'+m.id+'</td><td class="tc"><strong style="color:'+(m.score>=4?'var(--rd)':'var(--or)')+'">'+m.score+'</strong></td>'+(m.falt?y:n)+(m.bpp?y:n)+(m.sort?y:n)+(m.et?y:n)+(m.desloc?y:n)+'<td style="font-size:10px">'+m.mlp+'</td></tr>';
+  var topAdFalt=aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0];
+
+  var cadeiaRows=aduana.cadeia.map(function(m){
+    var y='<td class="tc" style="color:var(--rd)">&#10003;</td>',n='<td class="tc">&mdash;</td>';
+    return '<tr><td class="mono">'+m.id+'</td>'
+      +'<td class="tc"><strong style="color:'+(m.score>=4?'var(--rd)':'var(--or)')+'">'+m.score+'</strong></td>'
+      +(m.falt?y:n)+(m.bpp?y:n)+(m.sort?y:n)+(m.et?y:n)+(m.desloc?y:n)
+      +'<td style="font-size:9px">'+m.mlp+'</td>'
+      +'<td>'+rotaChips([m.rota])+'</td></tr>';
   }).join('');
 
-  var adMlpRows = aduana.mlp.map(function(m,i) {
-    var pclr = m.pctFalt>=30?'var(--rd)':m.pctFalt>=15?'var(--or)':'inherit';
-    return '<tr><td>'+rn(i)+'</td><td>'+m.mlp+'</td><td class="tr mono">'+m.total+'</td><td class="tr mono" style="color:'+pclr+'">'+m.falt+'</td><td class="tr mono" style="color:'+pclr+'">'+fmtPct(m.pctFalt)+'</td><td class="tr mono">'+m.bpp+'</td><td class="tr mono">'+m.sort+'</td><td class="tr mono">'+m.desloc+'</td></tr>';
+  var adMlpRows=aduana.mlp.map(function(m,i){
+    var pclr=m.pctFalt>=30?'var(--rd)':m.pctFalt>=15?'var(--or)':'inherit';
+    return '<tr><td>'+rn(i)+'</td><td>'+m.mlp+'</td>'
+      +'<td class="tr mono">'+m.total+'</td>'
+      +'<td class="tr mono" style="color:'+pclr+'">'+m.falt+'</td>'
+      +'<td class="tr mono" style="color:'+pclr+'">'+fmtPct(m.pctFalt)+'</td>'
+      +'<td class="tr mono">'+m.bpp+'</td>'
+      +'<td class="tr mono">'+m.sort+'</td>'
+      +'<td>'+rotaChips(m.rotas)+'</td></tr>';
   }).join('');
 
-  var adUsVolRows = aduana.users.slice(0,10).map(function(u,i) {
-    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td><td class="tr mono">'+u.total+'</td><td class="tr mono">'+u.falt+'</td><td class="tr mono">'+u.sort+'</td><td class="tr mono" style="font-family:\'JetBrains Mono\',monospace;font-size:10px">'+(u.total>0?Math.round(u.score/u.total*100)/100:0)+'</td></tr>';
+  var adUsVolRows=aduana.users.slice(0,10).map(function(u,i){
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td>'
+      +'<td class="tr mono">'+u.total+'</td>'
+      +'<td class="tr mono">'+u.falt+'</td>'
+      +'<td class="tr mono">'+u.sort+'</td>'
+      +'<td>'+rotaChips(u.rotas)+'</td></tr>';
   }).join('');
 
-  var adUsFaltArr = aduana.users.filter(function(u){return u.total>=10;}).slice(0).sort(function(a,b){return b.pctFalt-a.pctFalt;}).slice(0,10);
-  var adUsFaltRows = adUsFaltArr.map(function(u,i) {
-    var pclr = u.pctFalt>=30?'var(--rd)':u.pctFalt>=15?'var(--or)':'inherit';
-    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td><td class="tr mono">'+u.total+'</td><td class="tr mono" style="color:'+pclr+'">'+u.falt+'</td><td class="tr mono" style="color:'+pclr+'">'+fmtPct(u.pctFalt)+'</td><td class="tr mono">'+u.bpp+'</td><td class="tc">'+tag(u.pctFalt>=30?'cr':u.pctFalt>=15?'w':'ok',u.pctFalt>=30?'Alto':u.pctFalt>=15?'Medio':'Baixo')+'</td></tr>';
+  var adUsFaltArr=aduana.users.filter(function(u){return u.total>=10;}).slice(0).sort(function(a,b){return b.pctFalt-a.pctFalt;}).slice(0,10);
+  var adUsFaltRows=adUsFaltArr.map(function(u,i){
+    var pclr=u.pctFalt>=30?'var(--rd)':u.pctFalt>=15?'var(--or)':'inherit';
+    return '<tr><td>'+rn(i)+'</td><td><strong>'+u.u+'</strong></td>'
+      +'<td class="tr mono">'+u.total+'</td>'
+      +'<td class="tr mono" style="color:'+pclr+'">'+u.falt+'</td>'
+      +'<td class="tr mono" style="color:'+pclr+'">'+fmtPct(u.pctFalt)+'</td>'
+      +'<td class="tr mono">'+u.bpp+'</td>'
+      +'<td>'+rotaChips(u.rotas)+'</td>'
+      +'<td class="tc">'+tag(u.pctFalt>=30?'cr':u.pctFalt>=15?'w':'ok',u.pctFalt>=30?'Alto':u.pctFalt>=15?'Medio':'Baixo')+'</td></tr>';
   }).join('');
 
-  // ── RESUMO KPIs e ABERTURA ──
-  var bppChg = bpp.tend.length>1?((bpp.tend[bpp.tend.length-1].pct-bpp.tend[bpp.tend.length-2].pct)/bpp.tend[bpp.tend.length-2].pct*100):null;
-  var bppPrevPct = bpp.tend.length>1?bpp.tend[bpp.tend.length-2].pct:null;
+  // ── RESUMO ──
+  var bppChg=bpp.tend.length>1?((bpp.tend[bpp.tend.length-1].pct-bpp.tend[bpp.tend.length-2].pct)/bpp.tend[bpp.tend.length-2].pct*100):null;
+  var bppPrev=bpp.tend.length>1?bpp.tend[bpp.tend.length-2].pct:null;
 
-  var topAdFalt2 = aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0];
+  // ── MONTAR HTML ──
+  var html=
+'<div class="sticky-top">'
++'<div class="header">'
++'<div class="hbrand"><div class="logo">ML</div><div><div class="bname">'+cfg.svc+' \xb7 '+cfg.svcName+'</div><div class="bsub">Demonstrativo Semanal de Invent\xe1rio</div></div></div>'
++'<div class="hinfo">'
++'<div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>'
++'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>'
++'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
++'<div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.geral.pct)+'</div></div>'
++'</div>'
++'<div class="hright">'
++'<span class="wchip">'+cfg.week+'</span>'
++'<span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span>'
++'<button class="btn-theme" id="btnTheme" onclick="toggleTheme()">\u2600\ufe0f Dia</button>'
++'<button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button>'
++'</div>'
++'</div>'
++'<div class="nav">'
++'<button class="nb active" onclick="showTab(\'resumo\',this)">\ud83d\udcca Resumo</button>'
++'<button class="nb" onclick="showTab(\'bpp\',this)">\ud83d\udcb8 BPP</button>'
++'<button class="nb" onclick="showTab(\'aduana\',this)">\ud83d\udd17 Aduanas</button>'
++'<button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>'
++'<button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>'
++'<button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>'
++'</div>'
++'</div>'
 
-  // ── MONTAR HTML FINAL ──
-  var html = '\
-<div class="sticky-top">\
-  <div class="header">\
-    <div class="hbrand"><div class="logo">ML</div><div><div class="bname">'+cfg.svc+' \xb7 '+cfg.svcName+'</div><div class="bsub">Demonstrativo Semanal de Invent\xe1rio</div></div></div>\
-    <div class="hinfo">\
-      <div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>\
-      <div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>\
-      <div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>\
-      <div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.pct)+'</div></div>\
-    </div>\
-    <div class="hright"><span class="wchip">'+cfg.week+'</span><span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span><button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button></div>\
-  </div>\
-  <div class="nav">\
-    <button class="nb active" onclick="showTab(\'resumo\',this)">\ud83d\udcca Resumo</button>\
-    <button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>\
-    <button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>\
-    <button class="nb" onclick="showTab(\'bpp\',this)">\ud83d\udcb8 BPP</button>\
-    <button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>\
-    <button class="nb" onclick="showTab(\'aduana\',this)">\ud83d\udd17 Aduanas</button>\
-  </div>\
-</div>\
-<div class="content">\
-\
-<!-- RESUMO -->\
-<div id="resumo" class="tab active">\
-  <div class="sh"><div><div class="st">Resumo Executivo \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</div></div></div>\
-  <div style="background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:12px;">\
-    <div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">\ud83d\udccb Abertura de Reuni\xe3o \u2014 '+cfg.svc+' '+cfg.week+'</div>\
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
-      <div style="display:flex;flex-direction:column;gap:10px;">\
-        <div style="background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;">\
-          <div style="font-size:9px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u2705 Destaques positivos</div>\
-          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">'+fmtPct(desloc.pct)+'</strong> '+(desloc.pct<=5?'dentro da meta':'acima da meta')+', com <strong style="color:var(--gn)">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</strong> de corre\xe7\xe3o no turno.'+(bppChg!==null&&bppChg<0?' BPP Bruto caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior &mdash; de '+fmtPct(bppPrevPct)+' para <strong style="color:var(--y)">'+fmtBpp(bpp.pct)+'</strong>.':'')+'</p>\
-        </div>\
-        <div style="background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;">\
-          <div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u26a0\ufe0f Alerta operacional</div>\
-          <p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Poka Yoke com <strong style="color:var(--rd)">'+(pk.sort.total+pk.et.total).toLocaleString()+'</strong> erros na semana &mdash; '+pk.sort.total.toLocaleString()+' no sorting e '+pk.et.total.toLocaleString()+' na etiquetagem. Ra\xedz operacional confirmada no cruzamento com aduanas.</p>\
-        </div>\
-      </div>\
-      <div style="background:rgba(52,131,250,.07);border:1px solid rgba(52,131,250,.25);border-radius:6px;padding:10px 12px;">\
-        <div style="font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\ud83d\udd17 Oportunidade \u2014 Aduanas '+cfg.week+'</div>\
-        <p style="font-size:11.5px;line-height:1.75;color:var(--tm);margin-bottom:8px;">Auditamos <strong style="color:var(--tx)">'+aduana.total.toLocaleString()+'</strong> IDs nas aduanas. <strong style="color:var(--rd)">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</strong> apresentaram ao menos uma falha correlata.</p>\
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">\
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+aduana.cadeia.length+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia &ge;3 processos</div></div>\
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+aduana.faltBpp+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP gerado</div></div>\
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+(aduana.mlp[0]?fmtPct(aduana.mlp[0].pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">'+(aduana.mlp[0]?aduana.mlp[0].mlp:'--')+' maior faltante</div></div>\
-          <div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+(topAdFalt2?fmtPct(topAdFalt2.pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior taxa faltante (op.)</div></div>\
-        </div>\
-        <p style="font-size:10.5px;color:var(--td);">Detalhe completo na aba <strong style="color:var(--bl)">\ud83d\udd17 Aduanas</strong>.</p>\
-      </div>\
-    </div>\
-  </div>\
-  <div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta \u2014 ponto de aten\xe7\xe3o priorit\xe1rio</div><div class="ab">Accuracy <strong>com POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>\
-  <div class="kr" style="grid-template-columns:repeat(4,1fr);">\
-    <div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=80?'ok':'cr',acc.geral>=80?'OK':'Abaixo da meta')+'</div>\
-    <div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>\
-    <div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'Dentro da meta':'Acima da meta')+'</div>\
-    <div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.pct)+'</div><div class="km">Cashout / GMV \xb7 '+(bppChg!==null?(bppChg<0?'v -'+Math.abs(bppChg).toFixed(1)+'% vs ant.':'^  +'+bppChg.toFixed(1)+'% vs ant.'):cfg.week)+'</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>\
-  </div>\
-</div>\
-\
-<!-- ACURACIA -->\
-<div id="accuracy" class="tab">\
-  <div class="sh"><div><div class="st">Acur\xe1cia \u2014 Resultado Di\xe1rio</div><div class="ss">'+acc.totalInv.toLocaleString()+' inventariados \xb7 '+acc.totalFalt.toLocaleString()+' faltantes \xb7 '+cfg.week+'</div></div>'+btnExp('accuracy')+'</div>\
-  <div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Por que a accuracy geral ('+acc.geral.toFixed(1)+'%) difere da m\xe9dia visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>'+acc.totalInv.toLocaleString()+' \xf7 ('+acc.totalInv.toLocaleString()+' + '+acc.totalFalt.toLocaleString()+') = '+acc.geral.toFixed(1)+'%</strong>. O primeiro dia tem volume inventariado muito maior, elevando a m\xe9dia ponderada.</div></div></div>\
-  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 % Accuracy Di\xe1ria \u2014 '+cfg.week+'</span><span class="chart-note">Inventariado Planificado &divide; (Inventariado + Faltante) \xb7 Base2</span></div><div class="chart-body"><canvas id="cAcc"></canvas></div>\
-  <div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>% Accuracy</div><div class="leg"><div class="leg-dot" style="background:var(--rd);border-radius:2px;width:14px;height:2px;"></div>Meta 80%</div><div class="leg"><div class="leg-dot" style="background:var(--or);border-radius:2px;width:14px;height:2px;"></div>Geral '+acc.geral.toFixed(1)+'%</div></div>\
-  <div style="padding:0 14px 12px"><table class="dsumm"><'+accDayHead+accInvRow+accFaltRow+accPctRow+accMetaRow+'</tbody></table></div></div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">Faltantes por Zona</span><span class="cc">'+acc.totalFalt.toLocaleString()+' total</span></div><table><thead><tr><th>Zona</th><th class="tr">Volume</th><th class="tr">%</th><th class="tc">Status</th></tr></thead><tbody>'+zonaRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">A\xe7\xf5es \u2014 Acur\xe1cia '+cfg.week+'</span></div><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Contagem emergencial nas zonas cr\xedticas (PS / For Returns)</div><div class="adesc">Designar operador fixo para bipar cada pacote na entrada. Validar via Query3.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div><div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Acionar TechOps para pacotes com erro sist\xeamico</div><div class="adesc">N\xe3o contabilizar como perda operacional. Abrir ticket com IDs.</div><div class="ameta"><span class="achip">Prazo: D+3</span></div></div></div></div></div>\
-  </div>\
-</div>\
-\
-<!-- DESLOCADOS -->\
-<div id="deslocados" class="tab">\
-  <div class="sh"><div><div class="st">Deslocados \u2014 Resultado Di\xe1rio</div><div class="ss">'+desloc.total.toLocaleString()+' pacotes fora da zona \xb7 Meta &le;5% \xb7 '+cfg.week+'</div></div>'+btnExp('deslocados')+'</div>\
-  <div class="kr">\
-    <div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'OK':'Acima da meta')+'</div>\
-    <div class="kc cb"><div class="kl">Total</div><div class="kv b">'+desloc.total.toLocaleString()+'</div></div>\
-    <div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>\
-    <div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>\
-  </div>\
-  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Deslocados por Dia \u2014 '+cfg.week+'</span></div><div class="chart-body"><canvas id="cDes"></canvas></div></div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">Top Fluxos</span></div><table><thead><tr><th>#</th><th>Fluxo</th><th class="tr">Volume</th></tr></thead><tbody>'+fluxoRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">N\xe3o Cor.</th><th class="tr">% N/C</th></tr></thead><tbody>'+desOpRows+'</tbody></table></div>\
-  </div>\
-  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Corrigir '+desloc.naoCorrigidos+' deslocados pendentes + refor\xe7ar passagem de turno fim de semana</div><div class="adesc">Priorizar operadores com maior % de n\xe3o corre\xe7\xe3o. Feedback 1:1 com l\xedder.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div></div></div>\
-</div>\
-\
-<!-- BPP -->\
-<div id="bpp" class="tab">\
-  <div class="sh"><div><div class="st">BPP \u2014 % Bruto + Tend\xeancia</div><div class="ss">% BPP = Cashout USD &divide; GMV USD \xb7 '+cfg.week+'</div></div>'+btnExp('bpp')+'</div>\
-  <div class="trow">'+tendCards+'</div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">MLP \u2014 % BPP Bruto '+cfg.week+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th><th class="tr">% Lost</th><th class="tr">% Dmg</th></tr></thead><tbody>'+mlpRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">Classifica\xe7\xe3o '+cfg.week+'</span><span class="cc">'+bpp.total.toLocaleString()+' ocorr\xeancias</span></div><table><thead><tr><th>Tipo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+tipoRows+'</tbody></table></div>\
-  </div>\
-  <div class="sub-sh"><span class="sub-title">\ud83d\udc64 Top 3 Drivers por Transportadora</span></div>\
-  <div class="card"><div class="ch"><span class="ct">Drivers Ofensores \u2014 '+cfg.week+'</span><span class="cc">Node ID \xb7 Tramo \xb7 Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Lost</th><th class="tr">Dmg</th><th class="tr">PNR</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody>'+driverRows+'</tbody></table></div>\
-  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reuni\xe3o com MLP de maior % BPP + acionamento LP para drivers com alto cashout</div><div class="adesc">Acionar LP para cashout &gt;USD 100 (WI). Verificar drivers blocked gerando BPP.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div></div></div>\
-</div>\
-\
-<!-- POKA YOKE -->\
-<div id="pokayoke" class="tab">\
-  <div class="sh"><div><div class="st">Poka Yoke \u2014 Etiquetagem + Sorting \xb7 '+cfg.week+'</div><div class="ss">Total: '+(pk.sort.total+pk.et.total).toLocaleString()+' erros</div></div>'+btnExp('pokayoke')+'</div>\
-  <div class="kr">\
-    <div class="kc cr"><div class="kl">Total</div><div class="kv r">'+(pk.sort.total+pk.et.total).toLocaleString()+'</div></div>\
-    <div class="kc co"><div class="kl">Etiquetagem</div><div class="kv o">'+pk.et.total.toLocaleString()+'</div><div class="km">'+pk.et.ops.length+' operadores</div></div>\
-    <div class="kc cr"><div class="kl">Sorting</div><div class="kv r">'+pk.sort.total.toLocaleString()+'</div><div class="km">'+pk.sort.ops.length+' operadores</div></div>\
-  </div>\
-  <div class="sub-sh"><span class="sub-title">\ud83d\udce6 Sorting</span></div>\
-  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Erros de Sorting por Dia</span></div><div class="chart-body"><canvas id="cSort"></canvas></div>\
-  <div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--rd)"></div>QR s/ PK</div><div class="leg"><div class="leg-dot" style="background:var(--or)"></div>Gaiola Errada</div><div class="leg"><div class="leg-dot" style="background:var(--y)"></div>Sa\xedda For\xe7ada</div></div></div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">Motivos</span></div><table><thead><tr><th>Motivo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+sortMotRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">Top 20 Operadores \u2014 Sorting</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">QR s/PK</th><th class="tr">Gaiola</th><th class="tr">Sa\xedda F.</th><th class="tr">Pac.Div.</th><th class="tc">Perfil</th></tr></thead><tbody>'+sortOpsRows+'</tbody></table></div>\
-  </div>\
-  <div class="divider"></div>\
-  <div class="sub-sh"><span class="sub-title">\ud83c\udff7\ufe0f Etiquetagem</span><span class="sub-badge">'+pk.et.total.toLocaleString()+' IDs \xfanicos</span></div>\
-  <div class="alert w"><div class="ai">\u26a0\ufe0f</div><div><div class="at">Distribui\xe7\xe3o di\xe1ria limitada</div><div class="ab">Coluna Hora com formato inconsistente. Total semanal confi\xe1vel. Para di\xe1rio, consultar Looker PK.</div></div></div>\
-  <div class="card"><div class="ch"><span class="ct">Top 20 Operadores \u2014 Etiquetagem</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">IDs \xfanicos</th><th class="tr">Sem Cob.</th><th class="tr">Com Cob.</th><th class="tr">% Sem Cob.</th><th class="tc">N\xedvel</th></tr></thead><tbody>'+etOpsRows+'</tbody></table></div>\
-  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reciclagem \u2014 sorting (sa\xeddas for\xe7adas) + etiquetagem (sem cobertura PK)</div><div class="adesc">Priorizar reincidentes. Sa\xedda for\xe7ada = risco disciplinar imediato.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div><div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Mapear pontos sem cobertura PK e acionar TechOps/Infra</div><div class="ameta"><span class="achip">Prazo: D+3</span></div></div></div></div></div>\
-</div>\
-\
-<!-- ADUANAS -->\
-<div id="aduana" class="tab">\
-  <div class="sh"><div><div class="st">Aduanas \u2014 Correla\xe7\xe3o com Processos</div><div class="ss">'+aduana.total.toLocaleString()+' IDs auditados \xb7 '+cfg.week+'</div></div>'+btnExp('aduana')+'</div>\
-  <div class="kr">\
-    <div class="kc cb"><div class="kl">IDs Auditados</div><div class="kv b">'+aduana.total.toLocaleString()+'</div></div>\
-    <div class="kc cg"><div class="kl">Sem rastro de falha</div><div class="kv g">'+(aduana.total-aduana.comFalha).toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?(aduana.total-aduana.comFalha)/aduana.total*100:0)+'</div></div>\
-    <div class="kc co"><div class="kl">Com &ge;1 falha correlata</div><div class="kv o">'+aduana.comFalha.toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</div></div>\
-    <div class="kc cr"><div class="kl">Cadeia &ge;3 processos</div><div class="kv r">'+aduana.cadeia.length+'</div></div>\
-    <div class="kc cr"><div class="kl">Faltante + BPP</div><div class="kv r">'+aduana.faltBpp+'</div><div class="km">Perdido E ressarcido</div></div>\
-    <div class="kc co"><div class="kl">Faltante + PK</div><div class="kv o">'+aduana.faltPk+'</div><div class="km">Ra\xedz operacional confirmada</div></div>\
-  </div>\
-  <div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Aduanas por Dia \u2014 Volume + % Faltante</span></div><div class="chart-body"><canvas id="cAdDia"></canvas></div></div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">Aduana por MLP</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tr">Sort.PK</th><th class="tr">Desloc.</th></tr></thead><tbody>'+adMlpRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">Cadeia de Falha (Score &ge;3)</span></div><table><thead><tr><th>ID Pacote</th><th class="tc">Score</th><th class="tc">Falt</th><th class="tc">BPP</th><th class="tc">Sort</th><th class="tc">Etiq</th><th class="tc">Desl</th><th>MLP</th></tr></thead><tbody>'+cadeiaRows+'</tbody></table></div>\
-  </div>\
-  <div class="g2">\
-    <div class="card"><div class="ch"><span class="ct">Para MAIS \u2014 Maior Volume</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Faltante</th><th class="tr">Sort.PK</th><th class="tr">Score/ID</th></tr></thead><tbody>'+adUsVolRows+'</tbody></table></div>\
-    <div class="card"><div class="ch"><span class="ct">Para MENOS \u2014 Maior % Faltante</span><span class="cc">&ge;10 aduanas</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">% Falt.</th><th class="tr">BPP</th><th class="tc">Risco</th></tr></thead><tbody>'+adUsFaltRows+'</tbody></table></div>\
-  </div>\
-  <div class="card"><div style="padding:4px 14px 8px"><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha \u2014 verificar '+aduana.faltBpp+' com faltante + BPP</div><div class="adesc">Risco de BPP pago indevidamente. Acionar LP.</div><div class="ameta"><span class="achip">Prazo: D+1</span></div></div></div><div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Feedback para operadores com alta taxa de faltante na bipagem (Para MENOS)</div><div class="adesc">Taxa elevada indica bipagem sem confer\xeancia f\xedsica. Confrontar com ROTA_LOG.</div><div class="ameta"><span class="achip">Prazo: D+2</span></div></div></div></div></div>\
-</div>\
-\
-</div>\
-<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
++'<div class="content">'
 
-  document.getElementById('demoScreen').innerHTML = html;
-  document.getElementById('uploadScreen').style.display = 'none';
-  document.getElementById('demoScreen').style.display = 'block';
-  setTimeout(function() {
-    showTab('resumo', document.querySelector('.nb'));
+// ── RESUMO ──
++'<div id="resumo" class="tab active">'
++'<div class="sh"><div><div class="st">Resumo Executivo \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</div></div></div>'
++'<div style="background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:12px;">'
++'<div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">\ud83d\udccb Abertura de Reuni\xe3o \u2014 '+cfg.svc+' '+cfg.week+'</div>'
++'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
++'<div style="display:flex;flex-direction:column;gap:10px;">'
++'<div style="background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;">'
++'<div style="font-size:9px;font-weight:700;color:var(--gn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u2705 Destaques positivos</div>'
++'<p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Deslocados em <strong style="color:var(--gn)">'+fmtPct(desloc.pct)+'</strong> '+(desloc.pct<=5?'dentro da meta':'acima da meta')+', com <strong style="color:var(--gn)">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</strong> de corre\xe7\xe3o no turno.'+(bppChg!==null&&bppChg<0?' BPP caiu <strong style="color:var(--y)">'+Math.abs(bppChg).toFixed(1)+'%</strong> vs semana anterior.':'')+'</p>'
++'</div>'
++'<div style="background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;">'
++'<div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\u26a0\ufe0f Alerta operacional</div>'
++'<p style="font-size:11.5px;line-height:1.75;color:var(--tm);">Poka Yoke com <strong style="color:var(--rd)">'+(pk.sort.total+pk.et.total).toLocaleString()+'</strong> erros \u2014 '+pk.sort.total.toLocaleString()+' sorting / '+pk.et.total.toLocaleString()+' etiquetagem. Ra\xedz confirmada no cruzamento com aduanas.</p>'
++'</div>'
++'</div>'
++'<div style="background:rgba(52,131,250,.07);border:1px solid rgba(52,131,250,.25);border-radius:6px;padding:10px 12px;">'
++'<div style="font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\ud83d\udd17 Oportunidade \u2014 Aduanas '+cfg.week+'</div>'
++'<p style="font-size:11.5px;line-height:1.75;color:var(--tm);margin-bottom:8px;">Auditamos <strong>'+aduana.total.toLocaleString()+'</strong> IDs. <strong style="color:var(--rd)">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</strong> com ao menos uma falha correlata.</p>'
++'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+aduana.cadeia.length+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia &ge;3 processos</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+aduana.faltBpp+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+(aduana.mlp[0]?fmtPct(aduana.mlp[0].pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">'+(aduana.mlp[0]?aduana.mlp[0].mlp:'--')+' faltante</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+(topAdFalt?fmtPct(topAdFalt.pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior faltante op.</div></div>'
++'</div>'
++'</div>'
++'</div>'
++'</div>'
++'<div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta</div><div class="ab">Accuracy <strong>c/ POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>'
++'<div class="kr" style="grid-template-columns:repeat(4,1fr);">'
++'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=80?'ok':'cr',acc.geral>=80?'OK':'Abaixo da meta')+'</div>'
++'<div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>'
++'<div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'Dentro da meta':'Acima da meta')+'</div>'
++'<div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.geral.pct)+'</div><div class="km">Cashout / GMV</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>'
++'</div>'
++'</div>'
+
+// ── BPP ──
++'<div id="bpp" class="tab">'
++'<div class="sh"><div><div class="st">BPP \u2014 Tramos + Tend\xeancia</div><div class="ss">% BPP = Cashout USD \xf7 GMV USD \xb7 '+cfg.week+'</div></div>'+btnExp('bpp')+'</div>'
++'<div class="trow">'+tendCards(bpp.tend)+'</div>'
++'<div class="kr" style="grid-template-columns:repeat(3,1fr);">'
++'<div class="kc cr"><div class="kl">% BPP Geral</div><div class="kv r">'+fmtBpp(bpp.geral.pct)+'</div></div>'
++'<div class="kc co"><div class="kl">Cashout Total</div><div class="kv o">'+fmtN(bpp.geral.cashout)+'</div></div>'
++'<div class="kc cb"><div class="kl">Ocorr\xeancias</div><div class="kv b">'+bpp.geral.total+'</div></div>'
++'</div>'
++'<div class="sub-sh"><span class="sub-title">\ud83d\udcc2 An\xe1lise por Tramo</span><span class="sub-badge">Clique para detalhar</span></div>'
++'<div class="subnav">'+subNavBtns+'</div>'
++subPanels
++'</div>'
+
+// ── ADUANAS ──
++'<div id="aduana" class="tab">'
++'<div class="sh"><div><div class="st">Aduanas \u2014 Correla\xe7\xe3o com Processos</div><div class="ss">'+aduana.total.toLocaleString()+' IDs auditados \xb7 '+cfg.week+'</div></div>'+btnExp('aduana')+'</div>'
++'<div class="kr">'
++'<div class="kc cb"><div class="kl">IDs Auditados</div><div class="kv b">'+aduana.total.toLocaleString()+'</div></div>'
++'<div class="kc cg"><div class="kl">Sem rastro</div><div class="kv g">'+(aduana.total-aduana.comFalha).toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?(aduana.total-aduana.comFalha)/aduana.total*100:0)+'</div></div>'
++'<div class="kc co"><div class="kl">Com &ge;1 falha</div><div class="kv o">'+aduana.comFalha.toLocaleString()+'</div><div class="km">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</div></div>'
++'<div class="kc cr"><div class="kl">Cadeia &ge;3</div><div class="kv r">'+aduana.cadeia.length+'</div></div>'
++'<div class="kc cr"><div class="kl">Faltante + BPP</div><div class="kv r">'+aduana.faltBpp+'</div></div>'
++'<div class="kc co"><div class="kl">Faltante + PK</div><div class="kv o">'+aduana.faltPk+'</div></div>'
++'</div>'
++'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Volume + % Faltante por Dia</span></div><div class="chart-body"><canvas id="cAdDia"></canvas></div></div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Anomalias por MLP \u2014 com Rotas</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">%Falt</th><th class="tr">BPP</th><th class="tr">Sort.PK</th><th>Rotas</th></tr></thead><tbody>'+adMlpRows+'</tbody></table></div>'
++'<div class="card"><div class="ch"><span class="ct">Cadeia de Falha (Score &ge;3)</span></div><table><thead><tr><th>ID Pacote</th><th class="tc">Score</th><th class="tc">Falt</th><th class="tc">BPP</th><th class="tc">Sort</th><th class="tc">Etiq</th><th class="tc">Desl</th><th>MLP</th><th>Rota</th></tr></thead><tbody>'+cadeiaRows+'</tbody></table></div>'
++'</div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Para MAIS \u2014 Volume &xb7; Rotas</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">Sort.PK</th><th>Rotas</th></tr></thead><tbody>'+adUsVolRows+'</tbody></table></div>'
++'<div class="card"><div class="ch"><span class="ct">Para MENOS \u2014 % Faltante &xb7; Rotas</span><span class="cc">&ge;10 aduanas</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">Falt.</th><th class="tr">%Falt</th><th class="tr">BPP</th><th>Rotas</th><th class="tc">Risco</th></tr></thead><tbody>'+adUsFaltRows+'</tbody></table></div>'
++'</div>'
++'<div class="card"><div style="padding:4px 14px 8px">'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha (score &ge;3) \u2014 '+aduana.faltBpp+' com faltante+BPP</div><div class="adesc">Levantar rota de cada pacote e confrontar com ROTA_LOG. Acionar LP para cashout relevante.</div><div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">Analista Invent.</span></div></div></div>'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Feedback para '+(topAdFalt?topAdFalt.u:'operadores')+' \u2014 '+(topAdFalt?topAdFalt.pctFalt+'% faltante em '+topAdFalt.total+' aduanas':'maior taxa Para MENOS')+(topAdFalt&&topAdFalt.rotas.length?' \u2014 Rotas: '+topAdFalt.rotas.slice(0,2).join(', '):'')+'</div><div class="adesc">Bipagem sem confer\xeancia f\xedsica confirmada. Acompanhar pr\xf3xima auditoria presencialmente.</div><div class="ameta"><span class="achip">Prazo: D+2</span><span class="achip resp">L\xedder Aduana</span></div></div></div>'
++'<div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Cruzar rotas com anomalias para identificar padr\xe3o de rota problem\xe1tica</div><div class="adesc">Verificar se as rotas ofensoras s\xe3o recorrentes entre semanas. Atuar preventivamente.</div><div class="ameta"><span class="achip">Prazo: D+3</span><span class="achip resp">Coord. Log\xedstica</span></div></div></div>'
++'</div></div>'
++'</div>'
+
+// ── POKA YOKE ──
++'<div id="pokayoke" class="tab">'
++'<div class="sh"><div><div class="st">Poka Yoke \u2014 Sorting + Etiquetagem</div><div class="ss">Total: '+(pk.sort.total+pk.et.total).toLocaleString()+' erros \xb7 '+cfg.week+'</div></div>'+btnExp('pokayoke')+'</div>'
++'<div class="kr">'
++'<div class="kc cr"><div class="kl">Total Geral</div><div class="kv r">'+(pk.sort.total+pk.et.total).toLocaleString()+'</div></div>'
++'<div class="kc co"><div class="kl">Erros Sorting</div><div class="kv o">'+pk.sort.total.toLocaleString()+'</div><div class="km">'+pk.sort.ops.length+' operadores</div></div>'
++'<div class="kc co"><div class="kl">Erros Etiquetagem</div><div class="kv o">'+pk.et.total.toLocaleString()+'</div><div class="km">'+pk.et.ops.length+' operadores</div></div>'
++'</div>'
++'<div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Legenda Cobertura PK</div><div class="ab"><strong>Com cobertura PK:</strong> o sensor Poka Yoke estava ativo no ponto de leitura \u2014 o erro foi detectado automaticamente pelo sistema. <strong>Sem cobertura PK:</strong> o ponto n\xe3o possui sensor instalado \u2014 o erro foi detectado manualmente ou via auditoria posterior. Pontos sem cobertura s\xe3o priorit\xe1rios para acionamento TechOps.</div></div></div>'
++'<div class="pk-legend"><div class="pk-leg-item"><div class="pk-leg-dot" style="background:var(--rd)"></div>QR Sem cobertura PK</div><div class="pk-leg-item"><div class="pk-leg-dot" style="background:var(--bl)"></div>QR Com cobertura PK</div><div class="pk-leg-item"><div class="pk-leg-dot" style="background:var(--or)"></div>Gaiola errada</div><div class="pk-leg-item"><div class="pk-leg-dot" style="background:var(--y)"></div>Sa\xedda for\xe7ada</div><div class="pk-leg-item"><div class="pk-leg-dot" style="background:var(--pu)"></div>Divergente</div></div>'
+
++'<div class="sub-sh"><span class="sub-title">\ud83d\udce6 Sorting</span><span class="sub-badge">'+pk.sort.total.toLocaleString()+' erros</span></div>'
++'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Erros de Sorting por Dia</span></div><div class="chart-body"><canvas id="cSort"></canvas></div>'
++'<div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--rd)"></div>QR s/ PK</div><div class="leg"><div class="leg-dot" style="background:var(--or)"></div>Gaiola</div><div class="leg"><div class="leg-dot" style="background:var(--y)"></div>Sa\xedda For\xe7.</div></div></div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Top 20 Operadores &mdash; Sorting + Motivos</span></div><table><thead><tr><th>#</th><th>Operador / Top Motivos</th><th class="tr">Total</th><th class="tr">QR s/PK</th><th class="tr">Gaiola</th><th class="tr">Sa\xedda F.</th><th class="tr">Div.</th><th class="tc">Perfil</th></tr></thead><tbody>'+sortOpsRows+'</tbody></table></div>'
++'<div class="card"><div class="ch"><span class="ct">Motivos de Sorting</span></div><table><thead><tr><th>Motivo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+sortMotRows+'</tbody></table></div>'
++'</div>'
+
++'<div class="divider"></div>'
++'<div class="sub-sh"><span class="sub-title">\ud83c\udff7\ufe0f Etiquetagem</span><span class="sub-badge">'+pk.et.total.toLocaleString()+' IDs \xfanicos</span></div>'
++'<div class="alert w"><div class="ai">\u26a0\ufe0f</div><div><div class="at">Distribui\xe7\xe3o di\xe1ria indispon\xedvel</div><div class="ab">Coluna Hora com formato inconsistente. Total semanal confi\xe1vel. Para di\xe1rio, consultar Looker PK.</div></div></div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Top 20 Operadores &mdash; Etiquetagem + Motivos</span></div><table><thead><tr><th>#</th><th>Operador / Top Motivos</th><th class="tr">Total</th><th class="tr">Sem Cob.</th><th class="tr">Com Cob.</th><th class="tr">% Sem Cob.</th><th class="tc">N\xedvel</th></tr></thead><tbody>'+etOpsRows+'</tbody></table></div>'
++'<div class="card"><div class="ch"><span class="ct">Motivos de Etiquetagem</span></div><table><thead><tr><th>Motivo</th><th class="tr">Volume</th><th class="tr">%</th></tr></thead><tbody>'+etMotRows+'</tbody></table></div>'
++'</div>'
++'<div class="card"><div style="padding:4px 14px 8px">'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reciclagem imediata \u2014 Sorting: '+(pk.sort.ops[0]?pk.sort.ops[0].op+' ('+pk.sort.ops[0].total+' erros)':'top ofensor')+' \u2014 foco em sa\xeddas for\xe7adas e gaiola errada</div><div class="adesc">Sa\xedda for\xe7ada = risco disciplinar. Refor\xe7ar: bipar gaiola antes do QR, 1 pacote por vez.</div><div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">L\xedder Sorting</span></div></div></div>'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Reciclagem imediata \u2014 Etiquetagem: '+(pk.et.ops[0]?pk.et.ops[0].op+' ('+pk.et.ops[0].total+' erros)':'top ofensor')+' \u2014 pontos sem cobertura PK</div><div class="adesc">Goleiro manual nos pontos sem sensor enquanto aguarda TechOps. Refor\xe7ar etiquetar 1 pacote por vez.</div><div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">L\xedder Etiquetagem</span></div></div></div>'
++'<div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Acionar TechOps para mapeamento e cobertura dos pontos sem sensor PK</div><div class="adesc">QR_PROBLEM_WITHOUT_POKAYOKE recorrente indica gap de infraestrutura. Abrir ticket com coordenadas dos pontos afetados.</div><div class="ameta"><span class="achip">Prazo: D+3</span><span class="achip resp">TechOps / Infra</span></div></div></div>'
++'</div></div>'
++'</div>'
+
+// ── DESLOCADOS ──
++'<div id="deslocados" class="tab">'
++'<div class="sh"><div><div class="st">Deslocados \u2014 Resultado Di\xe1rio</div><div class="ss">'+desloc.total.toLocaleString()+' fora da zona \xb7 Meta &le;5% \xb7 '+cfg.week+'</div></div>'+btnExp('deslocados')+'</div>'
++'<div class="kr">'
++'<div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'OK':'Acima da meta')+'</div>'
++'<div class="kc cb"><div class="kl">Total</div><div class="kv b">'+desloc.total.toLocaleString()+'</div></div>'
++'<div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>'
++'<div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>'
++'</div>'
++'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Deslocados por Dia</span></div><div class="chart-body"><canvas id="cDes"></canvas></div></div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Top Fluxos</span></div><table><thead><tr><th>#</th><th>Fluxo</th><th class="tr">Volume</th></tr></thead><tbody>'+fluxoRows+'</tbody></table></div>'
++'<div class="card"><div class="ch"><span class="ct">Top 20 Operadores</span></div><table><thead><tr><th>#</th><th>Operador</th><th class="tr">Total</th><th class="tr">N\xe3o Cor.</th><th class="tr">% N/C</th></tr></thead><tbody>'+desOpRows+'</tbody></table></div>'
++'</div>'
++'<div class="card"><div style="padding:4px 14px 8px">'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Corrigir '+desloc.naoCorrigidos+' deslocados pendentes + refor\xe7ar passagem de turno fim de semana</div><div class="adesc">Verificar zonas com maior volume de n\xe3o corre\xe7\xe3o. Incluir checklist na transi\xe7\xe3o de turno.</div><div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">L\xedder de Turno</span></div></div></div>'
++(desloc.ops[0]?'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Feedback 1:1 \u2014 Op. '+desloc.ops[0].id+' ('+desloc.ops[0].total+' deslocados, '+desloc.ops[0].nc+' n\xe3o corrigidos)</div><div class="adesc">Top ofensor da semana. Analisar padr\xe3o de fluxo e refor\xe7ar bipar zona destino antes de liberar o pacote.</div><div class="ameta"><span class="achip">Prazo: D+2</span><span class="achip resp">L\xedder Invent\xe1rio</span></div></div></div>':'')
++(desloc.ops[1]?'<div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Feedback \u2014 Op. '+desloc.ops[1].id+' ('+desloc.ops[1].total+' deslocados, '+desloc.ops[1].nc+' n\xe3o corrigidos)</div><div class="adesc">Segundo maior ofensor. Incluir na agenda de reciclagem do pr\xf3ximo ciclo.</div><div class="ameta"><span class="achip">Prazo: D+3</span><span class="achip resp">L\xedder Invent\xe1rio</span></div></div></div>':'')
++'<div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Mapear fluxos recorrentes e ajustar layout f\xedsico se necess\xe1rio</div><div class="adesc">Fluxos com alto volume podem indicar problema de identifica\xe7\xe3o de zonas. Revisar demarca\xe7\xe3o.</div><div class="ameta"><span class="achip">Prazo: D+5</span><span class="achip resp">Coord. Opera\xe7\xf5es</span></div></div></div>'
++'</div></div>'
++'</div>'
+
+// ── ACURÁCIA ──
++'<div id="accuracy" class="tab">'
++'<div class="sh"><div><div class="st">Acur\xe1cia \u2014 Resultado Di\xe1rio</div><div class="ss">'+acc.totalInv.toLocaleString()+' inventariados \xb7 '+acc.totalFalt.toLocaleString()+' faltantes \xb7 '+cfg.week+'</div></div>'+btnExp('accuracy')+'</div>'
++(acc.semanas&&acc.semanas.length>1?'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\xe7\xe3o Semanal \u2014 Accuracy c/ POC vs s/ POC</span><span class="chart-note">Gerado quando a base cont\xe9m m\xfaltiplas semanas</span></div><div class="chart-body"><canvas id="cAccSem"></canvas></div><div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>c/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--gn)"></div>s/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta 80%</div></div></div>':'')
++'<div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Por que a accuracy geral ('+acc.geral.toFixed(1)+'%) difere da m\xe9dia visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>'+acc.totalInv.toLocaleString()+' \xf7 ('+acc.totalInv.toLocaleString()+' + '+acc.totalFalt.toLocaleString()+') = '+acc.geral.toFixed(1)+'%</strong>. Domingo tem volume ~4x maior, elevando a m\xe9dia ponderada.</div></div></div>'
++'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 % Accuracy Di\xe1ria \u2014 '+cfg.week+'</span><span class="chart-note">Inventariado Planificado \xf7 (Inventariado + Faltante) \xb7 Base2</span></div><div class="chart-body"><canvas id="cAcc"></canvas></div>'
++'<div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>% Accuracy di\xe1ria</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta 80%</div><div class="leg"><div class="leg-dot" style="background:var(--or);width:14px;height:2px;border-radius:2px"></div>Geral '+acc.geral.toFixed(1)+'%</div></div>'
++'<div style="padding:0 14px 12px"><table class="dsumm"><'+accHead+rowInv+rowFalt+rowPct+rowMeta+'</tbody></table></div></div>'
++'<div class="g2">'
++'<div class="card"><div class="ch"><span class="ct">Faltantes por Zona</span><span class="cc">'+acc.totalFalt.toLocaleString()+' total</span></div><table><thead><tr><th>Zona</th><th class="tr">Volume</th><th class="tr">%</th><th class="tc">Status</th></tr></thead><tbody>'+zonaRows+'</tbody></table></div>'
++'<div class="card"><div style="padding:4px 14px 8px">'
++'<div class="arow"><div class="aprio p1">P1</div><div><div class="atitle">Contagem emergencial nas zonas cr\xedticas (PS / For Returns)</div><div class="adesc">Designar operador fixo para bipar cada pacote na entrada. Validar via Query3. Compartilhar base com LP.</div><div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">Coord. Invent\xe1rio</span></div></div></div>'
++'<div class="arow"><div class="aprio p2">P2</div><div><div class="atitle">Acionar TechOps para pacotes com erro sist\xeamico (SHP con 2.0)</div><div class="adesc">N\xe3o contabilizar como perda operacional. Abrir ticket com IDs afetados e aguardar tratativa.</div><div class="ameta"><span class="achip">Prazo: D+3</span><span class="achip resp">TechOps</span></div></div></div>'
++'</div></div>'
++'</div>'
++'</div>'
+
++'</div>'
++'<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
+
+  document.getElementById('demoScreen').innerHTML=html;
+  document.getElementById('uploadScreen').style.display='none';
+  document.getElementById('demoScreen').style.display='block';
+
+  setTimeout(function(){
+    showTab('resumo',document.querySelector('.nb'));
     drawAllCharts();
-  }, 80);
+  },80);
 }
 
 
-// ── CHARTS ──────────────────────────────────
-function drawAllCharts() {
-  if (!D) return;
-  var acc = D.acc, desloc = D.desloc, bpp = D.bpp, pk = D.pk, aduana = D.aduana;
 
-  // Accuracy
-  var dL = acc.days.map(function(d){ return d.label; });
-  var dAcc = acc.days.map(function(d){ return d.acc; });
-  lineChart('cAcc', dL, dAcc, cv('--bl'), 'rgba(52,131,250,0.08)',
+function drawAllCharts(){
+  if(!D) return;
+  var acc=D.acc, desloc=D.desloc, bpp=D.bpp, pk=D.pk, aduana=D.aduana;
+
+  // Accuracy diária
+  var dL=acc.days.map(function(d){return d.label;});
+  var dAcc=acc.days.map(function(d){return d.acc;});
+  lineChart('cAcc',dL,dAcc,cv('--bl'),'rgba(52,131,250,0.08)',
     [{val:80,color:cv('--rd'),label:'Meta 80%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
-    55, 95, function(v){ return v.toFixed(1)+'%'; });
+    55,95,function(v){return v.toFixed(1)+'%';});
 
-  // Deslocados — barras simples com % por dia
+  // Deslocados
   (function(){
-    var s = setupCanvas('cDes', 130); if(!s) return;
-    var ctx=s.ctx, W=s.W, H=s.H, pad={t:16,r:12,b:22,l:44};
-    var cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
-    var arr = desloc.byDay;
-    if (!arr || arr.length===0) return;
-    var n = arr.length, gap = cw/n, bw = gap*0.55;
-    var maxV = 20;
-    grid(ctx,pad,W,H,maxV,4,function(v){ return v.toFixed(0)+'%'; });
-    // linha meta 5%
-    var gy = pad.t + ch*(1-5/maxV);
-    ctx.strokeStyle=cv('--or'); ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
-    ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(W-pad.r,gy); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle=cv('--or'); ctx.font='bold 9px Inter'; ctx.textAlign='left';
-    ctx.fillText('Meta 5%', pad.l+4, gy-3);
-    arr.forEach(function(d,i) {
-      var inv = acc.days[i] ? acc.days[i].inv : 1;
-      var pct = inv>0 ? d.total/inv*100 : 0;
-      var x = pad.l+i*gap+(gap-bw)/2;
-      var bh = ch*(Math.min(pct,maxV)/maxV);
-      ctx.fillStyle = pct>5?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
-      ctx.beginPath(); ctx.rect(x,pad.t+ch-bh,bw,bh); ctx.fill();
-      ctx.fillStyle=cv('--tx'); ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+    var s=setupCanvas('cDes',130); if(!s) return;
+    var ctx=s.ctx,W=s.W,H=s.H,pad={t:16,r:12,b:22,l:44};
+    var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+    var arr=desloc.byDay; if(!arr||arr.length===0) return;
+    var n=arr.length,gap=cw/n,bw=gap*0.55,maxV=20;
+    grid(ctx,pad,W,H,maxV,4,function(v){return v.toFixed(0)+'%';});
+    var gy=pad.t+ch*(1-5/maxV);
+    ctx.strokeStyle=cv('--or');ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=cv('--or');ctx.font='bold 9px Inter';ctx.textAlign='left';
+    ctx.fillText('Meta 5%',pad.l+4,gy-3);
+    arr.forEach(function(d,i){
+      var inv=acc.days[i]?acc.days[i].inv:1;
+      var pct=inv>0?d.total/inv*100:0;
+      var x=pad.l+i*gap+(gap-bw)/2,bh=ch*(Math.min(pct,maxV)/maxV);
+      ctx.fillStyle=pct>5?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
+      ctx.beginPath();ctx.rect(x,pad.t+ch-bh,bw,bh);ctx.fill();
+      ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
       ctx.fillText(pct.toFixed(1)+'%',x+bw/2,pad.t+ch-bh-3);
-      // nc
-      var ncPct = d.total>0?d.nc/d.total*100:0;
-      if (ncPct>0) {
-        ctx.fillStyle='rgba(232,168,56,0.8)';
-        ctx.font='8px JetBrains Mono'; ctx.fillText(ncPct.toFixed(0)+'%nc',x+bw/2,pad.t+ch-bh-13);
-      }
     });
-    xlabels(ctx,arr.map(function(d){ return d.dt.slice(5).replace('-','/'); }),pad,W,H);
+    xlabels(ctx,arr.map(function(d){return d.dt.slice(5).replace('-','/');}),pad,W,H);
   })();
 
   // Sorting stacked
   (function(){
-    var dayKeys = Object.keys(pk.sort.byDay).sort();
-    if (dayKeys.length===0) return;
-    var labels = dayKeys.map(function(k){ return k.slice(5).replace('-','/'); });
-    var ds = [
-      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].qr_sem||0; }), color:'rgba(248,81,73,0.85)'},
-      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].gaiola||0; }), color:'rgba(232,168,56,0.85)'},
-      {data: dayKeys.map(function(k){ return pk.sort.byDay[k].saida||0; }), color:'rgba(255,230,0,0.75)'}
+    var dayKeys=Object.keys(pk.sort.byDay).sort();
+    if(dayKeys.length===0) return;
+    var labels=dayKeys.map(function(k){return k.slice(5).replace('-','/');});
+    var ds=[
+      {data:dayKeys.map(function(k){return pk.sort.byDay[k].qr_sem||0;}),color:'rgba(248,81,73,0.85)'},
+      {data:dayKeys.map(function(k){return pk.sort.byDay[k].gaiola||0;}),color:'rgba(232,168,56,0.85)'},
+      {data:dayKeys.map(function(k){return pk.sort.byDay[k].saida||0;}),color:'rgba(255,230,0,0.75)'}
     ];
-    stackedBar('cSort', ds, labels);
+    stackedBar('cSort',ds,labels);
   })();
 
-  // Aduanas — dual (barras volume + linha % faltante)
+  // Aduanas dual
   (function(){
-    var arr = aduana.byDay;
-    if (!arr || arr.length===0) return;
-    var s = setupCanvas('cAdDia', 130); if(!s) return;
-    var ctx=s.ctx, W=s.W, H=s.H, pad={t:16,r:40,b:22,l:44};
-    var cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
-    var n=arr.length, gap=cw/n, bw=gap*0.55;
-    var maxBar = Math.max.apply(null, arr.map(function(d){ return d.total; }))*1.2;
-    var maxLine = 35;
+    var arr=aduana.byDay; if(!arr||arr.length===0) return;
+    var s=setupCanvas('cAdDia',130); if(!s) return;
+    var ctx=s.ctx,W=s.W,H=s.H,pad={t:16,r:44,b:22,l:44};
+    var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+    var n=arr.length,gap=cw/n,bw=gap*0.55;
+    var maxBar=Math.max.apply(null,arr.map(function(d){return d.total;}))*1.2;
+    var maxLine=35;
     grid(ctx,pad,W,H,maxBar,4,null);
-    arr.forEach(function(d,i) {
-      var x=pad.l+i*gap+(gap-bw)/2, bh=ch*(d.total/maxBar);
-      ctx.fillStyle='rgba(52,131,250,0.6)'; ctx.beginPath(); ctx.rect(x,pad.t+ch-bh,bw,bh); ctx.fill();
-      ctx.fillStyle=cv('--tx'); ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+    arr.forEach(function(d,i){
+      var x=pad.l+i*gap+(gap-bw)/2,bh=ch*(d.total/maxBar);
+      ctx.fillStyle='rgba(52,131,250,0.6)';ctx.beginPath();ctx.rect(x,pad.t+ch-bh,bw,bh);ctx.fill();
+      ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
       ctx.fillText(d.total,x+bw/2,pad.t+ch-bh-3);
     });
-    ctx.strokeStyle=cv('--rd'); ctx.lineWidth=2; ctx.setLineDash([]); ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.strokeStyle=cv('--rd');ctx.lineWidth=2;ctx.setLineDash([]);ctx.lineJoin='round';ctx.lineCap='round';
     ctx.beginPath();
-    arr.forEach(function(d,i) {
-      var x=pad.l+i*gap+gap/2, y=pad.t+ch*(1-d.pctFalt/maxLine);
+    arr.forEach(function(d,i){
+      var x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-d.pctFalt/maxLine);
       i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     });
     ctx.stroke();
-    arr.forEach(function(d,i) {
-      var x=pad.l+i*gap+gap/2, y=pad.t+ch*(1-d.pctFalt/maxLine);
+    arr.forEach(function(d,i){
+      var x=pad.l+i*gap+gap/2,y=pad.t+ch*(1-d.pctFalt/maxLine);
       var c=d.pctFalt>=20?cv('--rd'):d.pctFalt>=10?cv('--or'):cv('--gn');
-      ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle=c; ctx.font='bold 9px JetBrains Mono'; ctx.textAlign='center';
+      ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=c;ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
       ctx.fillText(d.pctFalt.toFixed(1)+'%',x,y-6);
     });
-    ctx.fillStyle=cv('--td'); ctx.font='9px Inter'; ctx.textAlign='left';
+    ctx.fillStyle=cv('--td');ctx.font='9px Inter';ctx.textAlign='left';
     ctx.fillText('% falt',W-pad.r+3,pad.t+10);
-    xlabels(ctx,arr.map(function(d){ return d.dt.slice(5).replace('-','/'); }),pad,W,H);
+    xlabels(ctx,arr.map(function(d){return d.dt.slice(5).replace('-','/');}),pad,W,H);
   })();
 }
 
-var _resizeTimer;
-window.addEventListener('resize', function(){ clearTimeout(_resizeTimer); _resizeTimer=setTimeout(drawAllCharts,150); });
+var _rt; window.addEventListener('resize',function(){clearTimeout(_rt);_rt=setTimeout(drawAllCharts,150);});
 
 </script>
 </body>
