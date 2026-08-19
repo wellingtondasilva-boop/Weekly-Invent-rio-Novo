@@ -199,6 +199,7 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
         <div class="up-item" id="ui-et"><input type="file" accept=".csv" onchange="onFile('et',this)"><div class="up-name">05 · PK Etiquetagem</div><div class="up-hint">PK_ETIQUETAGEM_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-et">⬆ Aguardando</span></div>
         <div class="up-item" id="ui-sort"><input type="file" accept=".csv" onchange="onFile('sort',this)"><div class="up-name">06 · PK Sorting</div><div class="up-hint">PK_SORTING_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-sort">⬆ Aguardando</span></div>
         <div class="up-item" id="ui-aduana"><input type="file" accept=".csv" onchange="onFile('aduana',this)"><div class="up-name">07 · Aduanas</div><div class="up-hint">Aduanas_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-aduana">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-poc" style="border-color:var(--gn)"><input type="file" accept=".csv" onchange="onFilePoc(this)"><div class="up-name">08 · Pacotes em POC <span style="font-size:9px;color:var(--gn);font-weight:700">★ OPCIONAL</span></div><div class="up-hint">POC_SVC.csv · coluna ID · sep=,</div><span class="up-st" id="st-poc">⬆ Opcional</span></div>
       </div>
       <div class="up-pbar"><div class="up-pfill" id="upFill"></div></div>
       <div class="up-plabel" id="upLabel">0 de 7 arquivos carregados</div>
@@ -1519,9 +1520,6 @@ function renderDemo(){
 +'<span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span>'
 +'<button class="btn-theme" id="btnTheme" onclick="toggleTheme()">\u2600\ufe0f Dia</button>'
 +'<button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button>'
-+'<div style="margin-left:auto;display:flex;align-items:center;padding:0 8px;">'
-+'<button class="nb" style="font-size:10px;opacity:0.6" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking Ops.</button>'
-+'</div>'
 +'</div>'
 +'</div>'
 +'<div class="nav">'
@@ -1531,7 +1529,7 @@ function renderDemo(){
 +'<button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>'
 +'<button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>'
 +'<button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>'
-+'<!-- ranking acessível via URL #ranking -->'
++'<button class="nb" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking</button>'
 +'</div>'
 +'</div>'
 
@@ -1796,20 +1794,24 @@ function drawAllCharts(){
       ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(W-pad.r,gy); ctx.stroke();
       ctx.setLineDash([]); ctx.fillStyle=cv('--rd'); ctx.font='bold 8px Inter'; ctx.textAlign='left';
       ctx.fillText('Meta '+meta+'%',pad.l+3,gy-3);
-      // Barras
+      // Barras — cor fixa por série (azul = c/ POC, verde = s/ POC).
+      // Quando a semana NÃO bate a meta, a barra ganha apenas uma borda vermelha (não muda a cor de preenchimento).
+      var CLR_COM='rgba(52,131,250,0.85)';   // azul fixo
+      var CLR_SEM='rgba(63,185,80,0.85)';    // verde fixo
+      var CLR_ALERTA='rgba(248,81,73,0.95)'; // vermelho só para contorno/alerta
       acc.accSemanas.forEach(function(wk,i){
         var x=pad.l+i*gap+(gap-bw*2-4)/2;
         // c/ POC
         var h1=ch*Math.max(0,(Math.min(wk.accCom,maxV)-minV))/(maxV-minV);
-        var clr1=wk.accCom>=meta?'rgba(52,131,250,0.85)':'rgba(248,81,73,0.85)';
-        ctx.fillStyle=clr1; ctx.beginPath(); ctx.rect(x,pad.t+ch-h1,bw,h1); ctx.fill();
+        ctx.fillStyle=CLR_COM; ctx.beginPath(); ctx.rect(x,pad.t+ch-h1,bw,h1); ctx.fill();
+        if(wk.accCom<meta){ ctx.strokeStyle=CLR_ALERTA; ctx.lineWidth=2; ctx.strokeRect(x,pad.t+ch-h1,bw,h1); }
         ctx.fillStyle=cv('--tx'); ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='center';
         ctx.fillText(wk.accCom.toFixed(1)+'%',x+bw/2,pad.t+ch-h1-3);
         // s/ POC
         var x2=x+bw+3;
         var h2=ch*Math.max(0,(Math.min(wk.accSem,maxV)-minV))/(maxV-minV);
-        var clr2=wk.accSem>=meta?'rgba(63,185,80,0.85)':'rgba(232,168,56,0.85)';
-        ctx.fillStyle=clr2; ctx.beginPath(); ctx.rect(x2,pad.t+ch-h2,bw,h2); ctx.fill();
+        ctx.fillStyle=CLR_SEM; ctx.beginPath(); ctx.rect(x2,pad.t+ch-h2,bw,h2); ctx.fill();
+        if(wk.accSem<meta){ ctx.strokeStyle=CLR_ALERTA; ctx.lineWidth=2; ctx.strokeRect(x2,pad.t+ch-h2,bw,h2); }
         ctx.fillStyle=cv('--tx'); ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='center';
         ctx.fillText(wk.accSem.toFixed(1)+'%',x2+bw/2,pad.t+ch-h2-3);
         // Label semana
