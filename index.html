@@ -179,6 +179,17 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
         <div class="up-field"><label>Data fim</label><input id="cfgEnd" value="08/08/2026"></div>
         <div class="up-field"><label>Cód. BPP (AAAA-SS)</label><input id="cfgBpp" value="2026-32"></div>
       </div>
+      <div class="up-section" style="margin-top:12px">Metas operacionais</div>
+      <div class="up-cfg">
+        <div class="up-field"><label>Meta Accuracy (%)</label><input id="cfgMetaAcc" value="80" type="number" min="0" max="100"></div>
+        <div class="up-field"><label>Meta Deslocados (%)</label><input id="cfgMetaDesloc" value="5" type="number" min="0" max="100"></div>
+        <div class="up-field"><label>Meta BPP Total (%)</label><input id="cfgMetaBpp" value="0.269" type="number" step="0.001" min="0"></div>
+        <div class="up-field"><label>Meta BPP Damaged (%)</label><input id="cfgMetaBppDamaged" value="0.128" type="number" step="0.001" min="0"></div>
+        <div class="up-field"><label>Meta BPP Lost (%)</label><input id="cfgMetaBppLost" value="0.063" type="number" step="0.001" min="0"></div>
+        <div class="up-field"><label>Meta BPP Fraud (%)</label><input id="cfgMetaBppFraud" value="0.049" type="number" step="0.001" min="0"></div>
+        <div class="up-field"><label>Meta BPP Stolen (%)</label><input id="cfgMetaBppStolen" value="0.012" type="number" step="0.001" min="0"></div>
+        <div class="up-field"><label>Meta BPP Delayed (%)</label><input id="cfgMetaBppDelayed" value="0.016" type="number" step="0.001" min="0"></div>
+      </div>
       <div class="up-section">Arquivos — clique ou arraste</div>
       <div class="up-grid">
         <div class="up-item" id="ui-base2"><input type="file" accept=".csv" onchange="onFile('base2',this)"><div class="up-name">01 · Base 2 Inventário</div><div class="up-hint">BASE_2_INVENTARIO_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-base2">⬆ Aguardando</span></div>
@@ -407,6 +418,42 @@ function tousd(s){var v=parseFloat(String(s||'').trim().replace(',','.'));return
 function groupBy(arr,key){var m={};for(var i=0;i<arr.length;i++){var k=arr[i][key]||'';m[k]=(m[k]||0)+1;}return m;}
 function topN(obj,n){var a=Object.keys(obj).map(function(k){return[k,obj[k]];});a.sort(function(a,b){return b[1]-a[1];});return a.slice(0,n||a.length);}
 
+
+// ── FILTRO DE PERÍODO ──────────────────────────────────────────────
+function parseDateBR(s) {
+  // Suporta: '2026-08-15', '15/08/2026', '2026-08-15T...'
+  if (!s) return null;
+  s = String(s).trim().slice(0, 10);
+  var m;
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return new Date(+m[1], +m[2]-1, +m[3]);
+  if ((m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/))) return new Date(+m[3], +m[2]-1, +m[1]);
+  return null;
+}
+
+function filtrarPorPeriodo(rows, dateField, cfg) {
+  var start = parseDateBR(cfg.dateStart);
+  var end   = parseDateBR(cfg.dateEnd);
+  if (!start || !end) return rows; // sem período configurado → retorna tudo
+  end.setHours(23, 59, 59); // incluir o dia final completo
+  return rows.filter(function(r) {
+    var v = r[dateField] || '';
+    // Tentar ISO primeiro
+    var dt = parseDateBR(v.slice(0,10));
+    if (!dt) return true; // data inválida → não filtrar
+    return dt >= start && dt <= end;
+  });
+}
+
+// Detectar anomalias: valor > média + 3*desvio padrão
+function detectarAnomalias(valores) {
+  if (!valores || valores.length < 3) return [];
+  var media = valores.reduce(function(a,b){return a+b;},0) / valores.length;
+  var variance = valores.reduce(function(a,b){return a+Math.pow(b-media,2);},0) / valores.length;
+  var desvio = Math.sqrt(variance);
+  var limiar = media + 3 * desvio;
+  return valores.map(function(v,i){return v > limiar && desvio > 0 ? i : -1;}).filter(function(i){return i>=0;});
+}
+
 function processar(){
   var cfg={
     svc:document.getElementById('cfgSvc').value||'SSP15',
@@ -414,14 +461,45 @@ function processar(){
     week:document.getElementById('cfgWeek').value||'W32',
     dateStart:document.getElementById('cfgStart').value||'',
     dateEnd:document.getElementById('cfgEnd').value||'',
-    bppWeek:document.getElementById('cfgBpp').value||'2026-32'
+    bppWeek:document.getElementById('cfgBpp').value||'2026-32',
+    metaAcc:parseFloat(document.getElementById('cfgMetaAcc')?document.getElementById('cfgMetaAcc').value:'80')||80,
+    metaDesloc:parseFloat(document.getElementById('cfgMetaDesloc')?document.getElementById('cfgMetaDesloc').value:'5')||5,
+    metaBpp:parseFloat(document.getElementById('cfgMetaBpp')?document.getElementById('cfgMetaBpp').value:'0.269')||0.269,
+    metaBppTramo:{
+      LOST:    parseFloat(document.getElementById('cfgMetaBppLost')?document.getElementById('cfgMetaBppLost').value:'0.063')||0.063,
+      DAMAGED: parseFloat(document.getElementById('cfgMetaBppDamaged')?document.getElementById('cfgMetaBppDamaged').value:'0.128')||0.128,
+      FRAUD:   parseFloat(document.getElementById('cfgMetaBppFraud')?document.getElementById('cfgMetaBppFraud').value:'0.049')||0.049,
+      STOLEN:  parseFloat(document.getElementById('cfgMetaBppStolen')?document.getElementById('cfgMetaBppStolen').value:'0.012')||0.012,
+      DELAYED: parseFloat(document.getElementById('cfgMetaBppDelayed')?document.getElementById('cfgMetaBppDelayed').value:'0.016')||0.016
+    }
   };
   var acc=calcAccuracy(cfg);
   var desloc=calcDeslocados(cfg,acc.totalInv);
   var bpp=calcBPP(cfg);
-  var pk=calcPK();
-  var aduana=calcAduanas(acc,bpp,pk,desloc);
-  D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana};
+  var pk=calcPK(cfg);
+  var aduana=calcAduanas(acc,bpp,pk,desloc,cfg);
+  // Detectar anomalias
+  var alertas = [];
+  var deslocPcts = desloc.byDay.map(function(d){
+    var inv = acc.days.reduce(function(s,x){return x.label&&d.dt&&x.label.slice(-2)===d.dt.slice(-2)?x.inv:s;},0);
+    return inv > 0 ? d.total/inv*100 : 0;
+  });
+  var anomDesloc = detectarAnomalias(deslocPcts);
+  if (anomDesloc.length > 0) {
+    anomDesloc.forEach(function(i){
+      var d = desloc.byDay[i];
+      alertas.push({tipo:'deslocados', msg:'Valor discrepante em ' + d.dt + ': ' + deslocPcts[i].toFixed(1) + '% de deslocados (muito acima da média da semana). Verifique se o arquivo contém dados de outra semana.', nivel:'cr'});
+    });
+  }
+  var accVals = acc.days.map(function(d){return d.acc;});
+  var anomAcc = detectarAnomalias(accVals.map(function(v){return 100-v;})); // anomalia = accuracy muito BAIXA
+  if (anomAcc.length > 0) {
+    anomAcc.forEach(function(i){
+      alertas.push({tipo:'accuracy', msg:'Accuracy anormalmente baixa em ' + acc.days[i].label + ': ' + acc.days[i].acc.toFixed(1) + '%. Verifique o arquivo BASE2 desse dia.', nivel:'w'});
+    });
+  }
+  var ranking=calcRankingCruzado(pk,desloc,aduana);
+  D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana,alertas:alertas,ranking:ranking};
 }
 
 function calcAccuracy(cfg){
@@ -451,7 +529,7 @@ function calcAccuracy(cfg){
 }
 
 function calcDeslocados(cfg,totalInv){
-  var rows=RAW.desloc||[],total=rows.length,naoCorr=0;
+  var rows=filtrarPorPeriodo(RAW.desloc||[],'SHP_INVENTORY_INIT_DTTM',cfg),total=rows.length,naoCorr=0;
   for(var i=0;i<rows.length;i++) if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') naoCorr++;
   var pct=totalInv>0?Math.round(total/totalInv*1000)/10:0;
   var byDay={};
@@ -623,8 +701,9 @@ function calcBPP(cfg){
   return{geral:geralData,tramos:tramoData,tramoDisp:tramoDisp,tend:tend,tendTramo:tendTramo,ids_bpp:ids_bpp};
 }
 
-function calcPK(){
-  var sort=RAW.sort||[],et=RAW.et||[];
+function calcPK(cfg){
+  var sort=filtrarPorPeriodo(RAW.sort||[],'DATA_EVENTO',cfg);
+  var et=RAW.et||[];
   var sortByDay={};
   for(var i=0;i<sort.length;i++){
     var dt=(sort[i]['DATA_EVENTO']||'').slice(0,10),ev=sort[i]['EVENT_TYPE']||'';
@@ -681,8 +760,9 @@ function calcPK(){
          et:{total:etDedup.length,ops:etOps,motivos:etMotivos},ids_sort:ids_sort,ids_et:ids_et};
 }
 
-function calcAduanas(acc,bpp,pk,desloc){
-  var rows=RAW.aduana||[],seen={},ids=[];
+function calcAduanas(acc,bpp,pk,desloc,cfg){
+  var rawAduana=filtrarPorPeriodo(RAW.aduana||[],'DATA_CRIACAO_AUDITORIA',cfg);
+  var rows=rawAduana,seen={},ids=[];
   for(var i=0;i<rows.length;i++){var pid=rows[i]['ID_Pacote']||'';if(pid&&!seen[pid]){seen[pid]=rows[i];ids.push(pid);}}
   var master=ids.map(function(pid){
     var r=seen[pid];
@@ -822,7 +902,7 @@ function gerarDemo(){
 function fmtPct(n){return typeof n==='number'?n.toFixed(1)+'%':'--';}
 function fmtBpp(n){return typeof n==='number'?n.toFixed(3)+'%':'--';}
 function fmtN(n){return typeof n==='number'?n.toLocaleString('pt-BR',{maximumFractionDigits:2}):'--';}
-function clrAcc(v){return v>=80?'var(--gn)':v>=70?'var(--or)':'var(--rd)';}
+function clrAcc(v){return v>=cfg.metaAcc?'var(--gn)':v>=(cfg.metaAcc-10)?'var(--or)':'var(--rd)';}
 function tag(cls,txt){return '<span class="tag '+cls+'">'+txt+'</span>';}
 function rn(i){var cls=i<3?'r'+(i+1):'';return '<span class="rn '+cls+'">'+(i+1)+'</span>';}
 function rotaChips(rotas){if(!rotas||rotas.length===0) return '<span style="color:var(--td);font-size:9px">—</span>';return rotas.map(function(r){return '<span class="rota-chip">'+r+'</span>';}).join('');}
@@ -1008,14 +1088,14 @@ function tendCards(tend){
     var prev=i>0?tend[i-1]:null;
     var chg=prev&&prev.pct>0?(t.pct-prev.pct)/prev.pct*100:null;
     var chgTxt=chg!==null?(chg<0?'<span style="color:var(--gn)">&#9660; -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">&#9650; +'+chg.toFixed(1)+'%</span>'):'&mdash;';
-    var vclr=t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
+    var vclr=t.pct>cfg.metaBpp?'var(--rd)':t.pct>(cfg.metaBpp*0.7)?'var(--or)':'var(--gn)';
     return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout / GMV</div><div class="td2">'+chgTxt+'</div></div>';
   }).join('');
 }
 
 function mlpTable(mlpList,totalGeral){
   return mlpList.map(function(m,i){
-    var pclr=m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
+    var pclr=m.pct&&m.pct>cfg.metaBpp?'var(--rd)':m.pct&&m.pct>(cfg.metaBpp*0.7)?'var(--or)':'inherit';
     return '<tr'+(i<1?' class="rh"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+fmtBpp(m.pct)+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td></tr>';
   }).join('');
 }
@@ -1034,6 +1114,39 @@ function tipoRows(tipos,total){
   return tipos.map(function(t){
     return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(total>0?t[1]/total*100:0)+'</td></tr>';
   }).join('');
+}
+
+
+// ── RANKING CRUZADO DE OPERADORES ──────────────────────────────────
+function calcRankingCruzado(pk, desloc, aduana) {
+  var mapa = {};
+
+  function add(op, campo, valor) {
+    if (!op || op === '?' || op === 'nan') return;
+    if (!mapa[op]) mapa[op] = {op:op, sort:0, et:0, desloc:0, deslocNc:0, aduana:0, aduanaFalt:0, score:0};
+    mapa[op][campo] += valor;
+  }
+
+  pk.sort.ops.forEach(function(o){ add(o.op,'sort',o.total); });
+  pk.et.ops.forEach(function(o){ add(o.op,'et',o.total); });
+  desloc.ops.forEach(function(o){ add(o.id,'desloc',o.total); add(o.id,'deslocNc',o.nc); });
+  aduana.users.forEach(function(u){ add(u.u,'aduana',u.total); add(u.u,'aduanaFalt',u.falt); });
+
+  // Score: quantos processos distintos o operador aparece (0-4)
+  var lista = Object.keys(mapa).map(function(op){
+    var v = mapa[op];
+    var processos = (v.sort>0?1:0)+(v.et>0?1:0)+(v.desloc>0?1:0)+(v.aduana>0?1:0);
+    v.score = processos;
+    return v;
+  });
+
+  // Ordenar: primeiro por score (mais processos), depois por total combinado
+  lista.sort(function(a,b){
+    if (b.score !== a.score) return b.score - a.score;
+    return (b.sort+b.et+b.desloc+b.aduana) - (a.sort+a.et+a.desloc+a.aduana);
+  });
+
+  return lista.slice(0,30);
 }
 
 function renderDemo(){
@@ -1084,7 +1197,8 @@ function renderDemo(){
 
   var subPanels=bpp.tramoDisp.map(function(tr,i){
     var td=bpp.tramos[tr]; var tt=bpp.tendTramo[tr]||[];
-    var vclr=td.pct>0.5?'var(--rd)':td.pct>0.35?'var(--or)':'var(--gn)';
+    var metaTr=(cfg.metaBppTramo&&cfg.metaBppTramo[tr])||cfg.metaBpp;
+    var vclr=td.pct>metaTr?'var(--rd)':td.pct>(metaTr*0.9)?'var(--or)':'var(--gn)';
 
     // Chips de filtro por sub-tipo — usando data-attributes para evitar problema de aspas
     var chipHtml='<div class="fchips" id="fchips-'+tr+'">';
@@ -1101,7 +1215,7 @@ function renderDemo(){
       +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o">'+fmtN(td.cashout)+'</div></div>'
       +'<div class="kc cb"><div class="kl">Ocorr&ecirc;ncias</div><div class="kv b">'+td.total+'</div></div>'
       +'</div>'
-      +'<div class="trow">'+tendCards(tt)+'</div>'
+      +'<div class="trow">'+tendCards(tt,metaTr)+'</div>'
       + chipHtml
       +'<div id="bpp-dynamic-'+tr+'">'
       +buildBppContent(td.mlpList, td.tipos, td.total, tr, td)
@@ -1197,7 +1311,7 @@ function renderDemo(){
 +'<div class="hinfo">'
 +'<div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>'
 +'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>'
-+'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
++'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
 +'<div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.geral.pct)+'</div></div>'
 +'</div>'
 +'<div class="hright">'
@@ -1214,6 +1328,7 @@ function renderDemo(){
 +'<button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>'
 +'<button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>'
 +'<button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>'
++'<button class="nb" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking</button>'
 +'</div>'
 +'</div>'
 
@@ -1239,19 +1354,19 @@ function renderDemo(){
 +'<div style="font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">\ud83d\udd17 Oportunidade \u2014 Aduanas '+cfg.week+'</div>'
 +'<p style="font-size:11.5px;line-height:1.75;color:var(--tm);margin-bottom:8px;">Auditamos <strong>'+aduana.total.toLocaleString()+'</strong> IDs. <strong style="color:var(--rd)">'+fmtPct(aduana.total>0?aduana.comFalha/aduana.total*100:0)+'</strong> com ao menos uma falha correlata.</p>'
 +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
-+'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+aduana.cadeia.length+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia &ge;3 processos</div></div>'
-+'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+aduana.faltBpp+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP</div></div>'
-+'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--or)">'+(aduana.mlp[0]?fmtPct(aduana.mlp[0].pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">'+(aduana.mlp[0]?aduana.mlp[0].mlp:'--')+' faltante</div></div>'
-+'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:var(--rd)">'+(topAdFalt?fmtPct(topAdFalt.pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior faltante op.</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:JetBrains Mono,monospace;color:var(--rd)">'+aduana.cadeia.length+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">cadeia &ge;3 processos</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:JetBrains Mono,monospace;color:var(--or)">'+aduana.faltBpp+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">faltante + BPP</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:JetBrains Mono,monospace;color:var(--or)">'+(aduana.mlp[0]?fmtPct(aduana.mlp[0].pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">'+(aduana.mlp[0]?aduana.mlp[0].mlp:'--')+' faltante</div></div>'
++'<div style="background:var(--sf2);border-radius:4px;padding:7px 9px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:JetBrains Mono,monospace;color:var(--rd)">'+(topAdFalt?fmtPct(topAdFalt.pctFalt):'--')+'</div><div style="font-size:9px;color:var(--td);margin-top:2px;">maior faltante op.</div></div>'
 +'</div>'
 +'</div>'
 +'</div>'
 +'</div>'
 +'<div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta</div><div class="ab">Accuracy <strong>c/ POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>'
 +'<div class="kr" style="grid-template-columns:repeat(4,1fr);">'
-+'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=80?'ok':'cr',acc.geral>=80?'OK':'Abaixo da meta')+'</div>'
++'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=cfg.metaAcc?'ok':'cr',acc.geral>=cfg.metaAcc?'OK':'Abaixo da meta')+'</div>'
 +'<div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>'
-+'<div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'Dentro da meta':'Acima da meta')+'</div>'
++'<div class="kc '+(desloc.pct<=cfg.metaDesloc?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=cfg.metaDesloc?'ok':'cr',desloc.pct<=cfg.metaDesloc?'Dentro da meta':'Acima da meta')+'</div>'
 +'<div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.geral.pct)+'</div><div class="km">Cashout / GMV</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>'
 +'</div>'
 +'</div>'
@@ -1259,7 +1374,34 @@ function renderDemo(){
 // ── BPP ──
 +'<div id="bpp" class="tab">'
 +'<div class="sh"><div><div class="st">BPP \u2014 Tramos + Tend\xeancia</div><div class="ss">% BPP = Cashout USD \xf7 GMV USD \xb7 '+cfg.week+'</div></div>'+btnExp('bpp')+'</div>'
-+'<div class="trow">'+tendCards(bpp.tend)+'</div>'
++'<div class="card" style="margin-bottom:8px"><div class="ch"><span class="ct">&#127919; Targets BPP</span><span class="cc">Metas configuradas para '+cfg.week+'</span></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;padding:10px 14px;">'
+      +(function(){
+        var tramos=[['Total',cfg.metaBpp,bpp.geral.pct],
+          ['LOST',(cfg.metaBppTramo&&cfg.metaBppTramo.LOST)||0.063, bpp.tramos.LOST?bpp.tramos.LOST.pct:null],
+          ['DAMAGED',(cfg.metaBppTramo&&cfg.metaBppTramo.DAMAGED)||0.128, bpp.tramos.DAMAGED?bpp.tramos.DAMAGED.pct:null],
+          ['FRAUD',(cfg.metaBppTramo&&cfg.metaBppTramo.FRAUD)||0.049, bpp.tramos.FRAUD?bpp.tramos.FRAUD.pct:null],
+          ['STOLEN',(cfg.metaBppTramo&&cfg.metaBppTramo.STOLEN)||0.012, bpp.tramos.STOLEN?bpp.tramos.STOLEN.pct:null],
+          ['DELAYED',(cfg.metaBppTramo&&cfg.metaBppTramo.DELAYED)||0.016, bpp.tramos.DELAYED?bpp.tramos.DELAYED.pct:null]
+        ];
+        return tramos.map(function(t){
+          var label=t[0],meta=t[1],real=t[2];
+          var vclr=real==null?'var(--td)':real>meta?'var(--rd)':real>(meta*0.9)?'var(--or)':'var(--gn)';
+          var realStr=real!=null?fmtBpp(real):'N/D';
+          var gap=real!=null?(real-meta):null;
+          var gapStr=gap!=null?(gap>0?'<span style="color:var(--rd)">+'+fmtBpp(gap)+'</span>':'<span style="color:var(--gn)">'+fmtBpp(gap)+'</span>'):'';
+          var pct=real!=null&&meta>0?Math.round(real/meta*100):null;
+          var bar=pct!=null?'<div style="height:3px;background:var(--sf3);border-radius:2px;margin-top:4px"><div style="height:100%;width:'+Math.min(pct,150)+'%;background:'+vclr+';border-radius:2px;transition:width .4s"></div></div>':'';
+          return '<div style="background:var(--sf2);border:1px solid var(--br);border-left:3px solid '+vclr+';border-radius:6px;padding:8px 10px;">'
+            +'<div style="font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">'+label+'</div>'
+            +'<div style="font-size:16px;font-weight:800;color:'+vclr+'">'+realStr+'</div>'
+            +'<div style="font-size:9px;color:var(--td);margin-top:2px">Meta: '+fmtBpp(meta)+' '+gapStr+'</div>'
+            +bar
+            +'</div>';
+        }).join('');
+      })()
+      +'</div></div>'
+      +'<div class="trow">'+tendCards(bpp.tend)+'</div>'
 +'<div class="kr" style="grid-template-columns:repeat(3,1fr);">'
 +'<div class="kc cr"><div class="kl">% BPP Geral</div><div class="kv r">'+fmtBpp(bpp.geral.pct)+'</div></div>'
 +'<div class="kc co"><div class="kl">Cashout Total</div><div class="kv o">'+fmtN(bpp.geral.cashout)+'</div></div>'
@@ -1334,7 +1476,7 @@ function renderDemo(){
 +'<div id="deslocados" class="tab">'
 +'<div class="sh"><div><div class="st">Deslocados \u2014 Resultado Di\xe1rio</div><div class="ss">'+desloc.total.toLocaleString()+' fora da zona \xb7 Meta &le;5% \xb7 '+cfg.week+'</div></div>'+btnExp('deslocados')+'</div>'
 +'<div class="kr">'
-+'<div class="kc '+(desloc.pct<=5?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=5?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=5?'ok':'cr',desloc.pct<=5?'OK':'Acima da meta')+'</div>'
++'<div class="kc '+(desloc.pct<=cfg.metaDesloc?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=cfg.metaDesloc?'ok':'cr',desloc.pct<=cfg.metaDesloc?'OK':'Acima da meta')+'</div>'
 +'<div class="kc cb"><div class="kl">Total</div><div class="kv b">'+desloc.total.toLocaleString()+'</div></div>'
 +'<div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>'
 +'<div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>'
@@ -1370,6 +1512,69 @@ function renderDemo(){
 +'</div>'
 
 +'</div>'
+
+  // ── HTML RANKING CRUZADO ──
+  var rankingRows = D.ranking.map(function(v,i){
+    var score = v.score;
+    var scoreCls = score>=3?'cr':score>=2?'w':'ok';
+    var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:9px">'+val+'</span>':'<span style="color:var(--td);font-size:9px">&mdash;</span>'; };
+    return '<tr>'
+      +'<td>'+rn(i)+'</td>'
+      +'<td><strong>'+v.op+'</strong></td>'
+      +'<td class="tc">'+dot(v.sort,'cr')+'</td>'
+      +'<td class="tc">'+dot(v.et,'w')+'</td>'
+      +'<td class="tc">'+dot(v.desloc,'i')+'</td>'
+      +'<td class="tc">'+dot(v.deslocNc,'w')+'</td>'
+      +'<td class="tc">'+dot(v.aduana,'p')+'</td>'
+      +'<td class="tc">'+dot(v.aduanaFalt,'cr')+'</td>'
+      +'<td class="tc"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800">'+score+'/4</span></td>'
+      +'</tr>';
+  }).join('');
+
+  // ── HTML ALERTAS ──
+  var alertasHtml = D.alertas.length > 0
+    ? D.alertas.map(function(a){
+        return '<div class="alert '+a.nivel+'" style="margin-bottom:8px"><div class="ai">'+(a.nivel==='cr'?'🚨':'⚠️')+'</div><div><div class="at">Anomalia detectada — '+a.tipo.toUpperCase()+'</div><div class="ab">'+a.msg+'</div></div></div>';
+      }).join('')
+    : '<div class="alert i"><div class="ai">✅</div><div><div class="at">Nenhuma anomalia detectada</div><div class="ab">Todos os valores estão dentro do padrão estatístico esperado para a semana.</div></div></div>';
+
++'<div id="ranking" class="tab">'
++'<div class="sh"><div><div class="st">Ranking Cruzado de Operadores — '+cfg.week+'</div><div class="ss">Operadores que aparecem em mais de um processo na mesma semana</div></div></div>'
++'<div class="sub-sh"><span class="sub-title">⚠️ Alertas Automáticos</span><span class="sub-badge">Anomalias estatísticas detectadas</span></div>'
++ alertasHtml
++'<div class="sub-sh" style="margin-top:16px"><span class="sub-title">🏆 Operadores Multifrontes</span><span class="sub-badge">Score = nº de processos distintos com ocorrência</span></div>'
++'<div class="alert i" style="margin-bottom:8px"><div class="ai">💡</div><div><div class="at">Como ler o Score</div><div class="ab">Score <strong>4/4</strong> = aparece em Sorting PK + Etiquetagem PK + Deslocados + Aduanas. Operadores com score ≥ 2 merecem atenção prioritária — o erro não é pontual, é um padrão de comportamento.</div></div></div>'
++'<div class="card"><div class="ch"><span class="ct">Top 30 Operadores por Score</span><span class="cc">Ordenado por nº de processos</span></div>'
++'<table><thead><tr>'
++'<th>#</th><th>Operador</th>'
++'<th class="tc"><span class="tag cr" style="font-size:8px">Sort PK</span></th>'
++'<th class="tc"><span class="tag w" style="font-size:8px">Etiq PK</span></th>'
++'<th class="tc"><span class="tag i" style="font-size:8px">Desl.</span></th>'
++'<th class="tc"><span class="tag w" style="font-size:8px">N/C</span></th>'
++'<th class="tc"><span class="tag p" style="font-size:8px">Aduana</span></th>'
++'<th class="tc"><span class="tag cr" style="font-size:8px">Falt.</span></th>'
++'<th class="tc">Score</th>'
++'</tr></thead><tbody>'+rankingRows+'</tbody></table></div>'
++'<div class="card" style="margin-top:8px"><div style="padding:4px 14px 8px">'
++ (function(){
+    var top3 = D.ranking.filter(function(v){return v.score>=2;}).slice(0,3);
+    if(top3.length===0) return '<div style="padding:8px;color:var(--td);font-size:11px">Nenhum operador multifonte identificado esta semana.</div>';
+    return top3.map(function(v,i){
+      var processos=[];
+      if(v.sort>0) processos.push(v.sort+' erros Sorting PK');
+      if(v.et>0) processos.push(v.et+' erros Etiquetagem PK');
+      if(v.desloc>0) processos.push(v.desloc+' deslocados ('+v.deslocNc+' N/C)');
+      if(v.aduana>0) processos.push(v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
+      return '<div class="arow"><div class="aprio p'+(i+1<=2?i+1:2)+'">P'+(i+1)+'</div>'
+        +'<div><div class="atitle">Feedback e plano de ação — Op. '+v.op+' (Score '+v.score+'/4)</div>'
+        +'<div class="adesc">Aparece em: '+processos.join(' · ')+'</div>'
+        +'<div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">Líder de Turno</span></div>'
+        +'</div></div>';
+    }).join('');
+  })()
++'</div></div>'
++'</div>'
+
 +'<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
 
   document.getElementById('demoScreen').innerHTML=html;
@@ -1394,7 +1599,7 @@ function drawAllCharts(){
   var dL=acc.days.map(function(d){return d.label;});
   var dAcc=acc.days.map(function(d){return d.acc;});
   lineChart('cAcc',dL,dAcc,cv('--bl'),'rgba(52,131,250,0.08)',
-    [{val:80,color:cv('--rd'),label:'Meta 80%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
+    [{val:cfg.metaAcc,color:cv('--rd'),label:'Meta '+cfg.metaAcc+'%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
     55,95,function(v){return v.toFixed(1)+'%';});
 
   // Deslocados
@@ -1414,7 +1619,7 @@ function drawAllCharts(){
       var inv=acc.days[i]?acc.days[i].inv:1;
       var pct=inv>0?d.total/inv*100:0;
       var x=pad.l+i*gap+(gap-bw)/2,bh=ch*(Math.min(pct,maxV)/maxV);
-      ctx.fillStyle=pct>5?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
+      ctx.fillStyle=pct>cfg.metaDesloc?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
       ctx.beginPath();ctx.rect(x,pad.t+ch-bh,bw,bh);ctx.fill();
       ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
       ctx.fillText(pct.toFixed(1)+'%',x+bw/2,pad.t+ch-bh-3);
