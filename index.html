@@ -369,6 +369,35 @@ function toggleTheme(){
 }
 
 // ── UPLOAD ──
+function onFilePoc(inp){
+  var file=inp.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var rows=parseCSV(e.target.result,',');
+      // Extrair coluna ID — normalizar para string sem decimais
+      RAW.poc=rows.map(function(r){
+        var v=r['ID']||r['id']||r['Id']||'';
+        // Remover .0 de notação científica/float
+        return String(v).replace(/\.0$/,'').replace(/e\+/i,'e+').trim();
+      }).filter(function(v){return v!=='';});
+      // Converter notação científica se necessário
+      RAW.poc=RAW.poc.map(function(v){
+        var n=parseFloat(v);
+        return isNaN(n)?v:String(Math.round(n));
+      });
+      RAW.pocSet={}; RAW.poc.forEach(function(id){RAW.pocSet[id]=true;});
+      document.getElementById('st-poc').textContent='✓ '+file.name.slice(0,28)+' ('+RAW.poc.length+' IDs)';
+      document.getElementById('ui-poc').classList.add('ok');
+      // Atualizar label sem incrementar LOADED
+      document.getElementById('upLabel').textContent=LOADED+' de 7 arquivos carregados · +POC carregado';
+    }catch(err){
+      document.getElementById('st-poc').textContent='⚠ Erro: '+err.message;
+    }
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
 function onFile(key,inp){
   var file=inp.files[0]; if(!file) return;
   var sep=(key==='bpp')?';':',';
@@ -380,7 +409,7 @@ function onFile(key,inp){
       document.getElementById('ui-'+key).classList.add('ok');
       LOADED++;
       document.getElementById('upFill').style.width=(LOADED/7*100)+'%';
-      document.getElementById('upLabel').textContent=LOADED+' de 7 arquivos carregados';
+      document.getElementById('upLabel').textContent=LOADED+' de 7 arquivos carregados'+(RAW.poc?' · +POC carregado':'');
       if(LOADED===7) document.getElementById('btnGo').disabled=false;
     }catch(err){ document.getElementById('st-'+key).textContent='❌ Erro: '+err.message; }
   };
@@ -499,33 +528,152 @@ function processar(){
     });
   }
   var ranking=calcRankingCruzado(pk,desloc,aduana);
+
+  // Calcular evolução semanal de deslocados
+  var deslocSemanas=[];
+  if(acc.multiSemana&&acc.accSemanas&&acc.accSemanas.length>1){
+    var rawDesloc=RAW.desloc||[];
+    acc.accSemanas.forEach(function(s){
+      // Filtrar deslocados da semana pelo label (aproximação por getWeekLabel)
+      var wkRows=rawDesloc.filter(function(r){
+        var dt=(r['SHP_INVENTORY_INIT_DTTM']||'').slice(0,10);
+        if(!dt) return false;
+        var d=new Date(dt);
+        // Semana ISO do deslocado
+        var start=new Date(d.getFullYear(),0,1);
+        var wn=Math.floor((d-start)/(7*24*3600*1000))+1;
+        return 'W'+wn===s.wk;
+      });
+      var pctWk=s.inv>0?Math.round(wkRows.length/s.inv*1000)/10:0;
+      deslocSemanas.push({wk:s.wk,total:wkRows.length,inv:s.inv,pct:pctWk});
+    });
+  }
+  desloc.semanas=deslocSemanas;
+  acc.semanas=acc.accSemanas; // alias
+
   D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana,alertas:alertas,ranking:ranking};
 }
 
+function ptDateOrder(s){
+  var m={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+  var x=s.match(/(\d+)\s+de\s+(\w+)(?:\s+de\s+(\d{4}))?/i);
+  if(x){
+    var yr=x[3]?parseInt(x[3]):2026;
+    return yr*10000+m[x[2].toLowerCase().slice(0,3)]*100+parseInt(x[1]);
+  }
+  return 0;
+}
+
+function getWeekLabel(dateStr){
+  // Retorna label da semana: 'W32', 'W33' etc baseado na data
+  var order=ptDateOrder(dateStr);
+  if(order===0) return 'W?';
+  // Calcular semana do ano aproximada
+  var x=dateStr.match(/(\d+)\s+de\s+(\w+)(?:\s+de\s+(\d{4}))?/i);
+  if(!x) return 'W?';
+  var months={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+  var day=parseInt(x[1]),mon=months[x[2].toLowerCase().slice(0,3)],yr=x[3]?parseInt(x[3]):2026;
+  var d=new Date(yr,mon-1,day);
+  var start=new Date(yr,0,1);
+  var diff=Math.floor((d-start)/(7*24*3600*1000));
+  return 'W'+(diff+1);
+}
+
 function calcAccuracy(cfg){
-  var b2=RAW.base2||[],inv_rows=[],falt_rows=[];
+  var b2=RAW.base2||[], inv_rows=[], falt_rows=[];
   for(var i=0;i<b2.length;i++){
     var cl=b2[i]['CLASIFICACION']||'';
     if(cl==='INVENTARIADO PLANIFICADO') inv_rows.push(b2[i]);
     else if(cl==='FALTANTE EN INVENTARIO') falt_rows.push(b2[i]);
   }
-  var inv_dia={},falt_dia={};
-  for(var i=0;i<inv_rows.length;i++){var dt=inv_rows[i]['INIT_DTTM_LOCAL']||'';inv_dia[dt]=(inv_dia[dt]||0)+1;}
-  for(var i=0;i<falt_rows.length;i++){var dt=falt_rows[i]['INIT_DTTM_LOCAL']||'';falt_dia[dt]=(falt_dia[dt]||0)+1;}
-  var ptOrder=function(s){var m={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};var x=s.match(/(\d+)\s+de\s+(\w+)/i);if(x)return m[x[2].toLowerCase().slice(0,3)]*100+parseInt(x[1]);return 0;};
-  var dayLabels=['Dom 02','Seg 03','Ter 04','Qua 05','Qui 06','Sex 07','Sab 08'];
-  var dates=Object.keys(inv_dia).sort(function(a,b){return ptOrder(a)-ptOrder(b);});
-  var days=[];
-  for(var i=0;i<dates.length;i++){
-    var dt=dates[i],inv=inv_dia[dt]||0,falt=falt_dia[dt]||0;
-    days.push({label:dayLabels[i]||dt,inv:inv,falt:falt,acc:inv+falt>0?Math.round(inv/(inv+falt)*1000)/10:0});
+
+  // Normalizar ID de um row da BASE2 (float → string inteira)
+  function normId(r){
+    var v=r['SHIPMENT']||'';
+    var n=parseFloat(v);
+    return isNaN(n)?String(v).trim():String(Math.round(n));
   }
-  var totalInv=inv_rows.length,totalFalt=falt_rows.length;
+
+  // POC Set — do arquivo externo carregado (08 · Pacotes em POC)
+  var pocSet=RAW.pocSet||{};
+  var hasPoc=Object.keys(pocSet).length>0;
+
+  // Filtrar dias do período configurado
+  var start=parseDateBR(cfg.dateStart), end_dt=parseDateBR(cfg.dateEnd);
+  if(end_dt) end_dt.setHours(23,59,59);
+
+  function inPeriod(row){
+    if(!start) return true;
+    var dt=row['INIT_DTTM_LOCAL']||'';
+    var months={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+    var xm=dt.match(/(\d+)\s+de\s+(\w+)/i);
+    if(!xm) return true;
+    var d=new Date(2026,months[xm[2].toLowerCase().slice(0,3)]-1,parseInt(xm[1]));
+    return d>=start&&d<=end_dt;
+  }
+
+  // Identificar semanas no arquivo (para gráfico de evolução)
+  var allDates=Object.keys(groupBy(inv_rows,'INIT_DTTM_LOCAL'));
+  allDates.sort(function(a,b){return ptDateOrder(a)-ptDateOrder(b);});
+  var weekGroups={};
+  for(var i=0;i<allDates.length;i++){
+    var wk=getWeekLabel(allDates[i]);
+    if(!weekGroups[wk]) weekGroups[wk]=[];
+    weekGroups[wk].push(allDates[i]);
+  }
+  var weekKeys=Object.keys(weekGroups).sort();
+  var multiSemana=weekKeys.length>1;
+
+  // Acurácia por semana — linhas brutas c/ POC e s/ POC
+  var accSemanas=weekKeys.map(function(wk){
+    var dtSet={};
+    weekGroups[wk].forEach(function(d){dtSet[d]=true;});
+    var invW=inv_rows.filter(function(r){return dtSet[r['INIT_DTTM_LOCAL']];});
+    var faltW=falt_rows.filter(function(r){return dtSet[r['INIT_DTTM_LOCAL']];});
+    var nInv=invW.length, nFalt=faltW.length;
+    var accCom=nInv+nFalt>0?Math.round(nInv/(nInv+nFalt)*1000)/10:0;
+    var invSp=hasPoc?invW.filter(function(r){return !pocSet[normId(r)];}).length:nInv;
+    var faltSp=hasPoc?faltW.filter(function(r){return !pocSet[normId(r)];}).length:nFalt;
+    var accSem=invSp+faltSp>0?Math.round(invSp/(invSp+faltSp)*1000)/10:accCom;
+    return{wk:wk,accCom:accCom,accSem:accSem,inv:nInv,falt:nFalt};
+  });
+
+  // Período atual — linhas brutas
+  var invCur=inv_rows.filter(inPeriod);
+  var faltCur=falt_rows.filter(inPeriod);
+
+  var totalInv=invCur.length, totalFalt=faltCur.length;
   var geral=totalInv+totalFalt>0?Math.round(totalInv/(totalInv+totalFalt)*1000)/10:0;
-  var zonaMap=groupBy(falt_rows,'SHP_ZONE_NAME');
+
+  // s/ POC — excluir linhas cujo ID está no pocSet
+  var invSp =hasPoc?invCur.filter(function(r){return !pocSet[normId(r)];}).length:totalInv;
+  var faltSp=hasPoc?faltCur.filter(function(r){return !pocSet[normId(r)];}).length:totalFalt;
+  var geralSPoc=invSp+faltSp>0?Math.round(invSp/(invSp+faltSp)*1000)/10:geral;
+
+  // Por dia (gráfico diário)
+  var inv_dia={},falt_dia={};
+  invCur.forEach(function(r){var dt=r['INIT_DTTM_LOCAL']||'';inv_dia[dt]=(inv_dia[dt]||0)+1;});
+  faltCur.forEach(function(r){var dt=r['INIT_DTTM_LOCAL']||'';falt_dia[dt]=(falt_dia[dt]||0)+1;});
+  var dates=Object.keys(inv_dia).sort(function(a,b){return ptDateOrder(a)-ptDateOrder(b);});
+  var days=dates.map(function(dt){
+    var inv=inv_dia[dt]||0,falt=falt_dia[dt]||0;
+    var xm=dt.match(/(\d+)\s+de\s+(\w+)/i);
+    var label=xm?(xm[1]+' '+xm[2].slice(0,3)):dt;
+    return{label:label,inv:inv,falt:falt,acc:inv+falt>0?Math.round(inv/(inv+falt)*1000)/10:0};
+  });
+
+  var zonaMap=groupBy(faltCur,'SHP_ZONE_NAME');
   var porZona=topN(zonaMap,10).map(function(x){return[x[0],x[1]];});
-  var ids_falt={};for(var i=0;i<falt_rows.length;i++) ids_falt[falt_rows[i]['SHIPMENT']]=true;
-  return{geral:geral,totalInv:totalInv,totalFalt:totalFalt,days:days,porZona:porZona,ids_falt:ids_falt};
+  var ids_falt={};
+  falt_rows.forEach(function(r){ids_falt[r['SHIPMENT']]=true;});
+
+  return{
+    geral:geral, geralSPoc:geralSPoc, hasPoc:hasPoc,
+    totalInv:totalInv, totalFalt:totalFalt,
+    totalInvSp:invSp, totalFaltSp:faltSp,
+    days:days, porZona:porZona, ids_falt:ids_falt,
+    accSemanas:accSemanas, multiSemana:multiSemana
+  };
 }
 
 function calcDeslocados(cfg,totalInv){
@@ -547,6 +695,16 @@ function calcDeslocados(cfg,totalInv){
   var ops=Object.keys(opMap).map(function(k){return{id:k,total:opMap[k].total,nc:opMap[k].nc};});
   ops.sort(function(a,b){return b.total-a.total;}); ops=ops.slice(0,20);
   var ids={};for(var i=0;i<rows.length;i++) ids[rows[i]['SHP_SHIPMENT_ID']]=true;
+
+  // Evolução semanal de deslocados (se BASE2 tiver múltiplas semanas)
+  var deslocSemanas=[];
+  if(D&&D.acc&&D.acc.accSemanas&&D.acc.accSemanas.length>1){
+    D.acc.accSemanas.forEach(function(s){
+      // Aproximar: calcular % deslocados usando inventariado da semana
+      deslocSemanas.push({wk:s.wk,pct:0,totalInv:s.inv}); // será preenchido depois
+    });
+  }
+
   return{total:total,naoCorrigidos:naoCorr,pct:pct,byDay:byDayArr,fluxos:fluxos,ops:ops,ids:ids};
 }
 
@@ -1352,7 +1510,7 @@ function renderDemo(){
 +'<div class="hbrand"><div class="logo">ML</div><div><div class="bname">'+cfg.svc+' \xb7 '+cfg.svcName+'</div><div class="bsub">Demonstrativo Semanal de Invent\xe1rio</div></div></div>'
 +'<div class="hinfo">'
 +'<div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>'
-+'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>'
++(acc.hasPoc?'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">'+acc.geralSPoc.toFixed(1)+'%</div></div>':'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv" style="font-size:11px;color:var(--td)">-- (sem POC)</div></div>')
 +'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=getMetaDesloc()?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
 +'<div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.geral.pct)+'</div></div>'
 +'</div>'
@@ -1361,6 +1519,9 @@ function renderDemo(){
 +'<span class="pchip">'+cfg.dateStart+' \u2013 '+cfg.dateEnd+'</span>'
 +'<button class="btn-theme" id="btnTheme" onclick="toggleTheme()">\u2600\ufe0f Dia</button>'
 +'<button class="btn-reload" onclick="resetDemo()">\u21a9 Nova semana</button>'
++'<div style="margin-left:auto;display:flex;align-items:center;padding:0 8px;">'
++'<button class="nb" style="font-size:10px;opacity:0.6" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking Ops.</button>'
++'</div>'
 +'</div>'
 +'</div>'
 +'<div class="nav">'
@@ -1370,7 +1531,7 @@ function renderDemo(){
 +'<button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>'
 +'<button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>'
 +'<button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>'
-+'<button class="nb" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking</button>'
++'<!-- ranking acessível via URL #ranking -->'
 +'</div>'
 +'</div>'
 
@@ -1407,7 +1568,7 @@ function renderDemo(){
 +'<div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta</div><div class="ab">Accuracy <strong>c/ POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>'
 +'<div class="kr" style="grid-template-columns:repeat(4,1fr);">'
 +'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=getMetaAcc()?'ok':'cr',acc.geral>=getMetaAcc()?'OK':'Abaixo da meta')+'</div>'
-+'<div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>'
++(acc.hasPoc?'<div class="kc '+(acc.geralSPoc>=getMetaAcc()?'cg':'co')+'"><div class="kl">% Accuracy s/ POC</div><div class="kv '+(acc.geralSPoc>=getMetaAcc()?'g':'o')+'">'+acc.geralSPoc.toFixed(1)+'%</div><div class="km">'+acc.totalInvSp.toLocaleString()+' inv \xb7 '+acc.totalFaltSp.toLocaleString()+' falt s/ POC</div>'+tag(acc.geralSPoc>=getMetaAcc()?'ok':'w',acc.geralSPoc>=getMetaAcc()?'Dentro da meta':'Aten\u00e7\u00e3o')+'</div>':'<div class="kc"><div class="kl">% Accuracy s/ POC</div><div class="kv" style="color:var(--td);font-size:13px">Sem arquivo POC</div><div class="km">Carregue o arquivo 08 na tela de upload</div></div>')
 +'<div class="kc '+(desloc.pct<=getMetaDesloc()?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=getMetaDesloc()?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=getMetaDesloc()?'ok':'cr',desloc.pct<=getMetaDesloc()?'Dentro da meta':'Acima da meta')+'</div>'
 +'<div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.geral.pct)+'</div><div class="km">Cashout / GMV</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>'
 +'</div>'
@@ -1523,6 +1684,7 @@ function renderDemo(){
 +'<div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>'
 +'<div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>'
 +'</div>'
++(desloc.semanas&&desloc.semanas.length>1?'<div class="chart-wrap" style="margin-bottom:8px"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\u00e7\u00e3o Semanal \u2014 % Deslocados</span><span class="chart-note">Barras vermelhas = acima da meta</span></div><div class="chart-body"><canvas id="cDeslocSem"></canvas></div></div>':'')
 +'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 Deslocados por Dia</span></div><div class="chart-body"><canvas id="cDes"></canvas></div></div>'
 +'<div class="g2">'
 +'<div class="card"><div class="ch"><span class="ct">Top Fluxos</span></div><table><thead><tr><th>#</th><th>Fluxo</th><th class="tr">Volume</th></tr></thead><tbody>'+fluxoRows+'</tbody></table></div>'
@@ -1541,6 +1703,7 @@ function renderDemo(){
 +'<div class="sh"><div><div class="st">Acur\xe1cia \u2014 Resultado Di\xe1rio</div><div class="ss">'+acc.totalInv.toLocaleString()+' inventariados \xb7 '+acc.totalFalt.toLocaleString()+' faltantes \xb7 '+cfg.week+'</div></div>'+btnExp('accuracy')+'</div>'
 +(acc.semanas&&acc.semanas.length>1?'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\xe7\xe3o Semanal \u2014 Accuracy c/ POC vs s/ POC</span><span class="chart-note">Gerado quando a base cont\xe9m m\xfaltiplas semanas</span></div><div class="chart-body"><canvas id="cAccSem"></canvas></div><div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>c/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--gn)"></div>s/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta 80%</div></div></div>':'')
 +'<div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Por que a accuracy geral ('+acc.geral.toFixed(1)+'%) difere da m\xe9dia visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>'+acc.totalInv.toLocaleString()+' \xf7 ('+acc.totalInv.toLocaleString()+' + '+acc.totalFalt.toLocaleString()+') = '+acc.geral.toFixed(1)+'%</strong>. Domingo tem volume ~4x maior, elevando a m\xe9dia ponderada.</div></div></div>'
++(acc.multiSemana&&acc.accSemanas&&acc.accSemanas.length>1?'<div class="chart-wrap" style="margin-bottom:8px"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\u00e7\u00e3o Semanal \u2014 Accuracy c/ POC vs s/ POC</span><span class="chart-note">Barras azuis = c/ POC \xb7 Barras verdes = s/ POC</span></div><div class="chart-body"><canvas id="cAccSem"></canvas></div><div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:rgba(52,131,250,0.85)"></div>c/ POC</div><div class="leg"><div class="leg-dot" style="background:rgba(63,185,80,0.85)"></div>s/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta '+getMetaAcc()+'%</div></div></div>':'')
 +'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 % Accuracy Di\xe1ria \u2014 '+cfg.week+'</span><span class="chart-note">Inventariado Planificado \xf7 (Inventariado + Faltante) \xb7 Base2</span></div><div class="chart-body"><canvas id="cAcc"></canvas></div>'
 +'<div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>% Accuracy di\xe1ria</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta 80%</div><div class="leg"><div class="leg-dot" style="background:var(--or);width:14px;height:2px;border-radius:2px"></div>Geral '+acc.geral.toFixed(1)+'%</div></div>'
 +'<div style="padding:0 14px 12px"><table class="dsumm"><'+accHead+rowInv+rowFalt+rowPct+rowMeta+'</tbody></table></div></div>'
@@ -1617,6 +1780,45 @@ function drawAllCharts(){
     [{val:getMetaAcc(),color:cv('--rd'),label:'Meta '+getMetaAcc()+'%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
     55,95,function(v){return v.toFixed(1)+'%';});
 
+  // Gráfico de evolução semanal (só aparece se há múltiplas semanas)
+  if(acc.multiSemana && acc.accSemanas && acc.accSemanas.length>1){
+    (function(){
+      var s=setupCanvas('cAccSem',150); if(!s) return;
+      var ctx=s.ctx,W=s.W,H=s.H,pad={t:24,r:20,b:28,l:44};
+      var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+      var n=acc.accSemanas.length,gap=cw/n,bw=gap*0.35;
+      var meta=getMetaAcc();
+      var maxV=100; var minV=Math.max(0,Math.floor(Math.min.apply(null,acc.accSemanas.map(function(s){return Math.min(s.accCom,s.accSem);}))/10)*10-10);
+      grid(ctx,pad,W,H,maxV,4,function(v){return v+'%';});
+      // Linha de meta
+      var gy=pad.t+ch*(1-(meta-minV)/(maxV-minV));
+      ctx.strokeStyle=cv('--rd'); ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(W-pad.r,gy); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle=cv('--rd'); ctx.font='bold 8px Inter'; ctx.textAlign='left';
+      ctx.fillText('Meta '+meta+'%',pad.l+3,gy-3);
+      // Barras
+      acc.accSemanas.forEach(function(wk,i){
+        var x=pad.l+i*gap+(gap-bw*2-4)/2;
+        // c/ POC
+        var h1=ch*Math.max(0,(Math.min(wk.accCom,maxV)-minV))/(maxV-minV);
+        var clr1=wk.accCom>=meta?'rgba(52,131,250,0.85)':'rgba(248,81,73,0.85)';
+        ctx.fillStyle=clr1; ctx.beginPath(); ctx.rect(x,pad.t+ch-h1,bw,h1); ctx.fill();
+        ctx.fillStyle=cv('--tx'); ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='center';
+        ctx.fillText(wk.accCom.toFixed(1)+'%',x+bw/2,pad.t+ch-h1-3);
+        // s/ POC
+        var x2=x+bw+3;
+        var h2=ch*Math.max(0,(Math.min(wk.accSem,maxV)-minV))/(maxV-minV);
+        var clr2=wk.accSem>=meta?'rgba(63,185,80,0.85)':'rgba(232,168,56,0.85)';
+        ctx.fillStyle=clr2; ctx.beginPath(); ctx.rect(x2,pad.t+ch-h2,bw,h2); ctx.fill();
+        ctx.fillStyle=cv('--tx'); ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='center';
+        ctx.fillText(wk.accSem.toFixed(1)+'%',x2+bw/2,pad.t+ch-h2-3);
+        // Label semana
+        ctx.fillStyle=cv('--td'); ctx.font='9px Inter'; ctx.textAlign='center';
+        ctx.fillText(wk.wk,x+bw+1.5,H-pad.b+12);
+      });
+    })();
+  }
+
   // Deslocados
   (function(){
     var s=setupCanvas('cDes',130); if(!s) return;
@@ -1641,6 +1843,37 @@ function drawAllCharts(){
     });
     xlabels(ctx,arr.map(function(d){return d.dt.slice(5).replace('-','/');}),pad,W,H);
   })();
+
+  // Gráfico semanal de deslocados (se multissemana)
+  if(desloc.semanas&&desloc.semanas.length>1){
+    (function(){
+      var s=setupCanvas('cDeslocSem',140); if(!s) return;
+      var ctx=s.ctx,W=s.W,H=s.H,pad={t:24,r:20,b:28,l:44};
+      var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+      var arr=desloc.semanas,n=arr.length,gap=cw/n,bw=gap*0.55;
+      var meta=getMetaDesloc();
+      var maxV=Math.max(meta*3,Math.max.apply(null,arr.map(function(s){return s.pct;}))*1.2);
+      maxV=Math.ceil(maxV/5)*5||10;
+      grid(ctx,pad,W,H,maxV,4,function(v){return v+'%';});
+      // Linha meta
+      var gy=pad.t+ch*(1-meta/maxV);
+      ctx.strokeStyle=cv('--or'); ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(W-pad.r,gy); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle=cv('--or'); ctx.font='bold 8px Inter'; ctx.textAlign='left';
+      ctx.fillText('Meta '+meta+'%',pad.l+3,gy-3);
+      // Barras
+      arr.forEach(function(d,i){
+        var x=pad.l+i*gap+(gap-bw)/2;
+        var bh=ch*(Math.min(d.pct,maxV)/maxV);
+        var clr=d.pct>meta?'rgba(248,81,73,0.8)':'rgba(52,131,250,0.7)';
+        ctx.fillStyle=clr; ctx.beginPath(); ctx.rect(x,pad.t+ch-bh,bw,bh); ctx.fill();
+        ctx.fillStyle=cv('--tx'); ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='center';
+        ctx.fillText(d.pct.toFixed(1)+'%',x+bw/2,pad.t+ch-bh-3);
+        ctx.fillStyle=cv('--td'); ctx.font='9px Inter';
+        ctx.fillText(d.wk,x+bw/2,H-pad.b+12);
+      });
+    })();
+  }
 
   // Sorting stacked
   (function(){
