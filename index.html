@@ -902,7 +902,14 @@ function gerarDemo(){
 function fmtPct(n){return typeof n==='number'?n.toFixed(1)+'%':'--';}
 function fmtBpp(n){return typeof n==='number'?n.toFixed(3)+'%':'--';}
 function fmtN(n){return typeof n==='number'?n.toLocaleString('pt-BR',{maximumFractionDigits:2}):'--';}
-function clrAcc(v){return v>=cfg.metaAcc?'var(--gn)':v>=(cfg.metaAcc-10)?'var(--or)':'var(--rd)';}
+
+function getCfg() { return D && D.cfg ? D.cfg : {}; }
+function getMetaAcc() { var c=getCfg(); return c.metaAcc||80; }
+function getMetaDesloc() { var c=getCfg(); return c.metaDesloc||5; }
+function getMetaBpp() { var c=getCfg(); return c.metaBpp||0.269; }
+function getMetaBppTramo(tr) { var c=getCfg(); return (c.metaBppTramo&&c.metaBppTramo[tr])||getMetaBpp(); }
+
+function clrAcc(v){var m=getMetaAcc();return v>=m?'var(--gn)':v>=(m-10)?'var(--or)':'var(--rd)';}
 function tag(cls,txt){return '<span class="tag '+cls+'">'+txt+'</span>';}
 function rn(i){var cls=i<3?'r'+(i+1):'';return '<span class="rn '+cls+'">'+(i+1)+'</span>';}
 function rotaChips(rotas){if(!rotas||rotas.length===0) return '<span style="color:var(--td);font-size:9px">—</span>';return rotas.map(function(r){return '<span class="rota-chip">'+r+'</span>';}).join('');}
@@ -1088,14 +1095,15 @@ function tendCards(tend){
     var prev=i>0?tend[i-1]:null;
     var chg=prev&&prev.pct>0?(t.pct-prev.pct)/prev.pct*100:null;
     var chgTxt=chg!==null?(chg<0?'<span style="color:var(--gn)">&#9660; -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">&#9650; +'+chg.toFixed(1)+'%</span>'):'&mdash;';
-    var vclr=t.pct>cfg.metaBpp?'var(--rd)':t.pct>(cfg.metaBpp*0.7)?'var(--or)':'var(--gn)';
+    var _mb=getMetaBpp();
+    var vclr=t.pct>_mb?'var(--rd)':t.pct>(_mb*0.7)?'var(--or)':'var(--gn)';
     return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout / GMV</div><div class="td2">'+chgTxt+'</div></div>';
   }).join('');
 }
 
 function mlpTable(mlpList,totalGeral){
   return mlpList.map(function(m,i){
-    var pclr=m.pct&&m.pct>cfg.metaBpp?'var(--rd)':m.pct&&m.pct>(cfg.metaBpp*0.7)?'var(--or)':'inherit';
+    var pclr=(function(){var _m=getMetaBpp();return m.pct&&m.pct>_m?'var(--rd)':m.pct&&m.pct>(_m*0.7)?'var(--or)':'inherit';})();
     return '<tr'+(i<1?' class="rh"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+fmtBpp(m.pct)+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td></tr>';
   }).join('');
 }
@@ -1197,7 +1205,7 @@ function renderDemo(){
 
   var subPanels=bpp.tramoDisp.map(function(tr,i){
     var td=bpp.tramos[tr]; var tt=bpp.tendTramo[tr]||[];
-    var metaTr=(cfg.metaBppTramo&&cfg.metaBppTramo[tr])||cfg.metaBpp;
+    var metaTr=(cfg.metaBppTramo&&cfg.metaBppTramo[tr])||getMetaBpp();
     var vclr=td.pct>metaTr?'var(--rd)':td.pct>(metaTr*0.9)?'var(--or)':'var(--gn)';
 
     // Chips de filtro por sub-tipo — usando data-attributes para evitar problema de aspas
@@ -1304,6 +1312,40 @@ function renderDemo(){
   var bppPrev=bpp.tend.length>1?bpp.tend[bpp.tend.length-2].pct:null;
 
   // ── MONTAR HTML ──
+  var rankingTop3 = D.ranking.filter(function(v){return v.score>=2;}).slice(0,3);
+  var rankingAcoes = rankingTop3.length===0
+    ? '<div style="padding:8px;color:var(--td);font-size:11px">Nenhum operador multifonte identificado esta semana.</div>'
+    : rankingTop3.map(function(v,i){
+        var processos=[];
+        if(v.sort>0) processos.push(v.sort+' erros Sorting PK');
+        if(v.et>0) processos.push(v.et+' erros Etiquetagem PK');
+        if(v.desloc>0) processos.push(v.desloc+' deslocados ('+v.deslocNc+' N/C)');
+        if(v.aduana>0) processos.push(v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
+        var prio=i<2?(i+1):2;
+        return '<div class="arow"><div class="aprio p'+prio+'">P'+(i+1)+'</div>'
+          +'<div><div class="atitle">Feedback — Op. '+v.op+' (Score '+v.score+'/4)</div>'
+          +'<div class="adesc">Aparece em: '+processos.join(' · ')+'</div>'
+          +'<div class="ameta"><span class="achip">Prazo: D+1</span>'
+          +'<span class="achip resp">Líder de Turno</span></div></div></div>';
+      }).join('');
+
+  var rankingRows = D.ranking.map(function(v,i){
+    var score = v.score;
+    var scoreCls = score>=3?'cr':score>=2?'w':'ok';
+    var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:9px">'+val+'</span>':'<span style="color:var(--td);font-size:9px">&mdash;</span>'; };
+    return '<tr>'
+      +'<td>'+rn(i)+'</td>'
+      +'<td><strong>'+v.op+'</strong></td>'
+      +'<td class="tc">'+dot(v.sort,'cr')+'</td>'
+      +'<td class="tc">'+dot(v.et,'w')+'</td>'
+      +'<td class="tc">'+dot(v.desloc,'i')+'</td>'
+      +'<td class="tc">'+dot(v.deslocNc,'w')+'</td>'
+      +'<td class="tc">'+dot(v.aduana,'p')+'</td>'
+      +'<td class="tc">'+dot(v.aduanaFalt,'cr')+'</td>'
+      +'<td class="tc"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800">'+score+'/4</span></td>'
+      +'</tr>';
+  }).join('');
+
   var html=
 '<div class="sticky-top">'
 +'<div class="header">'
@@ -1311,7 +1353,7 @@ function renderDemo(){
 +'<div class="hinfo">'
 +'<div class="hkpi"><div class="hkl">% Accuracy c/ POC</div><div class="hkv r">'+acc.geral.toFixed(1)+'%</div></div>'
 +'<div class="hkpi"><div class="hkl">% Accuracy s/ POC</div><div class="hkv g">&gt;90%</div></div>'
-+'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
++'<div class="hkpi"><div class="hkl">% Deslocados</div><div class="hkv '+(desloc.pct<=getMetaDesloc()?'g':'r')+'">'+fmtPct(desloc.pct)+'</div></div>'
 +'<div class="hkpi"><div class="hkl">% BPP Bruto</div><div class="hkv y">'+fmtBpp(bpp.geral.pct)+'</div></div>'
 +'</div>'
 +'<div class="hright">'
@@ -1364,9 +1406,9 @@ function renderDemo(){
 +'</div>'
 +'<div class="alert cr"><div class="ai">\ud83d\udd34</div><div><div class="at">Acur\xe1cia abaixo da meta</div><div class="ab">Accuracy <strong>c/ POC: '+acc.geral.toFixed(1)+'%</strong> vs meta <strong>80%</strong>. Excluindo POC, accuracy operacional supera <strong>90%</strong>.</div></div></div>'
 +'<div class="kr" style="grid-template-columns:repeat(4,1fr);">'
-+'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=cfg.metaAcc?'ok':'cr',acc.geral>=cfg.metaAcc?'OK':'Abaixo da meta')+'</div>'
++'<div class="kc cr"><div class="kl">% Accuracy c/ POC</div><div class="kv r">'+acc.geral.toFixed(1)+'%</div><div class="km">Meta: 80% \xb7 Gap: '+(acc.geral-80).toFixed(1)+'pp</div>'+tag(acc.geral>=getMetaAcc()?'ok':'cr',acc.geral>=getMetaAcc()?'OK':'Abaixo da meta')+'</div>'
 +'<div class="kc cg"><div class="kl">% Accuracy s/ POC</div><div class="kv g">&gt;90%</div><div class="km">Pacotes ativos no buyer</div>'+tag('ok','Dentro do esperado')+'</div>'
-+'<div class="kc '+(desloc.pct<=cfg.metaDesloc?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=cfg.metaDesloc?'ok':'cr',desloc.pct<=cfg.metaDesloc?'Dentro da meta':'Acima da meta')+'</div>'
++'<div class="kc '+(desloc.pct<=getMetaDesloc()?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=getMetaDesloc()?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta: &le;5% \xb7 Corrigidos: '+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag(desloc.pct<=getMetaDesloc()?'ok':'cr',desloc.pct<=getMetaDesloc()?'Dentro da meta':'Acima da meta')+'</div>'
 +'<div class="kc cy"><div class="kl">% BPP Bruto</div><div class="kv y">'+fmtBpp(bpp.geral.pct)+'</div><div class="km">Cashout / GMV</div>'+tag(bppChg!==null&&bppChg<0?'ok':'w',bppChg!==null&&bppChg<0?'Melhora vs ant.':'Monitorar')+'</div>'
 +'</div>'
 +'</div>'
@@ -1377,7 +1419,7 @@ function renderDemo(){
 +'<div class="card" style="margin-bottom:8px"><div class="ch"><span class="ct">&#127919; Targets BPP</span><span class="cc">Metas configuradas para '+cfg.week+'</span></div>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;padding:10px 14px;">'
       +(function(){
-        var tramos=[['Total',cfg.metaBpp,bpp.geral.pct],
+        var tramos=[['Total',getMetaBpp(),bpp.geral.pct],
           ['LOST',(cfg.metaBppTramo&&cfg.metaBppTramo.LOST)||0.063, bpp.tramos.LOST?bpp.tramos.LOST.pct:null],
           ['DAMAGED',(cfg.metaBppTramo&&cfg.metaBppTramo.DAMAGED)||0.128, bpp.tramos.DAMAGED?bpp.tramos.DAMAGED.pct:null],
           ['FRAUD',(cfg.metaBppTramo&&cfg.metaBppTramo.FRAUD)||0.049, bpp.tramos.FRAUD?bpp.tramos.FRAUD.pct:null],
@@ -1401,7 +1443,7 @@ function renderDemo(){
         }).join('');
       })()
       +'</div></div>'
-      +'<div class="trow">'+tendCards(bpp.tend)+'</div>'
+      +'<div class="trow">'+tendCards(bpp.tend, getMetaBpp())+'</div>'
 +'<div class="kr" style="grid-template-columns:repeat(3,1fr);">'
 +'<div class="kc cr"><div class="kl">% BPP Geral</div><div class="kv r">'+fmtBpp(bpp.geral.pct)+'</div></div>'
 +'<div class="kc co"><div class="kl">Cashout Total</div><div class="kv o">'+fmtN(bpp.geral.cashout)+'</div></div>'
@@ -1476,7 +1518,7 @@ function renderDemo(){
 +'<div id="deslocados" class="tab">'
 +'<div class="sh"><div><div class="st">Deslocados \u2014 Resultado Di\xe1rio</div><div class="ss">'+desloc.total.toLocaleString()+' fora da zona \xb7 Meta &le;5% \xb7 '+cfg.week+'</div></div>'+btnExp('deslocados')+'</div>'
 +'<div class="kr">'
-+'<div class="kc '+(desloc.pct<=cfg.metaDesloc?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=cfg.metaDesloc?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=cfg.metaDesloc?'ok':'cr',desloc.pct<=cfg.metaDesloc?'OK':'Acima da meta')+'</div>'
++'<div class="kc '+(desloc.pct<=getMetaDesloc()?'cg':'cr')+'"><div class="kl">% Deslocados</div><div class="kv '+(desloc.pct<=getMetaDesloc()?'g':'r')+'">'+fmtPct(desloc.pct)+'</div><div class="km">Meta &le;5%</div>'+tag(desloc.pct<=getMetaDesloc()?'ok':'cr',desloc.pct<=getMetaDesloc()?'OK':'Acima da meta')+'</div>'
 +'<div class="kc cb"><div class="kl">Total</div><div class="kv b">'+desloc.total.toLocaleString()+'</div></div>'
 +'<div class="kc cg"><div class="kl">Corrigidos</div><div class="kv g">'+(desloc.total-desloc.naoCorrigidos).toLocaleString()+'</div><div class="km">'+fmtPct(Math.round((desloc.total-desloc.naoCorrigidos)/desloc.total*1000)/10)+'</div>'+tag('ok','OK')+'</div>'
 +'<div class="kc co"><div class="kl">N\xe3o Corrigidos</div><div class="kv o">'+desloc.naoCorrigidos+'</div>'+tag('w','A\xe7\xe3o D+1')+'</div>'
@@ -1514,30 +1556,18 @@ function renderDemo(){
 +'</div>'
 
   // ── HTML RANKING CRUZADO ──
-  var rankingRows = D.ranking.map(function(v,i){
-    var score = v.score;
-    var scoreCls = score>=3?'cr':score>=2?'w':'ok';
-    var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:9px">'+val+'</span>':'<span style="color:var(--td);font-size:9px">&mdash;</span>'; };
-    return '<tr>'
-      +'<td>'+rn(i)+'</td>'
-      +'<td><strong>'+v.op+'</strong></td>'
-      +'<td class="tc">'+dot(v.sort,'cr')+'</td>'
-      +'<td class="tc">'+dot(v.et,'w')+'</td>'
-      +'<td class="tc">'+dot(v.desloc,'i')+'</td>'
-      +'<td class="tc">'+dot(v.deslocNc,'w')+'</td>'
-      +'<td class="tc">'+dot(v.aduana,'p')+'</td>'
-      +'<td class="tc">'+dot(v.aduanaFalt,'cr')+'</td>'
-      +'<td class="tc"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800">'+score+'/4</span></td>'
-      +'</tr>';
-  }).join('');
+
+
 
   // ── HTML ALERTAS ──
   var alertasHtml = D.alertas.length > 0
     ? D.alertas.map(function(a){
         return '<div class="alert '+a.nivel+'" style="margin-bottom:8px"><div class="ai">'+(a.nivel==='cr'?'🚨':'⚠️')+'</div><div><div class="at">Anomalia detectada — '+a.tipo.toUpperCase()+'</div><div class="ab">'+a.msg+'</div></div></div>';
       }).join('')
-    : '<div class="alert i"><div class="ai">✅</div><div><div class="at">Nenhuma anomalia detectada</div><div class="ab">Todos os valores estão dentro do padrão estatístico esperado para a semana.</div></div></div>';
+    : '<div class="alert i"><div class="ai">✅</div><div><div class="at">Nenhuma anomalia detectada</div><div class="ab">Todos os valores estão dentro do padrão estatístico esperado para a semana.</div></div></div>'
 
+  // Adicionar aba ranking ao html
+  html +=
 +'<div id="ranking" class="tab">'
 +'<div class="sh"><div><div class="st">Ranking Cruzado de Operadores — '+cfg.week+'</div><div class="ss">Operadores que aparecem em mais de um processo na mesma semana</div></div></div>'
 +'<div class="sub-sh"><span class="sub-title">⚠️ Alertas Automáticos</span><span class="sub-badge">Anomalias estatísticas detectadas</span></div>'
@@ -1556,26 +1586,11 @@ function renderDemo(){
 +'<th class="tc">Score</th>'
 +'</tr></thead><tbody>'+rankingRows+'</tbody></table></div>'
 +'<div class="card" style="margin-top:8px"><div style="padding:4px 14px 8px">'
-+ (function(){
-    var top3 = D.ranking.filter(function(v){return v.score>=2;}).slice(0,3);
-    if(top3.length===0) return '<div style="padding:8px;color:var(--td);font-size:11px">Nenhum operador multifonte identificado esta semana.</div>';
-    return top3.map(function(v,i){
-      var processos=[];
-      if(v.sort>0) processos.push(v.sort+' erros Sorting PK');
-      if(v.et>0) processos.push(v.et+' erros Etiquetagem PK');
-      if(v.desloc>0) processos.push(v.desloc+' deslocados ('+v.deslocNc+' N/C)');
-      if(v.aduana>0) processos.push(v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
-      return '<div class="arow"><div class="aprio p'+(i+1<=2?i+1:2)+'">P'+(i+1)+'</div>'
-        +'<div><div class="atitle">Feedback e plano de ação — Op. '+v.op+' (Score '+v.score+'/4)</div>'
-        +'<div class="adesc">Aparece em: '+processos.join(' · ')+'</div>'
-        +'<div class="ameta"><span class="achip">Prazo: D+1</span><span class="achip resp">Líder de Turno</span></div>'
-        +'</div></div>';
-    }).join('');
-  })()
++ rankingAcoes
 +'</div></div>'
 +'</div>'
-
 +'<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
+;
 
   document.getElementById('demoScreen').innerHTML=html;
   document.getElementById('uploadScreen').style.display='none';
@@ -1599,7 +1614,7 @@ function drawAllCharts(){
   var dL=acc.days.map(function(d){return d.label;});
   var dAcc=acc.days.map(function(d){return d.acc;});
   lineChart('cAcc',dL,dAcc,cv('--bl'),'rgba(52,131,250,0.08)',
-    [{val:cfg.metaAcc,color:cv('--rd'),label:'Meta '+cfg.metaAcc+'%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
+    [{val:getMetaAcc(),color:cv('--rd'),label:'Meta '+getMetaAcc()+'%'},{val:acc.geral,color:cv('--or'),label:'Geral '+acc.geral.toFixed(1)+'%'}],
     55,95,function(v){return v.toFixed(1)+'%';});
 
   // Deslocados
@@ -1619,7 +1634,7 @@ function drawAllCharts(){
       var inv=acc.days[i]?acc.days[i].inv:1;
       var pct=inv>0?d.total/inv*100:0;
       var x=pad.l+i*gap+(gap-bw)/2,bh=ch*(Math.min(pct,maxV)/maxV);
-      ctx.fillStyle=pct>cfg.metaDesloc?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
+      ctx.fillStyle=pct>getMetaDesloc()?'rgba(248,81,73,0.75)':'rgba(52,131,250,0.65)';
       ctx.beginPath();ctx.rect(x,pad.t+ch-bh,bw,bh);ctx.fill();
       ctx.fillStyle=cv('--tx');ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
       ctx.fillText(pct.toFixed(1)+'%',x+bw/2,pad.t+ch-bh-3);
