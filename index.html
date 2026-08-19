@@ -486,7 +486,25 @@ function calcBPPTramo(rows,gmvRows,gmvCol){
   }
   var subtipos=Object.keys(subtipoMap).sort(function(a,b){return subtipoMap[b].length-subtipoMap[a].length;});
 
-  function buildMlp(rowsArr){
+  
+function buildBppContent(mlpList, tipos, total, tr, td) {
+  var tiposHtml = td ? tipoRows(td.tipos, td.total) : tipoRows(tipos, total);
+  return '<div class="g2">'
+    +'<div class="card"><div class="ch"><span class="ct">MLP &mdash; '+tr+'</span></div>'
+    +'<table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead>'
+    +'<tbody>'+mlpTable(mlpList, total)+'</tbody></table></div>'
+    +'<div class="card"><div class="ch"><span class="ct">Classifica&ccedil;&atilde;o</span><span class="cc">'+total+' ocorr.</span></div>'
+    +'<table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead>'
+    +'<tbody>'+tiposHtml+'</tbody></table></div>'
+    +'</div>'
+    +'<div class="card"><div class="ch"><span class="ct">Top Drivers &mdash; '+tr+'</span>'
+    +'<span class="cc">Node ID &middot; Tramo &middot; Status</span></div>'
+    +'<table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th>'
+    +'<th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead>'
+    +'<tbody>'+driverTable(mlpList)+'</tbody></table></div>';
+}
+
+function buildMlp(rowsArr){
     var mlpMap={};
     for(var i=0;i<rowsArr.length;i++){
       var r=rowsArr[i];
@@ -898,69 +916,40 @@ function filterBpp(tramo, subIdx) {
   var td = D.bpp.tramos[tramo];
   if (!td) return;
 
-  // Resetar e ativar chip correto via data-attributes
+  // Marcar chip ativo
   var container = document.getElementById('fchips-'+tramo);
-  if (!container) return;
-  var allChips = container.querySelectorAll('.fchip');
-  for (var i = 0; i < allChips.length; i++) allChips[i].classList.remove('active');
-  for (var i = 0; i < allChips.length; i++) {
-    if (allChips[i].getAttribute('data-idx') === String(subIdx)) {
-      allChips[i].classList.add('active');
-      break;
+  if (container) {
+    var allChips = container.querySelectorAll('.fchip');
+    for (var i = 0; i < allChips.length; i++) {
+      allChips[i].classList.remove('active');
+      if (allChips[i].getAttribute('data-idx') === String(subIdx)) {
+        allChips[i].classList.add('active');
+      }
     }
   }
 
-  // Determinar dados conforme filtro
-  var mlpList, totalRows, cashout, label;
+  // Determinar dados
+  var mlpList, totalRows, tipos, label, subTd;
   if (subIdx === 'ALL') {
-    mlpList  = td.mlpList;
+    mlpList   = td.mlpList;
     totalRows = td.total;
-    cashout  = td.cashout;
-    label    = tramo;
+    tipos     = td.tipos;
+    label     = tramo;
+    subTd     = td;
   } else {
     var st = td.subtipos[parseInt(subIdx, 10)];
     var sd = td.subData[st];
-    mlpList  = sd.mlpList;
+    mlpList   = sd.mlpList;
     totalRows = sd.total;
-    cashout  = sd.cashout;
-    label    = st;
+    tipos     = [[st, sd.total]];
+    label     = st;
+    subTd     = null;
   }
 
-  // KPIs
-  var elCo  = document.getElementById('bpp-co-'+tramo);
-  var elTot = document.getElementById('bpp-tot-'+tramo);
-  if (elCo)  elCo.textContent  = fmtN(cashout);
-  if (elTot) elTot.textContent = totalRows;
-
-  // Títulos
-  var elMlpTitle = document.getElementById('bpp-mlp-title-'+tramo);
-  var elDrvTitle = document.getElementById('bpp-drv-title-'+tramo);
-  if (elMlpTitle) elMlpTitle.textContent = 'MLP — ' + label;
-  if (elDrvTitle) elDrvTitle.textContent = 'Top Drivers — ' + label;
-
-  // Tabela MLP
-  var elMlp = document.getElementById('bpp-mlp-'+tramo);
-  if (elMlp) elMlp.innerHTML = mlpTable(mlpList, totalRows);
-
-  // Tabela Drivers
-  var elDrv = document.getElementById('bpp-drv-rows-'+tramo);
-  if (elDrv) elDrv.innerHTML = driverTable(mlpList);
-
-  // Tipos — filtrar a tabela de classificação também
-  var elTipo = document.getElementById('bpp-tipo-'+tramo);
-  if (elTipo) {
-    if (subIdx === 'ALL') {
-      elTipo.innerHTML = tipoRows(td.tipos, td.total);
-    } else {
-      var st2 = td.subtipos[parseInt(subIdx, 10)];
-      var sd2 = td.subData[st2];
-      // Contar tipos dentro do sub-tipo
-      var tipoMap = {};
-      for (var mi = 0; mi < sd2.mlpList.length; mi++) {
-        // sd2 já tem o total — usar label do sub-tipo como único tipo
-      }
-      elTipo.innerHTML = '<tr><td>'+st2+'</td><td class="tr mono">'+sd2.total+'</td><td class="tr mono">100%</td></tr>';
-    }
+  // Reconstruir todo o conteúdo filtrável de uma vez
+  var dynEl = document.getElementById('bpp-dynamic-'+tramo);
+  if (dynEl) {
+    dynEl.innerHTML = buildBppContent(mlpList, tipos, totalRows, label, subTd);
   }
 }
 
@@ -1056,17 +1045,13 @@ function renderDemo(){
     return '<div class="subpanel'+(i===0?' active':'')+'" id="bpp-'+tr+'">'
       +'<div class="kr" style="grid-template-columns:repeat(3,1fr);margin-top:8px;">'
       +'<div class="kc cr"><div class="kl">% BPP '+tr+'</div><div class="kv" style="color:'+vclr+'">'+fmtBpp(td.pct)+'</div></div>'
-      +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o" id="bpp-co-'+tr+'">'+fmtN(td.cashout)+'</div></div>'
-      +'<div class="kc cb"><div class="kl">Ocorr&ecirc;ncias</div><div class="kv b" id="bpp-tot-'+tr+'">'+td.total+'</div></div>'
+      +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o">'+fmtN(td.cashout)+'</div></div>'
+      +'<div class="kc cb"><div class="kl">Ocorr&ecirc;ncias</div><div class="kv b">'+td.total+'</div></div>'
       +'</div>'
       +'<div class="trow">'+tendCards(tt)+'</div>'
       + chipHtml
-      +'<div class="g2" id="bpp-tables-'+tr+'">'
-      +'<div class="card"><div class="ch"><span class="ct" id="bpp-mlp-title-'+tr+'">MLP &mdash; '+tr+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead><tbody id="bpp-mlp-'+tr+'">'+mlpTable(td.mlpList,td.total)+'</tbody></table></div>'
-      +'<div class="card"><div class="ch"><span class="ct">Classifica&ccedil;&atilde;o '+tr+'</span><span class="cc">'+td.total+' ocorr.</span></div><table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead><tbody id="bpp-tipo-'+tr+'">'+tipoRows(td.tipos,td.total)+'</tbody></table></div>'
-      +'</div>'
-      +'<div id="bpp-drv-'+tr+'">'
-      +'<div class="card"><div class="ch"><span class="ct" id="bpp-drv-title-'+tr+'">Top Drivers &mdash; '+tr+'</span><span class="cc">Node ID &middot; Tramo &middot; Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody id="bpp-drv-rows-'+tr+'">'+driverTable(td.mlpList)+'</tbody></table></div>'
+      +'<div id="bpp-dynamic-'+tr+'">'
+      +buildBppContent(td.mlpList, td.tipos, td.total, tr, td)
       +'</div>'
       +tramoAcoes(tr,td,cfg)
       +'</div>';
