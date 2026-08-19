@@ -917,40 +917,86 @@ function filterBpp(tramo, subIdx) {
   if (!td) return;
 
   // Marcar chip ativo
-  var container = document.getElementById('fchips-'+tramo);
-  if (container) {
-    var allChips = container.querySelectorAll('.fchip');
-    for (var i = 0; i < allChips.length; i++) {
-      allChips[i].classList.remove('active');
-      if (allChips[i].getAttribute('data-idx') === String(subIdx)) {
-        allChips[i].classList.add('active');
+  var fchipsEl = document.getElementById('fchips-'+tramo);
+  if (fchipsEl) {
+    var allChips = fchipsEl.querySelectorAll('.fchip');
+    for (var ci = 0; ci < allChips.length; ci++) {
+      allChips[ci].classList.remove('active');
+      if (allChips[ci].getAttribute('data-idx') === String(subIdx)) {
+        allChips[ci].classList.add('active');
       }
     }
   }
 
   // Determinar dados
-  var mlpList, totalRows, tipos, label, subTd;
+  var mlpList, totalRows, tiposArr, label;
   if (subIdx === 'ALL') {
     mlpList   = td.mlpList;
     totalRows = td.total;
-    tipos     = td.tipos;
+    tiposArr  = td.tipos;
     label     = tramo;
-    subTd     = td;
   } else {
-    var st = td.subtipos[parseInt(subIdx, 10)];
-    var sd = td.subData[st];
+    var stKey = td.subtipos[parseInt(subIdx, 10)];
+    var sd    = td.subData[stKey];
     mlpList   = sd.mlpList;
     totalRows = sd.total;
-    tipos     = [[st, sd.total]];
-    label     = st;
-    subTd     = null;
+    tiposArr  = [[stKey, sd.total]];
+    label     = stKey;
   }
 
-  // Reconstruir todo o conteúdo filtrável de uma vez
-  var dynEl = document.getElementById('bpp-dynamic-'+tramo);
-  if (dynEl) {
-    dynEl.innerHTML = buildBppContent(mlpList, tipos, totalRows, label, subTd);
-  }
+  // Montar HTML das tabelas
+  var mlpRows = mlpList.map(function(m, i) {
+    var pclr = m.pct && m.pct > 0.5 ? 'var(--rd)' : m.pct && m.pct > 0.35 ? 'var(--or)' : 'inherit';
+    return '<tr' + (i < 1 ? ' class="rh"' : '') + '>'
+      + '<td>' + rn(i) + '</td>'
+      + '<td><strong>' + m.mlp + '</strong></td>'
+      + '<td class="tr mono" style="color:' + pclr + '">' + fmtBpp(m.pct) + '</td>'
+      + '<td class="tr mono">' + fmtN(m.cashout) + '</td>'
+      + '<td class="tr mono">' + m.total + '</td>'
+      + '</tr>';
+  }).join('');
+
+  var tipoRows2 = tiposArr.map(function(t) {
+    return '<tr><td>' + t[0] + '</td>'
+      + '<td class="tr mono">' + t[1] + '</td>'
+      + '<td class="tr mono">' + fmtPct(totalRows > 0 ? t[1] / totalRows * 100 : 0) + '</td>'
+      + '</tr>';
+  }).join('');
+
+  var drvRows = mlpList.filter(function(m) { return m.top3 && m.top3.length > 0; }).map(function(m) {
+    return m.top3.map(function(drv, di) {
+      var mlpCell = di === 0 ? '<td rowspan="' + m.top3.length + '"><strong>' + m.mlp + '</strong></td>' : '';
+      var stClr = drv.status === 'blocked' ? 'var(--rd)' : 'var(--gn)';
+      return '<tr class="' + (di === 0 ? 'wh' : '') + '">'
+        + mlpCell
+        + '<td class="mono">' + drv.id + '</td>'
+        + '<td class="tr mono">' + drv.total + '</td>'
+        + '<td class="tr mono">' + fmtN(drv.cashout) + '</td>'
+        + '<td class="mono" style="font-size:9px">' + drv.node + '</td>'
+        + '<td><span class="tag i" style="font-size:8px">' + drv.tramo + '</span></td>'
+        + '<td><span class="tag" style="font-size:8px;color:' + stClr + '">' + drv.status + '</span></td>'
+        + '</tr>';
+    }).join('');
+  }).join('');
+
+  // Substituir conteúdo do container dinâmico
+  var dynEl = document.getElementById('bpp-dynamic-' + tramo);
+  if (!dynEl) return;
+
+  dynEl.innerHTML =
+    '<div class="g2">'
+    + '<div class="card"><div class="ch"><span class="ct">MLP — ' + label + '</span></div>'
+    + '<table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead>'
+    + '<tbody>' + mlpRows + '</tbody></table></div>'
+    + '<div class="card"><div class="ch"><span class="ct">Classificação</span><span class="cc">' + totalRows + ' ocorr.</span></div>'
+    + '<table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead>'
+    + '<tbody>' + tipoRows2 + '</tbody></table></div>'
+    + '</div>'
+    + '<div class="card"><div class="ch"><span class="ct">Top Drivers — ' + label + '</span>'
+    + '<span class="cc">Node ID · Tramo · Status</span></div>'
+    + '<table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th>'
+    + '<th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead>'
+    + '<tbody>' + drvRows + '</tbody></table></div>';
 }
 
 function renderDemo(){
