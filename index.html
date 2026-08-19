@@ -1473,35 +1473,37 @@ function renderDemo(){
   // ── MONTAR HTML ──
   var rankingTop3 = D.ranking.filter(function(v){return v.score>=2;}).slice(0,3);
   var rankingAcoes = rankingTop3.length===0
-    ? '<div style="padding:8px;color:var(--td);font-size:11px">Nenhum operador multifonte identificado esta semana.</div>'
+    ? '<div style="padding:10px;color:var(--td);font-size:11px">\ud83c\udf89 Nenhum operador multifonte identificado esta semana.</div>'
     : rankingTop3.map(function(v,i){
         var processos=[];
-        if(v.sort>0) processos.push(v.sort+' erros Sorting PK');
-        if(v.et>0) processos.push(v.et+' erros Etiquetagem PK');
-        if(v.desloc>0) processos.push(v.desloc+' deslocados ('+v.deslocNc+' N/C)');
-        if(v.aduana>0) processos.push(v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
+        if(v.sort>0) processos.push('\ud83c\udff7\ufe0f '+v.sort+' erros Sorting PK');
+        if(v.et>0) processos.push('\ud83d\udcdd '+v.et+' erros Etiquetagem PK');
+        if(v.desloc>0) processos.push('\ud83d\udce6 '+v.desloc+' deslocados ('+v.deslocNc+' N/C)');
+        if(v.aduana>0) processos.push('\ud83d\udee3\ufe0f '+v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
         var prio=i<2?(i+1):2;
-        return '<div class="arow"><div class="aprio p'+prio+'">P'+(i+1)+'</div>'
-          +'<div><div class="atitle">Feedback — Op. '+v.op+' (Score '+v.score+'/4)</div>'
-          +'<div class="adesc">Aparece em: '+processos.join(' · ')+'</div>'
-          +'<div class="ameta"><span class="achip">Prazo: D+1</span>'
-          +'<span class="achip resp">Líder de Turno</span></div></div></div>';
+        var medalha=i===0?'\ud83e\udd47':i===1?'\ud83e\udd48':'\ud83e\udd49';
+        return '<div class="arow" style="padding:8px 10px;gap:8px"><div class="aprio p'+prio+'" style="font-size:11px">'+medalha+'</div>'
+          +'<div><div class="atitle" style="font-size:11px">\ud83d\udc64 '+v.op+' <span style="color:var(--td);font-weight:400">(Score '+v.score+'/4)</span></div>'
+          +'<div class="adesc" style="font-size:10px">'+processos.join(' &middot; ')+'</div>'
+          +'<div class="ameta"><span class="achip" style="font-size:9px">\u23f1\ufe0f D+1</span>'
+          +'<span class="achip resp" style="font-size:9px">\ud83d\udc68\u200d\ud83d\udcbc L\xedder de Turno</span></div></div></div>';
       }).join('');
 
   var rankingRows = D.ranking.map(function(v,i){
     var score = v.score;
     var scoreCls = score>=3?'cr':score>=2?'w':'ok';
-    var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:9px">'+val+'</span>':'<span style="color:var(--td);font-size:9px">&mdash;</span>'; };
-    return '<tr>'
-      +'<td>'+rn(i)+'</td>'
-      +'<td><strong>'+v.op+'</strong></td>'
-      +'<td class="tc">'+dot(v.sort,'cr')+'</td>'
-      +'<td class="tc">'+dot(v.et,'w')+'</td>'
-      +'<td class="tc">'+dot(v.desloc,'i')+'</td>'
-      +'<td class="tc">'+dot(v.deslocNc,'w')+'</td>'
-      +'<td class="tc">'+dot(v.aduana,'p')+'</td>'
-      +'<td class="tc">'+dot(v.aduanaFalt,'cr')+'</td>'
-      +'<td class="tc"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800">'+score+'/4</span></td>'
+    var scoreEmoji = score>=3?'\ud83d\udd25':score>=2?'\u26a0\ufe0f':'\u2705';
+    var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:10px;padding:2px 7px">'+val+'</span>':'<span style="color:var(--td);font-size:10px">&middot;</span>'; };
+    return '<tr style="height:34px">'
+      +'<td style="padding:5px 8px">'+rn(i)+'</td>'
+      +'<td style="padding:5px 8px"><strong>\ud83d\udc64 '+v.op+'</strong></td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.sort,'cr')+'</td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.et,'w')+'</td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.desloc,'i')+'</td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.deslocNc,'w')+'</td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.aduana,'p')+'</td>'
+      +'<td class="tc" style="padding:5px 4px">'+dot(v.aduanaFalt,'cr')+'</td>'
+      +'<td class="tc" style="padding:5px 4px"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800;padding:3px 8px">'+scoreEmoji+' '+score+'/4</span></td>'
       +'</tr>';
   }).join('');
 
@@ -1699,7 +1701,6 @@ function renderDemo(){
 // ── ACURÁCIA ──
 +'<div id="accuracy" class="tab">'
 +'<div class="sh"><div><div class="st">Acur\xe1cia \u2014 Resultado Di\xe1rio</div><div class="ss">'+acc.totalInv.toLocaleString()+' inventariados \xb7 '+acc.totalFalt.toLocaleString()+' faltantes \xb7 '+cfg.week+'</div></div>'+btnExp('accuracy')+'</div>'
-+(acc.semanas&&acc.semanas.length>1?'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\xe7\xe3o Semanal \u2014 Accuracy c/ POC vs s/ POC</span><span class="chart-note">Gerado quando a base cont\xe9m m\xfaltiplas semanas</span></div><div class="chart-body"><canvas id="cAccSem"></canvas></div><div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>c/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--gn)"></div>s/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta 80%</div></div></div>':'')
 +'<div class="alert i"><div class="ai">\ud83d\udca1</div><div><div class="at">Por que a accuracy geral ('+acc.geral.toFixed(1)+'%) difere da m\xe9dia visual dos dias?</div><div class="ab">Calculada sobre o total da semana: <strong>'+acc.totalInv.toLocaleString()+' \xf7 ('+acc.totalInv.toLocaleString()+' + '+acc.totalFalt.toLocaleString()+') = '+acc.geral.toFixed(1)+'%</strong>. Domingo tem volume ~4x maior, elevando a m\xe9dia ponderada.</div></div></div>'
 +(acc.multiSemana&&acc.accSemanas&&acc.accSemanas.length>1?'<div class="chart-wrap" style="margin-bottom:8px"><div class="chart-head"><span class="chart-title">\ud83d\udcc6 Evolu\u00e7\u00e3o Semanal \u2014 Accuracy c/ POC vs s/ POC</span><span class="chart-note">Barras azuis = c/ POC \xb7 Barras verdes = s/ POC</span></div><div class="chart-body"><canvas id="cAccSem"></canvas></div><div class="chart-legend"><div class="leg"><div class="leg-dot" style="background:rgba(52,131,250,0.85)"></div>c/ POC</div><div class="leg"><div class="leg-dot" style="background:rgba(63,185,80,0.85)"></div>s/ POC</div><div class="leg"><div class="leg-dot" style="background:var(--rd);width:14px;height:2px;border-radius:2px"></div>Meta '+getMetaAcc()+'%</div></div></div>':'')
 +'<div class="chart-wrap"><div class="chart-head"><span class="chart-title">\ud83d\udcc5 % Accuracy Di\xe1ria \u2014 '+cfg.week+'</span><span class="chart-note">Inventariado Planificado \xf7 (Inventariado + Faltante) \xb7 Base2</span></div><div class="chart-body"><canvas id="cAcc"></canvas></div>'
@@ -1725,28 +1726,34 @@ function renderDemo(){
     ? D.alertas.map(function(a){
         return '<div class="alert '+a.nivel+'" style="margin-bottom:8px"><div class="ai">'+(a.nivel==='cr'?'🚨':'⚠️')+'</div><div><div class="at">Anomalia detectada — '+a.tipo.toUpperCase()+'</div><div class="ab">'+a.msg+'</div></div></div>';
       }).join('')
-    : '<div class="alert i"><div class="ai">✅</div><div><div class="at">Nenhuma anomalia detectada</div><div class="ab">Todos os valores estão dentro do padrão estatístico esperado para a semana.</div></div></div>'
+    : '<div class="alert i"><div class="ai">✅</div><div><div class="at">Nenhuma anomalia detectada</div><div class="ab">Todos os valores estão dentro do padrão estatístico esperado para a semana.</div></div></div>';
 
   // Adicionar aba ranking ao html
   html +=
-+'<div id="ranking" class="tab">'
-+'<div class="sh"><div><div class="st">Ranking Cruzado de Operadores — '+cfg.week+'</div><div class="ss">Operadores que aparecem em mais de um processo na mesma semana</div></div></div>'
-+'<div class="sub-sh"><span class="sub-title">⚠️ Alertas Automáticos</span><span class="sub-badge">Anomalias estatísticas detectadas</span></div>'
+'<div id="ranking" class="tab">'
++'<div class="sh"><div><div class="st">\ud83c\udfc6 Ranking Cruzado de Operadores \u2014 '+cfg.week+'</div><div class="ss">Operadores que aparecem em mais de um processo na mesma semana</div></div></div>'
++'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">'
++'<div style="background:var(--sf2);border:1px solid var(--br);border-left:3px solid '+(D.alertas.length>0?'var(--rd)':'var(--gn)')+';border-radius:6px;padding:10px 12px"><div style="font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase">'+(D.alertas.length>0?'\ud83d\udea8':'\u2705')+' Alertas</div><div style="font-size:20px;font-weight:800;color:'+(D.alertas.length>0?'var(--rd)':'var(--gn)')+'">'+D.alertas.length+'</div></div>'
++'<div style="background:var(--sf2);border:1px solid var(--br);border-left:3px solid var(--rd);border-radius:6px;padding:10px 12px"><div style="font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase">\ud83d\udd25 Score 3-4</div><div style="font-size:20px;font-weight:800;color:var(--rd)">'+D.ranking.filter(function(v){return v.score>=3;}).length+'</div></div>'
++'<div style="background:var(--sf2);border:1px solid var(--br);border-left:3px solid var(--or);border-radius:6px;padding:10px 12px"><div style="font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase">\u26a0\ufe0f Score 2</div><div style="font-size:20px;font-weight:800;color:var(--or)">'+D.ranking.filter(function(v){return v.score===2;}).length+'</div></div>'
++'<div style="background:var(--sf2);border:1px solid var(--br);border-left:3px solid var(--bl);border-radius:6px;padding:10px 12px"><div style="font-size:9px;color:var(--td);font-weight:700;text-transform:uppercase">\ud83d\udc65 Total Mapeados</div><div style="font-size:20px;font-weight:800;color:var(--bl)">'+D.ranking.length+'</div></div>'
++'</div>'
++'<div class="sub-sh"><span class="sub-title">\ud83d\udea8 Alertas Autom\xe1ticos</span><span class="sub-badge">Anomalias estat\xedsticas detectadas</span></div>'
 + alertasHtml
-+'<div class="sub-sh" style="margin-top:16px"><span class="sub-title">🏆 Operadores Multifrontes</span><span class="sub-badge">Score = nº de processos distintos com ocorrência</span></div>'
-+'<div class="alert i" style="margin-bottom:8px"><div class="ai">💡</div><div><div class="at">Como ler o Score</div><div class="ab">Score <strong>4/4</strong> = aparece em Sorting PK + Etiquetagem PK + Deslocados + Aduanas. Operadores com score ≥ 2 merecem atenção prioritária — o erro não é pontual, é um padrão de comportamento.</div></div></div>'
-+'<div class="card"><div class="ch"><span class="ct">Top 30 Operadores por Score</span><span class="cc">Ordenado por nº de processos</span></div>'
-+'<table><thead><tr>'
-+'<th>#</th><th>Operador</th>'
-+'<th class="tc"><span class="tag cr" style="font-size:8px">Sort PK</span></th>'
-+'<th class="tc"><span class="tag w" style="font-size:8px">Etiq PK</span></th>'
-+'<th class="tc"><span class="tag i" style="font-size:8px">Desl.</span></th>'
-+'<th class="tc"><span class="tag w" style="font-size:8px">N/C</span></th>'
-+'<th class="tc"><span class="tag p" style="font-size:8px">Aduana</span></th>'
-+'<th class="tc"><span class="tag cr" style="font-size:8px">Falt.</span></th>'
-+'<th class="tc">Score</th>'
++'<div class="sub-sh" style="margin-top:10px"><span class="sub-title">\ud83c\udfc6 Operadores Multifrontes</span><span class="sub-badge">Score = n\xba de processos distintos com ocorr\xeancia</span></div>'
++'<div class="alert i" style="margin-bottom:8px;padding:8px 12px"><div class="ai">\ud83d\udca1</div><div><div class="at" style="font-size:11px">Como ler o Score</div><div class="ab" style="font-size:10px">\ud83d\udd25 <strong>4/4</strong> = aparece em Sorting PK + Etiquetagem PK + Deslocados + Aduanas simultaneamente. \u26a0\ufe0f Score \u2265 2 merece aten\xe7\xe3o priorit\xe1ria \u2014 o erro n\xe3o \xe9 pontual, \xe9 um padr\xe3o de comportamento.</div></div></div>'
++'<div class="card"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83d\udccb Top 30 Operadores por Score</span><span class="cc">Ordenado por n\xba de processos</span></div>'
++'<table style="border-spacing:0"><thead><tr>'
++'<th style="padding:6px 8px">#</th><th style="padding:6px 8px">\ud83d\udc64 Operador</th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag cr" style="font-size:9px">\ud83c\udff7\ufe0f Sort</span></th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag w" style="font-size:9px">\ud83d\udcdd Etiq</span></th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag i" style="font-size:9px">\ud83d\udce6 Desl</span></th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag w" style="font-size:9px">\u274c N/C</span></th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag p" style="font-size:9px">\ud83d\udee3\ufe0f Aduana</span></th>'
++'<th class="tc" style="padding:6px 4px"><span class="tag cr" style="font-size:9px">\u26a0\ufe0f Falt</span></th>'
++'<th class="tc" style="padding:6px 8px">\ud83c\udfaf Score</th>'
 +'</tr></thead><tbody>'+rankingRows+'</tbody></table></div>'
-+'<div class="card" style="margin-top:8px"><div style="padding:4px 14px 8px">'
++'<div class="card" style="margin-top:8px"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83c\udfaf A\u00e7\u00f5es Priorit\u00e1rias</span><span class="cc">Top 3 operadores multifrontes</span></div><div style="padding:2px 8px 8px">'
 + rankingAcoes
 +'</div></div>'
 +'</div>'
