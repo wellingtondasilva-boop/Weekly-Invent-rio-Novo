@@ -149,6 +149,13 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
 .rota-chip{font-size:8px;background:rgba(52,131,250,.1);color:var(--bl);border:1px solid rgba(52,131,250,.2);padding:1px 6px;border-radius:6px;font-family:'JetBrains Mono',monospace;display:inline-block;margin:1px}
 /* DIVIDER */
 .divider{height:1px;background:var(--br);margin:12px 0}
+/* FILTER CHIPS */
+.fchips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;background:var(--sf2);border-bottom:1px solid var(--br)}
+.fchip{background:var(--sf3);border:1px solid var(--br);color:var(--td);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;padding:4px 12px;border-radius:14px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fchip:hover{color:var(--tx);border-color:var(--bl)}
+.fchip.active{background:rgba(52,131,250,.2);border-color:var(--bl);color:var(--bl)}
+.fchip.all.active{background:rgba(63,185,80,.15);border-color:var(--gn);color:var(--gn)}
+.filter-badge{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;background:var(--sf3);color:var(--td);margin-left:3px}
 /* FOOTER */
 .footer{text-align:center;padding:16px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:24px}
 
@@ -469,37 +476,63 @@ function calcBPPTramo(rows,gmvRows,gmvCol){
   var cashout=0; for(var i=0;i<rows.length;i++) cashout+=tousd(rows[i]['Bpp Cashout Usd']);
   var gmv=0; for(var i=0;i<gmvRows.length;i++) gmv+=tousd(gmvRows[i][gmvCol]);
   var pct=gmv>0?Math.round(cashout/gmv*1000000)/10000:0;
-  var mlpMap={};
+
+  // Agrupar sub-tipos (Clasificacion LG)
+  var subtipoMap={};
   for(var i=0;i<rows.length;i++){
-    var r=rows[i];
-    var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
-    if(!mlpMap[mlp]) mlpMap[mlp]={total:0,cashout:0,gmv:0,drivers:{}};
-    mlpMap[mlp].total++; mlpMap[mlp].cashout+=tousd(r['Bpp Cashout Usd']);
-    var drv=r['Driver Id']||'';
-    if(drv&&drv!=='nan'){
-      if(!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,node:'',tramo:'',status:''};
-      var d=mlpMap[mlp].drivers[drv]; d.total++; d.cashout+=tousd(r['Bpp Cashout Usd']);
-      if(r['NODE_ID']) d.node=r['NODE_ID'];
-      if(r['NODES_LM']) d.tramo=r['NODES_LM'];
-      if(r['Driver Status']) d.status=r['Driver Status'];
+    var st=(rows[i]['Clasificacion LG']||'Outros').trim();
+    if(!subtipoMap[st]) subtipoMap[st]=[];
+    subtipoMap[st].push(rows[i]);
+  }
+  var subtipos=Object.keys(subtipoMap).sort(function(a,b){return subtipoMap[b].length-subtipoMap[a].length;});
+
+  function buildMlp(rowsArr){
+    var mlpMap={};
+    for(var i=0;i<rowsArr.length;i++){
+      var r=rowsArr[i];
+      var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
+      if(!mlpMap[mlp]) mlpMap[mlp]={total:0,cashout:0,gmv:0,drivers:{}};
+      mlpMap[mlp].total++; mlpMap[mlp].cashout+=tousd(r['Bpp Cashout Usd']);
+      var drv=r['Driver Id']||'';
+      if(drv&&drv!=='nan'){
+        if(!mlpMap[mlp].drivers[drv]) mlpMap[mlp].drivers[drv]={total:0,cashout:0,node:'',tramo:'',status:''};
+        var d=mlpMap[mlp].drivers[drv]; d.total++; d.cashout+=tousd(r['Bpp Cashout Usd']);
+        if(r['NODE_ID']) d.node=r['NODE_ID'];
+        if(r['NODES_LM']) d.tramo=r['NODES_LM'];
+        if(r['Driver Status']) d.status=r['Driver Status'];
+      }
     }
+    for(var i=0;i<gmvRows.length;i++){
+      var r=gmvRows[i];
+      var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
+      if(mlpMap[mlp]) mlpMap[mlp].gmv+=tousd(r[gmvCol]);
+    }
+    var list=Object.keys(mlpMap).map(function(mlp){
+      var v=mlpMap[mlp]; var p=v.gmv>0?Math.round(v.cashout/v.gmv*1000000)/10000:null;
+      var top3=Object.keys(v.drivers).map(function(k){return{id:k,total:v.drivers[k].total,cashout:Math.round(v.drivers[k].cashout*100)/100,node:v.drivers[k].node,tramo:v.drivers[k].tramo,status:v.drivers[k].status};});
+      top3.sort(function(a,b){return b.total-a.total;}); top3=top3.slice(0,3);
+      return{mlp:mlp,total:v.total,cashout:Math.round(v.cashout*100)/100,gmv:Math.round(v.gmv*100)/100,pct:p,top3:top3};
+    });
+    list.sort(function(a,b){return(b.pct||0)-(a.pct||0);});
+    return list;
   }
-  for(var i=0;i<gmvRows.length;i++){
-    var r=gmvRows[i];
-    var mlp=(r['MLP']||'').indexOf('Sin Asignar')>=0?'SVC':r['MLP']||'Outros';
-    if(mlpMap[mlp]) mlpMap[mlp].gmv+=tousd(r[gmvCol]);
+
+  var mlpList=buildMlp(rows);
+
+  // Pre-calcular dados por sub-tipo
+  var subData={};
+  for(var si=0;si<subtipos.length;si++){
+    var st=subtipos[si]; var stRows=subtipoMap[st];
+    var stCo=0; for(var i=0;i<stRows.length;i++) stCo+=tousd(stRows[i]['Bpp Cashout Usd']);
+    subData[st]={total:stRows.length,cashout:Math.round(stCo*100)/100,mlpList:buildMlp(stRows)};
   }
-  var mlpList=Object.keys(mlpMap).map(function(mlp){
-    var v=mlpMap[mlp]; var p=v.gmv>0?Math.round(v.cashout/v.gmv*1000000)/10000:null;
-    var top3=Object.keys(v.drivers).map(function(k){return{id:k,total:v.drivers[k].total,cashout:Math.round(v.drivers[k].cashout*100)/100,node:v.drivers[k].node,tramo:v.drivers[k].tramo,status:v.drivers[k].status};});
-    top3.sort(function(a,b){return b.total-a.total;}); top3=top3.slice(0,3);
-    return{mlp:mlp,total:v.total,cashout:Math.round(v.cashout*100)/100,gmv:Math.round(v.gmv*100)/100,pct:p,top3:top3};
-  });
-  mlpList.sort(function(a,b){return(b.pct||0)-(a.pct||0);});
+
   var tipoMap={};
-  for(var i=0;i<rows.length;i++){var fc=rows[i]['Clasificacion LG']||'?';tipoMap[fc]=(tipoMap[fc]||0)+1;}
+  for(var i=0;i<rows.length;i++){var fc=(rows[i]['Clasificacion LG']||'?').trim();tipoMap[fc]=(tipoMap[fc]||0)+1;}
   var tipos=topN(tipoMap,10).map(function(x){return[x[0],x[1]];});
-  return{cashout:Math.round(cashout*100)/100,gmv:Math.round(gmv*100)/100,pct:pct,total:rows.length,mlpList:mlpList,tipos:tipos};
+
+  return{cashout:Math.round(cashout*100)/100,gmv:Math.round(gmv*100)/100,pct:pct,total:rows.length,
+         mlpList:mlpList,tipos:tipos,subtipos:subtipos,subData:subData};
 }
 
 function calcBPP(cfg){
@@ -730,7 +763,21 @@ function showSubTab(tramo){
   var btns=document.querySelectorAll('.snb'); for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
   var el=document.getElementById('bpp-'+tramo); if(el) el.classList.add('active');
   var btn=document.getElementById('snb-'+tramo); if(btn) btn.classList.add('active');
+  bindChipListeners(tramo);
   setTimeout(drawAllCharts,60);
+}
+
+function bindChipListeners(tramo){
+  var container=document.getElementById('fchips-'+tramo);
+  if(!container) return;
+  var chips=container.querySelectorAll('.fchip');
+  for(var i=0;i<chips.length;i++){
+    (function(chip){
+      chip.onclick=function(){
+        filterBpp(chip.getAttribute('data-tramo'), chip.getAttribute('data-idx'));
+      };
+    })(chips[i]);
+  }
 }
 
 function resetDemo(){
@@ -845,6 +892,60 @@ function tramoAcoes(tramo, td, cfg) {
 }
 
 
+
+// ── FILTRO POR SUB-TIPO NO BPP ──────────────────────────────
+function filterBpp(tramo, subIdx) {
+  var td = D.bpp.tramos[tramo];
+  if (!td) return;
+
+  // Atualizar chips ativos
+  var chips = document.querySelectorAll('[id^="fc-'+tramo+'"]');
+  // Resetar todos (não podemos usar template literal aqui — usar querySelectorAll com prefix)
+  var allChips = document.getElementById('bpp-'+tramo).querySelectorAll('.fchip');
+  for (var i = 0; i < allChips.length; i++) allChips[i].classList.remove('active');
+
+  var isAll = (subIdx === 'ALL');
+  var activeChipId = isAll ? 'fc-'+tramo+'-ALL' : 'fc-'+tramo+'-'+subIdx;
+  var activeChip = document.getElementById(activeChipId);
+  if (activeChip) activeChip.classList.add('active');
+
+  // Determinar dados a exibir
+  var mlpList, totalRows, cashout, label;
+  if (isAll) {
+    mlpList = td.mlpList;
+    totalRows = td.total;
+    cashout = td.cashout;
+    label = tramo;
+  } else {
+    var st = td.subtipos[subIdx];
+    var sd = td.subData[st];
+    mlpList = sd.mlpList;
+    totalRows = sd.total;
+    cashout = sd.cashout;
+    label = st;
+  }
+
+  // Atualizar KPIs
+  var elCo = document.getElementById('bpp-co-'+tramo);
+  var elTot = document.getElementById('bpp-tot-'+tramo);
+  if (elCo) elCo.textContent = fmtN(cashout);
+  if (elTot) elTot.textContent = totalRows;
+
+  // Atualizar título
+  var elMlpTitle = document.getElementById('bpp-mlp-title-'+tramo);
+  if (elMlpTitle) elMlpTitle.textContent = 'MLP — ' + label;
+  var elDrvTitle = document.getElementById('bpp-drv-title-'+tramo);
+  if (elDrvTitle) elDrvTitle.textContent = 'Top Drivers — ' + label;
+
+  // Atualizar tabela MLP
+  var elMlp = document.getElementById('bpp-mlp-'+tramo);
+  if (elMlp) elMlp.innerHTML = mlpTable(mlpList, totalRows);
+
+  // Atualizar tabela Drivers
+  var elDrv = document.getElementById('bpp-drv-rows-'+tramo);
+  if (elDrv) elDrv.innerHTML = driverTable(mlpList);
+}
+
 function renderDemo(){
   var d=D, cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
 
@@ -924,18 +1025,31 @@ function renderDemo(){
   var subPanels=bpp.tramoDisp.map(function(tr,i){
     var td=bpp.tramos[tr]; var tt=bpp.tendTramo[tr]||[];
     var vclr=td.pct>0.5?'var(--rd)':td.pct>0.35?'var(--or)':'var(--gn)';
+
+    // Chips de filtro por sub-tipo — usando data-attributes para evitar problema de aspas
+    var chipHtml='<div class="fchips" id="fchips-'+tr+'">';
+    chipHtml+='<span class="fchip all active" data-tramo="'+tr+'" data-idx="ALL">Todos <span class="filter-badge">'+td.total+'</span></span>';
+    for(var si=0;si<td.subtipos.length;si++){
+      var st=td.subtipos[si]; var sd=td.subData[st];
+      chipHtml+='<span class="fchip" data-tramo="'+tr+'" data-idx="'+si+'">'+st+' <span class="filter-badge">'+sd.total+'</span></span>';
+    }
+    chipHtml+='</div>';
+
     return '<div class="subpanel'+(i===0?' active':'')+'" id="bpp-'+tr+'">'
       +'<div class="kr" style="grid-template-columns:repeat(3,1fr);margin-top:8px;">'
       +'<div class="kc cr"><div class="kl">% BPP '+tr+'</div><div class="kv" style="color:'+vclr+'">'+fmtBpp(td.pct)+'</div></div>'
-      +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o">'+fmtN(td.cashout)+'</div></div>'
-      +'<div class="kc cb"><div class="kl">Ocorrencias</div><div class="kv b">'+td.total+'</div></div>'
+      +'<div class="kc co"><div class="kl">Cashout USD</div><div class="kv o" id="bpp-co-'+tr+'">'+fmtN(td.cashout)+'</div></div>'
+      +'<div class="kc cb"><div class="kl">Ocorr&ecirc;ncias</div><div class="kv b" id="bpp-tot-'+tr+'">'+td.total+'</div></div>'
       +'</div>'
       +'<div class="trow">'+tendCards(tt)+'</div>'
-      +'<div class="g2">'
-      +'<div class="card"><div class="ch"><span class="ct">MLP &mdash; % BPP '+tr+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead><tbody>'+mlpTable(td.mlpList,td.total)+'</tbody></table></div>'
+      + chipHtml
+      +'<div class="g2" id="bpp-tables-'+tr+'">'
+      +'<div class="card"><div class="ch"><span class="ct" id="bpp-mlp-title-'+tr+'">MLP &mdash; '+tr+'</span></div><table><thead><tr><th>#</th><th>MLP</th><th class="tr">% BPP</th><th class="tr">Cashout</th><th class="tr">Ocorr.</th></tr></thead><tbody id="bpp-mlp-'+tr+'">'+mlpTable(td.mlpList,td.total)+'</tbody></table></div>'
       +'<div class="card"><div class="ch"><span class="ct">Classifica&ccedil;&atilde;o '+tr+'</span><span class="cc">'+td.total+' ocorr.</span></div><table><thead><tr><th>Tipo</th><th class="tr">Vol.</th><th class="tr">%</th></tr></thead><tbody>'+tipoRows(td.tipos,td.total)+'</tbody></table></div>'
       +'</div>'
-      +'<div class="card"><div class="ch"><span class="ct">Top Drivers &mdash; '+tr+'</span><span class="cc">Node ID &middot; Tramo &middot; Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody>'+driverTable(td.mlpList)+'</tbody></table></div>'
+      +'<div id="bpp-drv-'+tr+'">'
+      +'<div class="card"><div class="ch"><span class="ct" id="bpp-drv-title-'+tr+'">Top Drivers &mdash; '+tr+'</span><span class="cc">Node ID &middot; Tramo &middot; Status</span></div><table><thead><tr><th>MLP</th><th>Driver ID</th><th class="tr">BPPs</th><th class="tr">Cashout</th><th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead><tbody id="bpp-drv-rows-'+tr+'">'+driverTable(td.mlpList)+'</tbody></table></div>'
+      +'</div>'
       +tramoAcoes(tr,td,cfg)
       +'</div>';
   }).join('');
@@ -1209,6 +1323,8 @@ function renderDemo(){
   setTimeout(function(){
     showTab('resumo',document.querySelector('.nb'));
     drawAllCharts();
+    // Bind chips do primeiro tramo ativo
+    if(D.bpp.tramoDisp.length>0) bindChipListeners(D.bpp.tramoDisp[0]);
   },80);
 }
 
