@@ -613,22 +613,42 @@ function calcAccuracy(cfg){
     return d>=start&&d<=end_dt;
   }
 
-  // Identificar semanas no arquivo (para gráfico de evolução)
-  var allDates=Object.keys(groupBy(inv_rows,'INIT_DTTM_LOCAL'));
-  allDates.sort(function(a,b){return ptDateOrder(a)-ptDateOrder(b);});
-  var weekGroups={};
-  for(var i=0;i<allDates.length;i++){
-    var wk=getWeekLabel(allDates[i]);
-    if(!weekGroups[wk]) weekGroups[wk]=[];
-    weekGroups[wk].push(allDates[i]);
-  }
-  var weekKeys=Object.keys(weekGroups).sort();
-  var multiSemana=weekKeys.length>1;
+  // Identificar semanas no arquivo (para gráfico de evolução).
+  // As semanas são blocos de 7 dias ANCORADOS no fim do período configurado
+  // (cfg.dateEnd), andando para trás — isso garante que o último bloco seja
+  // EXATAMENTE igual ao período que o usuário configurou como semana atual,
+  // e as anteriores casam retroativamente sem cortar dias ao meio.
+  var allDatesRaw=Object.keys(groupBy(inv_rows,'INIT_DTTM_LOCAL'));
+  var allDateObjs=allDatesRaw.map(function(dt){
+    var months={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+    var xm=dt.match(/(\d+)\s+de\s+(\w+)/i);
+    var d=xm?new Date(2026,months[xm[2].toLowerCase().slice(0,3)]-1,parseInt(xm[1])):null;
+    return{raw:dt,date:d};
+  }).filter(function(x){return x.date;});
+  allDateObjs.sort(function(a,b){return a.date-b.date;});
 
-  // Acurácia por semana — linhas brutas c/ POC e s/ POC
-  var accSemanas=weekKeys.map(function(wk){
+  // Âncora: fim do período configurado (cfg.dateEnd) ou a última data disponível
+  var anchorEnd = end_dt || (allDateObjs.length?allDateObjs[allDateObjs.length-1].date:null);
+  var weekGroups={}, weekOrder=[];
+  if(anchorEnd){
+    allDateObjs.forEach(function(x){
+      var diffDays=Math.floor((anchorEnd-x.date)/(24*3600*1000));
+      var blockIdx=Math.floor(diffDays/7); // 0 = semana atual, 1 = semana anterior, ...
+      var wk='B'+blockIdx; // chave interna
+      if(!weekGroups[wk]){weekGroups[wk]=[];weekOrder.push(blockIdx);}
+      weekGroups[wk].push(x.raw);
+    });
+  }
+  weekOrder.sort(function(a,b){return b-a;}); // mais antigo primeiro
+  var multiSemana=weekOrder.length>1;
+
+  // Rotular cada bloco: o bloco 0 usa cfg.week (nome real da semana atual);
+  // os anteriores usam getWeekLabel da primeira data do bloco, só para exibição.
+  var accSemanas=weekOrder.map(function(blockIdx){
+    var wk='B'+blockIdx;
+    var datesInBlock=weekGroups[wk];
     var dtSet={};
-    weekGroups[wk].forEach(function(d){dtSet[d]=true;});
+    datesInBlock.forEach(function(d){dtSet[d]=true;});
     var invW=inv_rows.filter(function(r){return dtSet[r['INIT_DTTM_LOCAL']];});
     var faltW=falt_rows.filter(function(r){return dtSet[r['INIT_DTTM_LOCAL']];});
     var nInv=invW.length, nFalt=faltW.length;
@@ -636,7 +656,13 @@ function calcAccuracy(cfg){
     var invSp=hasPoc?invW.filter(function(r){return !pocSet[normId(r)];}).length:nInv;
     var faltSp=hasPoc?faltW.filter(function(r){return !pocSet[normId(r)];}).length:nFalt;
     var accSem=invSp+faltSp>0?Math.round(invSp/(invSp+faltSp)*1000)/10:accCom;
-    return{wk:wk,accCom:accCom,accSem:accSem,inv:nInv,falt:nFalt};
+    // Rotulagem 100% consistente: extrai o número da semana atual (cfg.week, ex 'W33' -> 33)
+    // e decrementa 1 para cada bloco anterior. Evita qualquer cálculo de semana ISO
+    // que poderia divergir da nomenclatura interna usada pelo time.
+    var curWeekNum=parseInt((cfg.week||'').replace(/\D/g,''),10);
+    var label=(!isNaN(curWeekNum))?('W'+(curWeekNum-blockIdx)):('B'+blockIdx);
+    if(blockIdx===0) label=cfg.week; // garante que a semana atual usa o texto exato configurado
+    return{wk:label,accCom:accCom,accSem:accSem,inv:nInv,falt:nFalt};
   });
 
   // Período atual — linhas brutas
