@@ -472,21 +472,7 @@ function calcDeslocados(cfg,totalInv){
   return{total:total,naoCorrigidos:naoCorr,pct:pct,byDay:byDayArr,fluxos:fluxos,ops:ops,ids:ids};
 }
 
-function calcBPPTramo(rows,gmvRows,gmvCol){
-  var cashout=0; for(var i=0;i<rows.length;i++) cashout+=tousd(rows[i]['Bpp Cashout Usd']);
-  var gmv=0; for(var i=0;i<gmvRows.length;i++) gmv+=tousd(gmvRows[i][gmvCol]);
-  var pct=gmv>0?Math.round(cashout/gmv*1000000)/10000:0;
 
-  // Agrupar sub-tipos (Clasificacion LG)
-  var subtipoMap={};
-  for(var i=0;i<rows.length;i++){
-    var st=(rows[i]['Clasificacion LG']||'Outros').trim();
-    if(!subtipoMap[st]) subtipoMap[st]=[];
-    subtipoMap[st].push(rows[i]);
-  }
-  var subtipos=Object.keys(subtipoMap).sort(function(a,b){return subtipoMap[b].length-subtipoMap[a].length;});
-
-  
 function buildBppContent(mlpList, tipos, total, tr, td) {
   var tiposHtml = td ? tipoRows(td.tipos, td.total) : tipoRows(tipos, total);
   return '<div class="g2">'
@@ -503,6 +489,22 @@ function buildBppContent(mlpList, tipos, total, tr, td) {
     +'<th>Node ID</th><th>Tramo</th><th>Status</th></tr></thead>'
     +'<tbody>'+driverTable(mlpList)+'</tbody></table></div>';
 }
+
+function calcBPPTramo(rows,gmvRows,gmvCol){
+  var cashout=0; for(var i=0;i<rows.length;i++) cashout+=tousd(rows[i]['Bpp Cashout Usd']);
+  var gmv=0; for(var i=0;i<gmvRows.length;i++) gmv+=tousd(gmvRows[i][gmvCol]);
+  var pct=gmv>0?Math.round(cashout/gmv*1000000)/10000:0;
+
+  // Agrupar sub-tipos (Clasificacion LG)
+  var subtipoMap={};
+  for(var i=0;i<rows.length;i++){
+    var st=(rows[i]['Clasificacion LG']||'Outros').trim();
+    if(!subtipoMap[st]) subtipoMap[st]=[];
+    subtipoMap[st].push(rows[i]);
+  }
+  var subtipos=Object.keys(subtipoMap).sort(function(a,b){return subtipoMap[b].length-subtipoMap[a].length;});
+
+  
 
 function buildMlp(rowsArr){
     var mlpMap={};
@@ -999,6 +1001,41 @@ function filterBpp(tramo, subIdx) {
     + '<tbody>' + drvRows + '</tbody></table></div>';
 }
 
+
+function tendCards(tend){
+  return tend.map(function(t,i){
+    var isCur=i===tend.length-1;
+    var prev=i>0?tend[i-1]:null;
+    var chg=prev&&prev.pct>0?(t.pct-prev.pct)/prev.pct*100:null;
+    var chgTxt=chg!==null?(chg<0?'<span style="color:var(--gn)">&#9660; -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">&#9650; +'+chg.toFixed(1)+'%</span>'):'&mdash;';
+    var vclr=t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
+    return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout / GMV</div><div class="td2">'+chgTxt+'</div></div>';
+  }).join('');
+}
+
+function mlpTable(mlpList,totalGeral){
+  return mlpList.map(function(m,i){
+    var pclr=m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
+    return '<tr'+(i<1?' class="rh"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+fmtBpp(m.pct)+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td></tr>';
+  }).join('');
+}
+
+function driverTable(mlpList){
+  return mlpList.filter(function(m){return m.top3&&m.top3.length>0;}).map(function(m){
+    return m.top3.map(function(drv,di){
+      var mlpCell=di===0?'<td rowspan="'+m.top3.length+'"><strong>'+m.mlp+'</strong></td>':'';
+      var stClr=drv.status==='blocked'?'var(--rd)':'var(--gn)';
+      return '<tr class="'+(di===0?'wh':'')+'">'+mlpCell+'<td class="mono">'+drv.id+'</td><td class="tr mono">'+drv.total+'</td><td class="tr mono">'+fmtN(drv.cashout)+'</td><td class="mono" style="font-size:9px">'+drv.node+'</td><td><span class="tag i" style="font-size:8px">'+drv.tramo+'</span></td><td><span class="tag" style="font-size:8px;color:'+stClr+'">'+drv.status+'</span></td></tr>';
+    }).join('');
+  }).join('');
+}
+
+function tipoRows(tipos,total){
+  return tipos.map(function(t){
+    return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(total>0?t[1]/total*100:0)+'</td></tr>';
+  }).join('');
+}
+
 function renderDemo(){
   var d=D, cfg=d.cfg, acc=d.acc, desloc=d.desloc, bpp=d.bpp, pk=d.pk, aduana=d.aduana;
 
@@ -1032,39 +1069,9 @@ function renderDemo(){
   }).join('');
 
   // ── BPP: tend cards ──
-  function tendCards(tend){
-    return tend.map(function(t,i){
-      var isCur=i===tend.length-1;
-      var prev=i>0?tend[i-1]:null;
-      var chg=prev&&prev.pct>0?(t.pct-prev.pct)/prev.pct*100:null;
-      var chgTxt=chg!==null?(chg<0?'<span style="color:var(--gn)">&#9660; -'+Math.abs(chg).toFixed(1)+'%</span>':'<span style="color:var(--rd)">&#9650; +'+chg.toFixed(1)+'%</span>'):'&mdash;';
-      var vclr=t.pct>0.5?'var(--rd)':t.pct>0.35?'var(--or)':'var(--gn)';
-      return '<div class="tc2'+(isCur?' cur':'')+'"><div class="twk">'+t.wk+(isCur?' &larr; atual':'')+'</div><div class="tv" style="color:'+vclr+'">'+fmtBpp(t.pct)+'</div><div class="ts2">Cashout / GMV</div><div class="td2">'+chgTxt+'</div></div>';
-    }).join('');
-  }
 
-  function mlpTable(mlpList,totalGeral){
-    return mlpList.map(function(m,i){
-      var pclr=m.pct&&m.pct>0.5?'var(--rd)':m.pct&&m.pct>0.35?'var(--or)':'inherit';
-      return '<tr'+(i<1?' class="rh"':'')+'><td>'+rn(i)+'</td><td><strong>'+m.mlp+'</strong></td><td class="tr mono" style="color:'+pclr+'">'+fmtBpp(m.pct)+'</td><td class="tr mono">'+fmtN(m.cashout)+'</td><td class="tr mono">'+m.total+'</td></tr>';
-    }).join('');
-  }
 
-  function driverTable(mlpList){
-    return mlpList.filter(function(m){return m.top3&&m.top3.length>0;}).map(function(m){
-      return m.top3.map(function(drv,di){
-        var mlpCell=di===0?'<td rowspan="'+m.top3.length+'"><strong>'+m.mlp+'</strong></td>':'';
-        var stClr=drv.status==='blocked'?'var(--rd)':'var(--gn)';
-        return '<tr class="'+(di===0?'wh':'')+'">'+mlpCell+'<td class="mono">'+drv.id+'</td><td class="tr mono">'+drv.total+'</td><td class="tr mono">'+fmtN(drv.cashout)+'</td><td class="mono" style="font-size:9px">'+drv.node+'</td><td><span class="tag i" style="font-size:8px">'+drv.tramo+'</span></td><td><span class="tag" style="font-size:8px;color:'+stClr+'">'+drv.status+'</span></td></tr>';
-      }).join('');
-    }).join('');
-  }
 
-  function tipoRows(tipos,total){
-    return tipos.map(function(t){
-      return '<tr><td>'+t[0]+'</td><td class="tr mono">'+t[1]+'</td><td class="tr mono">'+fmtPct(total>0?t[1]/total*100:0)+'</td></tr>';
-    }).join('');
-  }
 
   // ── SUBPAINEIS BPP ──
   var tramoColors={LOST:'cr',DAMAGED:'or',FRAUD:'p',STOLEN:'cr',DELAYED:'i'};
