@@ -653,9 +653,13 @@ function calcAccuracy(cfg){
     var faltW=falt_rows.filter(function(r){return dtSet[r['INIT_DTTM_LOCAL']];});
     var nInv=invW.length, nFalt=faltW.length;
     var accCom=nInv+nFalt>0?Math.round(nInv/(nInv+nFalt)*1000)/10:0;
-    var invSp=hasPoc?invW.filter(function(r){return !pocSet[normId(r)];}).length:nInv;
-    var faltSp=hasPoc?faltW.filter(function(r){return !pocSet[normId(r)];}).length:nFalt;
-    var accSem=invSp+faltSp>0?Math.round(invSp/(invSp+faltSp)*1000)/10:accCom;
+    // s/ POC: reclassifica faltantes que estão em POC como inventariados
+    // (o pacote está "em teoria" resolvido, não é uma perda real de acurácia).
+    // O denominador (total) NÃO muda — só migra do lado faltante para o lado inventariado.
+    var faltPocCount=hasPoc?faltW.filter(function(r){return pocSet[normId(r)];}).length:0;
+    var invSp=nInv+faltPocCount;
+    var faltSp=nFalt-faltPocCount;
+    var accSem=(invSp+faltSp)>0?Math.round(invSp/(invSp+faltSp)*1000)/10:accCom;
     // Rotulagem 100% consistente: extrai o número da semana atual (cfg.week, ex 'W33' -> 33)
     // e decrementa 1 para cada bloco anterior. Evita qualquer cálculo de semana ISO
     // que poderia divergir da nomenclatura interna usada pelo time.
@@ -672,10 +676,13 @@ function calcAccuracy(cfg){
   var totalInv=invCur.length, totalFalt=faltCur.length;
   var geral=totalInv+totalFalt>0?Math.round(totalInv/(totalInv+totalFalt)*1000)/10:0;
 
-  // s/ POC — excluir linhas cujo ID está no pocSet
-  var invSp =hasPoc?invCur.filter(function(r){return !pocSet[normId(r)];}).length:totalInv;
-  var faltSp=hasPoc?faltCur.filter(function(r){return !pocSet[normId(r)];}).length:totalFalt;
-  var geralSPoc=invSp+faltSp>0?Math.round(invSp/(invSp+faltSp)*1000)/10:geral;
+  // s/ POC — reclassifica faltantes-POC como inventariados (mesmo denominador).
+  // Regra de negócio: um pacote em POC está "em teoria" resolvido — não é uma
+  // perda real, então conta a favor da acurácia em vez de contra.
+  var faltPocCountGeral=hasPoc?faltCur.filter(function(r){return pocSet[normId(r)];}).length:0;
+  var invSp =totalInv+faltPocCountGeral;
+  var faltSp=totalFalt-faltPocCountGeral;
+  var geralSPoc=(invSp+faltSp)>0?Math.round(invSp/(invSp+faltSp)*1000)/10:geral;
 
   // Por dia (gráfico diário)
   var inv_dia={},falt_dia={};
