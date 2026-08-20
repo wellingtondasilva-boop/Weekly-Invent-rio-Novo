@@ -24,10 +24,15 @@ body.day{--dk:#F0F2F5;--sf:#FFFFFF;--sf2:#F0F2F5;--sf3:#E1E4E8;--br:rgba(200,210
 .up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:20px}
 .up-item{background:var(--sf2);border:1.5px dashed var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative}
 .up-item:hover{border-color:var(--bl)}.up-item.ok{border-style:solid;border-color:var(--gn);background:rgba(63,185,80,.05)}
-.up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1}
 .up-name{font-size:11px;font-weight:600;margin-bottom:3px}.up-hint{font-size:9px;color:var(--td);margin-bottom:7px}
 .up-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);display:inline-block}
 .up-item.ok .up-st{background:rgba(63,185,80,.15);color:var(--gn)}
+/* TOOLTIP DE ORIENTAÇÃO — ícone (i) no canto do card, acima do input de arquivo (z-index) */
+.up-info{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--sf3);color:var(--td);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;cursor:help}
+.up-info:hover{background:var(--bl);color:#fff}
+.up-info .up-tooltip{display:none;position:absolute;top:22px;right:0;width:240px;background:var(--dk);border:1px solid var(--bl);border-radius:8px;padding:10px 12px;font-size:10px;font-weight:400;line-height:1.5;color:var(--tx);text-align:left;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:10}
+.up-info:hover .up-tooltip{display:block}
 .up-cfg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
 .up-field label{display:block;font-size:9px;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .up-field input{width:100%;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;outline:none}
@@ -159,11 +164,25 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
 /* FOOTER */
 .footer{text-align:center;padding:16px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:24px}
 
+/* MODO APRESENTAÇÃO — overlay em tela cheia, focado na Capa Gerencial */
+.apres-overlay{display:none;position:fixed;inset:0;background:var(--dk);z-index:9999;flex-direction:column;padding:0}
+.apres-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--br)}
+.apres-week{font-size:14px;font-weight:700;color:var(--tm)}
+.apres-counter{font-size:13px;color:var(--td);font-family:'JetBrains Mono',monospace}
+.apres-close{background:var(--sf2);border:1px solid var(--br);color:var(--tx);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer}
+.apres-close:hover{background:var(--rd);border-color:var(--rd);color:#fff}
+.apres-body{flex:1;display:flex;align-items:center;justify-content:center;padding:32px;overflow-y:auto}
+.apres-card{max-width:820px;width:100%;background:var(--sf);border:1px solid var(--br);border-radius:16px;padding:36px 40px}
+.apres-nav{display:flex;justify-content:center;gap:16px;padding:20px 0 32px}
+.apres-btn{background:var(--sf2);border:1px solid var(--br);color:var(--tx);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;cursor:pointer;transition:all .15s}
+.apres-btn:hover:not(:disabled){border-color:var(--bl);background:rgba(52,131,250,.1)}
+.apres-btn:disabled{opacity:.3;cursor:not-allowed}
+
 /* IMPRESSÃO / EXPORTAR PDF */
 @media print{
   body{background:#fff !important;color:#111 !important}
   .sticky-top{position:static !important}
-  .nav, .btn-theme, .btn-reload, .btn-export-aba, .fchips, #upScreen, .up-item input{display:none !important}
+  .nav, .btn-theme, .btn-reload, .btn-export-aba, .fchips, #upScreen, .up-item input, .apres-overlay{display:none !important}
   .tab{display:block !important;page-break-after:always;padding:12px 0}
   .tab:last-child{page-break-after:auto}
   .card, .chart-wrap, .kc, .alert{break-inside:avoid;border:1px solid #ccc !important;background:#fff !important;color:#111 !important}
@@ -206,14 +225,14 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
       </div>
       <div class="up-section">Arquivos — clique ou arraste</div>
       <div class="up-grid">
-        <div class="up-item" id="ui-base2"><input type="file" accept=".csv" onchange="onFile('base2',this)"><div class="up-name">01 · Base 2 Inventário</div><div class="up-hint">BASE_2_INVENTARIO_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-base2">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-falt"><input type="file" accept=".csv" onchange="onFile('falt',this)"><div class="up-name">02 · Waterfall Faltantes</div><div class="up-hint">CONTEOS_LATAM_Wxx.csv · sep=,</div><span class="up-st" id="st-falt">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-desloc"><input type="file" accept=".csv" onchange="onFile('desloc',this)"><div class="up-name">03 · Deslocados</div><div class="up-hint">Deslocados_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-desloc">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-bpp"><input type="file" accept=".csv" onchange="onFile('bpp',this)"><div class="up-name">04 · BPP 4 Semanas</div><div class="up-hint">BPP_SVC_4SEMANAS.csv · sep=;</div><span class="up-st" id="st-bpp">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-et"><input type="file" accept=".csv" onchange="onFile('et',this)"><div class="up-name">05 · PK Etiquetagem</div><div class="up-hint">PK_ETIQUETAGEM_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-et">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-sort"><input type="file" accept=".csv" onchange="onFile('sort',this)"><div class="up-name">06 · PK Sorting</div><div class="up-hint">PK_SORTING_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-sort">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-aduana"><input type="file" accept=".csv" onchange="onFile('aduana',this)"><div class="up-name">07 · Aduanas</div><div class="up-hint">Aduanas_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-aduana">⬆ Aguardando</span></div>
-        <div class="up-item" id="ui-poc" style="border-color:var(--gn)"><input type="file" accept=".csv" onchange="onFilePoc(this)"><div class="up-name">08 · Pacotes em POC <span style="font-size:9px;color:var(--gn);font-weight:700">★ OPCIONAL</span></div><div class="up-hint">POC_SVC.csv · coluna ID · sep=,</div><span class="up-st" id="st-poc">⬆ Opcional</span></div>
+        <div class="up-item" id="ui-base2"><input type="file" accept=".csv" onchange="onFile('base2',this)"><span class="up-info">i<span class="up-tooltip">Carregar do <strong>Looker de Inventário</strong>, aba <strong>"Conteo | Detalle"</strong> — listagem completa dos pacotes inventariados no período das últimas 4 semanas (ex.: W30, W31, W32 e W33).</span></span><div class="up-name">01 · Base 2 Inventário</div><div class="up-hint">BASE_2_INVENTARIO_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-base2">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-falt"><input type="file" accept=".csv" onchange="onFile('falt',this)"><span class="up-info">i<span class="up-tooltip">Carregar do <strong>Looker de Inventário</strong>, aba <strong>"% Accuracy | Waterfall"</strong> — listagem das análises dos faltantes.</span></span><div class="up-name">02 · Waterfall Faltantes</div><div class="up-hint">CONTEOS_LATAM_Wxx.csv · sep=,</div><span class="up-st" id="st-falt">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-desloc"><input type="file" accept=".csv" onchange="onFile('desloc',this)"><span class="up-info">i<span class="up-tooltip">Rodar a <strong>query de Deslocados</strong> do período das últimas 4 semanas.</span></span><div class="up-name">03 · Deslocados</div><div class="up-hint">Deslocados_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-desloc">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-bpp"><input type="file" accept=".csv" onchange="onFile('bpp',this)"><span class="up-info">i<span class="up-tooltip">Carregar do <strong>Tableau</strong>, view <strong>"Details"</strong> — o BPP das últimas 4 semanas.</span></span><div class="up-name">04 · BPP 4 Semanas</div><div class="up-hint">BPP_SVC_4SEMANAS.csv · sep=;</div><span class="up-st" id="st-bpp">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-et"><input type="file" accept=".csv" onchange="onFile('et',this)"><span class="up-info">i<span class="up-tooltip">Carregar do <strong>Looker de Poka Yoke</strong>, aba <strong>"Análise erro etiquetas"</strong> — relatório da semana anterior com o detalhe dos IDs.</span></span><div class="up-name">05 · PK Etiquetagem</div><div class="up-hint">PK_ETIQUETAGEM_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-et">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-sort"><input type="file" accept=".csv" onchange="onFile('sort',this)"><span class="up-info">i<span class="up-tooltip">Rodar a <strong>query de Poka Yoke</strong> com o parâmetro da semana anterior fechada, para carregar o relatório.</span></span><div class="up-name">06 · PK Sorting</div><div class="up-hint">PK_SORTING_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-sort">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-aduana"><input type="file" accept=".csv" onchange="onFile('aduana',this)"><span class="up-info">i<span class="up-tooltip">Rodar a <strong>query de Aduanas</strong> com o parâmetro da semana anterior fechada, para carregar o relatório.</span></span><div class="up-name">07 · Aduanas</div><div class="up-hint">Aduanas_SVC_Wxx.csv · sep=,</div><span class="up-st" id="st-aduana">⬆ Aguardando</span></div>
+        <div class="up-item" id="ui-poc" style="border-color:var(--gn)"><input type="file" accept=".csv" onchange="onFilePoc(this)"><span class="up-info">i<span class="up-tooltip">Rodar a <strong>query de Pacotes em POC</strong> para carregar o relatório.</span></span><div class="up-name">08 · Pacotes em POC <span style="font-size:9px;color:var(--gn);font-weight:700">★ OPCIONAL</span></div><div class="up-hint">POC_SVC.csv · coluna ID · sep=,</div><span class="up-st" id="st-poc">⬆ Opcional</span></div>
       </div>
       <div class="up-pbar"><div class="up-pfill" id="upFill"></div></div>
       <div class="up-plabel" id="upLabel">0 de 7 arquivos carregados</div>
@@ -1125,6 +1144,86 @@ function exportarPDF(){
   window.print();
 }
 
+// ── MODO APRESENTAÇÃO — tela cheia navegável por seta, focado na Capa Gerencial ──
+var _apresIdx = 0;
+function entrarModoApresentacao(){
+  if(!D) return;
+  var cards = montarCapaGerencial();
+  if(cards.length===0) return;
+  _apresIdx = 0;
+
+  var overlay = document.getElementById('apresOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'apresOverlay';
+    overlay.className = 'apres-overlay';
+    document.body.appendChild(overlay);
+  }
+  renderApresSlide(cards);
+  overlay.style.display = 'flex';
+  document.addEventListener('keydown', apresKeyHandler);
+}
+
+function sairModoApresentacao(){
+  var overlay = document.getElementById('apresOverlay');
+  if(overlay) overlay.style.display = 'none';
+  document.removeEventListener('keydown', apresKeyHandler);
+}
+
+function apresKeyHandler(e){
+  if(e.key==='Escape') sairModoApresentacao();
+  else if(e.key==='ArrowRight' || e.key===' ') apresNavegar(1);
+  else if(e.key==='ArrowLeft') apresNavegar(-1);
+}
+
+function apresNavegar(delta){
+  var cards = montarCapaGerencial();
+  _apresIdx = Math.max(0, Math.min(cards.length-1, _apresIdx+delta));
+  renderApresSlide(cards);
+}
+
+function renderApresSlide(cards){
+  var c = cards[_apresIdx];
+  var cfg = D.cfg;
+  var corBorda = c.bateu ? 'var(--gn)' : 'var(--rd)';
+  var badge = c.bateu ? '<span class="tag ok" style="font-size:14px;padding:6px 16px">\u2705 DENTRO DA META</span>' : '<span class="tag cr" style="font-size:14px;padding:6px 16px">\u26a0\ufe0f FORA DA META</span>';
+  var gapTxt = c.bateu ? '' : ('<div style="font-size:16px;color:var(--rd);font-weight:700;margin-top:6px">Desvio: '+Math.abs(c.gap).toFixed(1)+(typeof c.gap==='number'&&Math.abs(c.gap)<100?'pp':'')+'</div>');
+  var tendTxt = c.tendencia ? ('<div style="font-size:15px;margin-top:6px">'+c.tendencia+'</div>') : '';
+  var obsSalva = getObsIndicador(cfg, c.indicador);
+  var obsHtml = obsSalva ? ('<div style="margin-top:16px;padding:12px 16px;background:rgba(232,168,56,0.1);border:1px solid rgba(232,168,56,0.3);border-radius:8px"><div style="font-size:11px;font-weight:700;color:var(--or);text-transform:uppercase;margin-bottom:4px">\ud83d\udcdd Observa\xe7\xe3o gerencial</div><div style="font-size:14px">'+obsSalva+'</div></div>') : '';
+
+  var overlay = document.getElementById('apresOverlay');
+  overlay.innerHTML =
+    '<div class="apres-topbar">'
+    +'<span class="apres-week">'+cfg.svc+' \xb7 '+cfg.svcName+' \xb7 '+cfg.week+'</span>'
+    +'<span class="apres-counter">'+(_apresIdx+1)+' / '+cards.length+'</span>'
+    +'<button class="apres-close" onclick="sairModoApresentacao()">\u2715 Sair (ESC)</button>'
+    +'</div>'
+    +'<div class="apres-body">'
+    +'<div class="apres-card" style="border-left:6px solid '+corBorda+'">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">'
+    +'<div style="font-size:32px;font-weight:800">'+c.indicador+'</div>'+badge
+    +'</div>'
+    +'<div style="font-size:20px;color:var(--td);margin-top:10px">Meta: <strong>'+c.meta+'</strong> \xb7 Resultado: <strong style="color:'+corBorda+';font-size:26px">'+c.real+'</strong></div>'
+    +gapTxt+tendTxt
+    +'<div style="margin-top:24px;padding:16px 20px;background:var(--sf2);border-radius:10px">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--tm);text-transform:uppercase;margin-bottom:6px">\ud83d\udd0d Causa identificada</div>'
+    +'<div style="font-size:18px">'+c.causa+'</div>'
+    +'</div>'
+    +'<div style="margin-top:14px;padding:16px 20px;background:rgba(52,131,250,0.08);border-radius:10px;border:1px solid rgba(52,131,250,0.2)">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--bl);text-transform:uppercase;margin-bottom:6px">\u26a1 A\xe7\xe3o recomendada</div>'
+    +'<div style="font-size:18px">'+c.acao+'</div>'
+    +'<div style="margin-top:10px"><span class="achip" style="font-size:12px;padding:5px 12px">Prazo: '+c.prazo+'</span> <span class="achip resp" style="font-size:12px;padding:5px 12px">'+c.resp+'</span></div>'
+    +'</div>'
+    +obsHtml
+    +'</div>'
+    +'</div>'
+    +'<div class="apres-nav">'
+    +'<button class="apres-btn" onclick="apresNavegar(-1)" '+(_apresIdx===0?'disabled':'')+'>\u2190 Anterior</button>'
+    +'<button class="apres-btn" onclick="apresNavegar(1)" '+(_apresIdx===cards.length-1?'disabled':'')+'>Pr\xf3ximo \u2192</button>'
+    +'</div>';
+}
+
 // ── CAPA GERENCIAL — vereditos automáticos por indicador, ordenados por criticidade ──
 function montarCapaGerencial(){
   if(!D) return [];
@@ -1866,7 +1965,9 @@ function renderDemo(){
 +'<div class="content">'
 
 +'<div id="capa" class="tab active">'
-+'<div class="sh"><div><div class="st">\ud83e\udded Capa Gerencial \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 Vis\xe3o consolidada para abertura da reuni\xe3o \xb7 ordenado por criticidade</div></div></div>'
++'<div class="sh"><div><div class="st">\ud83e\udded Capa Gerencial \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 Vis\xe3o consolidada para abertura da reuni\xe3o \xb7 ordenado por criticidade</div></div>'
++'<button class="btn-export-aba" style="background:var(--pu)" onclick="entrarModoApresentacao()">\ud83d\udcfd\ufe0f Modo Apresenta\xe7\xe3o</button>'
++'</div>'
 +'<div class="alert '+(qtdForaMeta>0?'cr':'i')+'" style="margin-bottom:14px">'
 +'<div class="ai">'+(qtdForaMeta>0?'\ud83d\udea8':'\u2705')+'</div>'
 +'<div><div class="at">'+(qtdForaMeta>0? qtdForaMeta+' de '+capaCards.length+' indicadores fora da meta esta semana' : 'Todos os indicadores dentro da meta esta semana')+'</div>'
