@@ -159,6 +159,20 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
 /* FOOTER */
 .footer{text-align:center;padding:16px;font-size:10px;color:var(--td);border-top:1px solid var(--br);margin-top:24px}
 
+/* IMPRESSÃO / EXPORTAR PDF */
+@media print{
+  body{background:#fff !important;color:#111 !important}
+  .sticky-top{position:static !important}
+  .nav, .btn-theme, .btn-reload, .btn-export-aba, .fchips, #upScreen, .up-item input{display:none !important}
+  .tab{display:block !important;page-break-after:always;padding:12px 0}
+  .tab:last-child{page-break-after:auto}
+  .card, .chart-wrap, .kc, .alert{break-inside:avoid;border:1px solid #ccc !important;background:#fff !important;color:#111 !important}
+  .ct,.st,.at,.atitle{color:#111 !important}
+  .ss,.cc,.td,.adesc,.ab{color:#555 !important}
+  canvas{max-width:100% !important}
+  a[href]:after{content:none !important}
+}
+
 </style>
 </head>
 <body>
@@ -992,45 +1006,78 @@ function calcAduanas(acc,bpp,pk,desloc,cfg){
   return{total:ids.length,comFalha:master.filter(function(m){return m.score>0;}).length,cadeia:cadeia.slice(0,20),faltBpp:master.filter(function(m){return m.falt&&m.bpp;}).length,faltPk:master.filter(function(m){return m.falt&&(m.sort||m.et);}).length,users:users.slice(0,20),mlp:mlpAd,byDay:adDays};
 }
 
-// ── EXPORT AÇÕES ──
-function exportAcoes(aba){
-  if(!D) return;
+// ── COLETA CENTRAL DE TODAS AS AÇÕES (usada por exportAcoes E pela aba consolidada) ──
+function coletarTodasAcoes(){
+  if(!D) return [];
   var cfg=D.cfg,acc=D.acc,desloc=D.desloc,bpp=D.bpp,pk=D.pk,aduana=D.aduana;
-  var hoje=new Date().toLocaleDateString('pt-BR'),mes=new Date().getMonth()+1;
   var topSort=pk.sort.ops.length>0?pk.sort.ops[0]:null;
   var topEt=pk.et.ops.length>0?pk.et.ops[0]:null;
   var topDesOp=desloc.ops.length>0?desloc.ops[0]:null;
   var topAdFalt=aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0]||null;
   var topMlpBpp=bpp.geral.mlpList.length>0?bpp.geral.mlpList[0]:null;
 
-  var acoesPorAba={
-    accuracy:[
-      ['INVENTARIO - Accuracy','Contagem emergencial nas zonas criticas (PS / For Returns) + bipar cada pacote na entrada','','D+1','','Em andamento','','PS com accuracy critica. Designar operador fixo. Validar via Query3.'],
-      ['INVENTARIO - Accuracy','Acionar TechOps para pacotes com erro sistemico (SHP con 2.0)','','D+3','','Em andamento','','Nao contabilizar como perda operacional. Abrir ticket com IDs afetados.']
-    ],
-    deslocados:[
-      ['INVENTARIO - Deslocados','Corrigir '+desloc.naoCorrigidos+' deslocados pendentes — reforcar passagem de turno','','D+1','','Em andamento','','Priorizar operadores com maior % de nao correcao.'],
-      topDesOp?['INVENTARIO - Deslocados','Feedback 1:1 — Op. '+topDesOp.id+' ('+topDesOp.total+' desl, '+topDesOp.nc+' nao corrigidos)','Lider de turno','D+2','','Em andamento','','Maior ofensor da semana. Verificar padrao de comportamento.']:null
-    ].filter(Boolean),
-    bpp:[
-      ['BPP','Reuniao com MLP de maior % BPP + acionamento LP para drivers com alto cashout','Analista BPP','D+1','','Em andamento','','Acionar LP para cashout > USD 100.'],
-      topMlpBpp?['BPP','Alinhamento com '+topMlpBpp.mlp+' — cashout USD '+topMlpBpp.cashout.toFixed(2)+' — top ofensor '+cfg.week,'Analista BPP','D+2','','Em andamento','','Apresentar dados de Lost/Damaged/PNR por driver. Solicitar plano de acao.']:null
-    ].filter(Boolean),
-    pokayoke:[
-      ['POKA YOKE - Sorting','Reciclagem critica — '+( topSort?topSort.op+' ('+topSort.total+' erros)':'-' )+' — focar em saidas forcadas e gaiola errada','Lider Sorting','D+1','','Em andamento','','Saida forcada = risco disciplinar imediato. Bipar gaiola antes do QR.'],
-      ['POKA YOKE - Etiquetagem','Reciclagem critica — '+(topEt?topEt.op+' ('+topEt.total+' erros)':'-')+' — sem cobertura PK','Lider Etiquetagem','D+2','','Em andamento','','Ponto sem sensor PK. Goleiro manual enquanto aguarda TechOps.'],
-      ['POKA YOKE','Mapear pontos sem cobertura PK e abrir ticket TechOps/Infra','TechOps','D+3','','Em andamento','','QR_PROBLEM_WITHOUT_POKAYOKE recorrente indica gap de infraestrutura.']
-    ],
-    aduana:[
-      ['INVENTARIO - Aduanas','Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha (score >= 3) — '+aduana.faltBpp+' com faltante+BPP','Analista Inv.','D+1','','Em andamento','','Risco de BPP pago indevidamente. Acionar LP para cashout relevante.'],
-      topAdFalt?['INVENTARIO - Aduanas','Feedback — Op. '+topAdFalt.u+' com '+topAdFalt.pctFalt+'% faltante em '+topAdFalt.total+' aduanas — Rotas: '+topAdFalt.rotas.slice(0,2).join(', '),'Lider Aduana','D+2','','Em andamento','','Bipagem sem conferencia fisica confirmada. Acompanhar proxima auditoria.']:null
-    ].filter(Boolean)
-  };
+  // Estrutura unificada: {processo, prioridade(p1/p2/p3), acao, resp, prazo, comentario}
+  var lista=[];
 
-  var acoes=aba==='todas'?[].concat(acoesPorAba.accuracy,acoesPorAba.deslocados,acoesPorAba.bpp,acoesPorAba.pokayoke,acoesPorAba.aduana):(acoesPorAba[aba]||[]);
+  lista.push({processo:'Accuracy',p:'p1',acao:'Contagem emergencial nas zonas críticas (PS / For Returns) + bipar cada pacote na entrada',resp:'Líder de Turno',prazo:'D+1',comentario:'PS com accuracy crítica. Designar operador fixo. Validar via Query3.'});
+  lista.push({processo:'Accuracy',p:'p2',acao:'Acionar TechOps para pacotes com erro sistêmico (SHP con 2.0)',resp:'TechOps',prazo:'D+3',comentario:'Não contabilizar como perda operacional. Abrir ticket com IDs afetados.'});
+
+  lista.push({processo:'Deslocados',p:'p1',acao:'Corrigir '+desloc.naoCorrigidos+' deslocados pendentes — reforçar passagem de turno',resp:'Líder de Turno',prazo:'D+1',comentario:'Priorizar operadores com maior % de não correção.'});
+  if(topDesOp) lista.push({processo:'Deslocados',p:'p2',acao:'Feedback 1:1 — Op. '+topDesOp.id+' ('+topDesOp.total+' desl, '+topDesOp.nc+' não corrigidos)',resp:'Líder de Turno',prazo:'D+2',comentario:'Maior ofensor da semana. Verificar padrão de comportamento.'});
+
+  lista.push({processo:'BPP',p:'p1',acao:'Reunião com MLP de maior % BPP + acionamento LP para drivers com alto cashout',resp:'Analista BPP',prazo:'D+1',comentario:'Acionar LP para cashout > USD 100.'});
+  if(topMlpBpp) lista.push({processo:'BPP',p:'p2',acao:'Alinhamento com '+topMlpBpp.mlp+' — cashout USD '+topMlpBpp.cashout.toFixed(2)+' — top ofensor '+cfg.week,resp:'Analista BPP',prazo:'D+2',comentario:'Apresentar dados de Lost/Damaged/PNR por driver. Solicitar plano de ação.'});
+
+  // Ações por tramo BPP (LOST/DAMAGED/FRAUD/STOLEN/DELAYED) — reaproveita tramoAcoesData
+  (bpp.tramoDisp||[]).forEach(function(tr){
+    var td=bpp.tramos[tr];
+    if(!td) return;
+    var itens=tramoAcoesData(tr,td,cfg);
+    itens.forEach(function(a){
+      lista.push({processo:'BPP · '+tr,p:a.p,acao:a.titulo,resp:a.resp,prazo:a.prazo,comentario:a.desc});
+    });
+  });
+
+  lista.push({processo:'Poka Yoke · Sorting',p:'p1',acao:'Reciclagem crítica — '+(topSort?topSort.op+' ('+topSort.total+' erros)':'-')+' — focar em saídas forçadas e gaiola errada',resp:'Líder Sorting',prazo:'D+1',comentario:'Saída forçada = risco disciplinar imediato. Bipar gaiola antes do QR.'});
+  lista.push({processo:'Poka Yoke · Etiquetagem',p:'p2',acao:'Reciclagem crítica — '+(topEt?topEt.op+' ('+topEt.total+' erros)':'-')+' — sem cobertura PK',resp:'Líder Etiquetagem',prazo:'D+2',comentario:'Ponto sem sensor PK. Goleiro manual enquanto aguarda TechOps.'});
+  lista.push({processo:'Poka Yoke',p:'p3',acao:'Mapear pontos sem cobertura PK e abrir ticket TechOps/Infra',resp:'TechOps',prazo:'D+3',comentario:'QR_PROBLEM_WITHOUT_POKAYOKE recorrente indica gap de infraestrutura.'});
+
+  lista.push({processo:'Aduanas',p:'p1',acao:'Investigar '+aduana.cadeia.length+' pacotes com cadeia de falha (score ≥ 3) — '+aduana.faltBpp+' com faltante+BPP',resp:'Analista Inv.',prazo:'D+1',comentario:'Risco de BPP pago indevidamente. Acionar LP para cashout relevante.'});
+  if(topAdFalt) lista.push({processo:'Aduanas',p:'p2',acao:'Feedback — Op. '+topAdFalt.u+' com '+topAdFalt.pctFalt+'% faltante em '+topAdFalt.total+' aduanas — Rotas: '+topAdFalt.rotas.slice(0,2).join(', '),resp:'Líder Aduana',prazo:'D+2',comentario:'Bipagem sem conferência física confirmada. Acompanhar próxima auditoria.'});
+
+  // Ações do Ranking (operadores multifrontes, score >= 2)
+  if(D.ranking){
+    D.ranking.filter(function(v){return v.score>=2;}).slice(0,3).forEach(function(v,i){
+      var procs=[];
+      if(v.sort>0) procs.push(v.sort+' erros Sorting PK');
+      if(v.et>0) procs.push(v.et+' erros Etiquetagem PK');
+      if(v.desloc>0) procs.push(v.desloc+' deslocados ('+v.deslocNc+' N/C)');
+      if(v.aduana>0) procs.push(v.aduana+' aduanas ('+v.aduanaFalt+' faltante)');
+      lista.push({processo:'Ranking',p:i===0?'p1':'p2',acao:'Feedback — Op. '+v.op+' (Score '+v.score+'/4)',resp:'Líder de Turno',prazo:'D+1',comentario:'Aparece em: '+procs.join(' · ')});
+    });
+  }
+
+  return lista;
+}
+
+// ── EXPORT AÇÕES ──
+function exportAcoes(aba){
+  if(!D) return;
+  var cfg=D.cfg;
+  var hoje=new Date().toLocaleDateString('pt-BR'),mes=new Date().getMonth()+1;
+  var todas=coletarTodasAcoes();
+
+  var mapaFiltro={
+    accuracy:'Accuracy', deslocados:'Deslocados', bpp:'BPP', pokayoke:'Poka Yoke', aduana:'Aduanas', ranking:'Ranking'
+  };
+  var acoes = aba==='todas' ? todas : todas.filter(function(a){
+    var alvo=mapaFiltro[aba]||aba;
+    return a.processo===alvo || a.processo.indexOf(alvo)===0;
+  });
+
   var headers=['DATA ABERTURA','Mes','WEEK','INDICADOR','ACAO','RESPONSAVEL','DATA PROGRAMADA','REPROGRAMADA','STATUS','DATA CONCLUSAO','COMENTARIOS'];
   var csvRows=acoes.map(function(a){
-    var row=[hoje,mes,cfg.week].concat(a);
+    var row=[hoje,mes,cfg.week,a.processo,a.acao,a.resp,a.prazo,'','Em andamento','',a.comentario];
     return row.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(';');
   });
   var csv='\uFEFF'+headers.map(function(h){return'"'+h+'"';}).join(';')+'\n'+csvRows.join('\n');
@@ -1039,6 +1086,100 @@ function exportAcoes(aba){
   var a=document.createElement('a');
   a.href=url; a.download='Acoes_'+cfg.svc+'_'+cfg.week+'_'+aba+'.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── EXPORTAR PDF (via impressão do navegador, com CSS @media print dedicado) ──
+function exportarPDF(){
+  window.print();
+}
+
+// ── CAPA GERENCIAL — vereditos automáticos por indicador, ordenados por criticidade ──
+function montarCapaGerencial(){
+  if(!D) return [];
+  var cfg=D.cfg, acc=D.acc, desloc=D.desloc, bpp=D.bpp, pk=D.pk, aduana=D.aduana;
+  var cards=[];
+
+  // 1) ACCURACY
+  (function(){
+    var meta=cfg.metaAcc, real=acc.geral, gap=real-meta;
+    var bateu=gap>=0;
+    var topZona=acc.porZona&&acc.porZona.length>0?acc.porZona[0]:null;
+    var causa=topZona?('Zona com mais faltantes: '+topZona[0]+' ('+topZona[1]+' pacotes)'):'Sem detalhamento de zona disponível.';
+    cards.push({
+      indicador:'\ud83c\udfaf Accuracy de Invent\xe1rio', meta:meta+'%', real:real.toFixed(1)+'%', gap:gap, bateu:bateu,
+      causa:causa,
+      acao: bateu? 'Manter rotina de contagem e refor\xe7ar pontos fortes da semana.' : 'Contagem emergencial nas zonas cr\xedticas + refor\xe7ar bipagem na entrada. Acionar TechOps para erros sist\xeamicos (POC).',
+      resp:'L\xedder de Turno', prazo:'D+1'
+    });
+  })();
+
+  // 2) BPP (bruto)
+  (function(){
+    var meta=cfg.metaBpp, real=bpp.geral.pct, gap=meta-real; // aqui "bater meta" = ficar ABAIXO do teto
+    var bateu=real<=meta;
+    var topMlp=bpp.geral.mlpList&&bpp.geral.mlpList.length>0?bpp.geral.mlpList[0]:null;
+    var causa=topMlp?('MLP com maior cashout: '+topMlp.mlp+' (USD '+fmtN(topMlp.cashout)+', '+topMlp.total+' ocorr.)'):'Sem MLP ofensor identificado.';
+    cards.push({
+      indicador:'\ud83d\udcb8 BPP Bruto', meta:'\u2264 '+meta.toFixed(3)+'%', real:real.toFixed(3)+'%', gap:-gap, bateu:bateu,
+      causa:causa,
+      acao: bateu? 'Manter monitoramento e prevenir reincid\xeancia com o MLP l\xedder de ocorr\xeancias.' : 'Reuni\xe3o com MLP ofensor + acionamento de LP para drivers com cashout elevado. Priorizar tramos LOST/DAMAGED/FRAUD com maior desvio de meta.',
+      resp:'Analista BPP', prazo:'D+1'
+    });
+  })();
+
+  // 3) DESLOCADOS
+  (function(){
+    var meta=cfg.metaDesloc, real=desloc.pct, gap=meta-real; // bater = ficar abaixo do teto
+    var bateu=real<=meta;
+    var topOp=desloc.ops&&desloc.ops.length>0?desloc.ops[0]:null;
+    var causa=topOp?('Maior ofensor: Op. '+topOp.id+' ('+topOp.total+' deslocados, '+topOp.nc+' n\xe3o corrigidos)'):(desloc.naoCorrigidos+' deslocados n\xe3o corrigidos na semana.');
+    cards.push({
+      indicador:'\ud83d\udd04 Deslocados', meta:'\u2264 '+meta+'%', real:real.toFixed(1)+'%', gap:-gap, bateu:bateu,
+      causa:causa,
+      acao: bateu? 'Manter refor\xe7o de passagem de turno para sustentar o resultado.' : 'Corrigir pend\xeancias imediatamente + feedback 1:1 com maior ofensor + refor\xe7ar passagem de turno.',
+      resp:'L\xedder de Turno', prazo:'D+1'
+    });
+  })();
+
+  // 4) ADUANAS (cadeia de falha / faltante+BPP)
+  (function(){
+    var totalCadeia=aduana.cadeia?aduana.cadeia.length:0;
+    var bateu=totalCadeia===0;
+    var topUser=aduana.users&&aduana.users.length>0?aduana.users.filter(function(u){return u.total>=10;}).sort(function(a,b){return b.pctFalt-a.pctFalt;})[0]:null;
+    var causa=topUser?('Operador com maior % faltante: '+topUser.u+' ('+topUser.pctFalt+'% em '+topUser.total+' aduanas)'):(totalCadeia+' pacotes com cadeia de falha (score \u2265 3).');
+    cards.push({
+      indicador:'\ud83d\udd17 Aduanas', meta:'0 cadeias de falha', real:totalCadeia+' cadeias', gap:bateu?0:-totalCadeia, bateu:bateu,
+      causa:causa,
+      acao: bateu? 'Nenhuma cadeia cr\xedtica identificada — manter auditoria de rotina.' : 'Investigar pacotes com cadeia de falha (faltante+BPP) + feedback com operador de maior % faltante. Risco de BPP pago indevidamente.',
+      resp:'Analista Invent\xe1rio', prazo:'D+1'
+    });
+  })();
+
+  // 5) POKA YOKE (Sorting + Etiquetagem)
+  (function(){
+    var totalErros=(pk.sort.ops||[]).reduce(function(s,o){return s+o.total;},0) + (pk.et.ops||[]).reduce(function(s,o){return s+o.total;},0);
+    var bateu=totalErros===0;
+    var topSort=pk.sort.ops&&pk.sort.ops.length>0?pk.sort.ops[0]:null;
+    var topEt=pk.et.ops&&pk.et.ops.length>0?pk.et.ops[0]:null;
+    var causaParts=[];
+    if(topSort) causaParts.push('Sorting: '+topSort.op+' ('+topSort.total+' erros)');
+    if(topEt) causaParts.push('Etiquetagem: '+topEt.op+' ('+topEt.total+' erros)');
+    var causa=causaParts.length>0?causaParts.join(' \xb7 '):'Sem ofensor identificado.';
+    cards.push({
+      indicador:'\u26a0\ufe0f Poka Yoke (Sorting + Etiq.)', meta:'0 erros cr\xedticos', real:totalErros+' erros', gap:bateu?0:-totalErros, bateu:bateu,
+      causa:causa,
+      acao: bateu? 'Nenhum erro cr\xedtico — manter reciclagem preventiva.' : 'Reciclagem cr\xedtica com maiores ofensores + mapear pontos sem cobertura PK e abrir ticket TechOps.',
+      resp:'L\xedder Sorting/Etiq.', prazo:'D+1'
+    });
+  })();
+
+  // Ordenar por criticidade: quem NÃO bateu a meta primeiro, e dentro desses, maior gap negativo primeiro
+  cards.sort(function(a,b){
+    if(a.bateu!==b.bateu) return a.bateu?1:-1;
+    return a.gap-b.gap;
+  });
+
+  return cards;
 }
 
 // ── NAVEGAÇÃO ──
@@ -1067,6 +1208,27 @@ function bindChipListeners(tramo){
     (function(chip){
       chip.onclick=function(){
         filterBpp(chip.getAttribute('data-tramo'), chip.getAttribute('data-idx'));
+      };
+    })(chips[i]);
+  }
+}
+
+function bindAcoesFilterListeners(){
+  var container=document.getElementById('fchips-acoes');
+  if(!container) return;
+  var chips=container.querySelectorAll('.fchip');
+  for(var i=0;i<chips.length;i++){
+    (function(chip){
+      chip.onclick=function(){
+        var proc=chip.getAttribute('data-proc');
+        var allChips=container.querySelectorAll('.fchip');
+        for(var j=0;j<allChips.length;j++) allChips[j].classList.remove('active');
+        chip.classList.add('active');
+        var rows=document.querySelectorAll('#acoes-tbody tr');
+        for(var j=0;j<rows.length;j++){
+          var rp=rows[j].getAttribute('data-proc');
+          rows[j].style.display=(proc==='TODOS'||rp===proc)?'':'none';
+        }
       };
     })(chips[i]);
   }
@@ -1109,8 +1271,8 @@ function btnExp(aba){return '<button class="btn-export-aba" onclick="exportAcoes
 
 
 
-// ── AÇÕES POR TRAMO BPP ──────────────────────────────
-function tramoAcoes(tramo, td, cfg) {
+// ── AÇÕES POR TRAMO BPP — DADOS (reaproveitável pela coleta central e pelo render) ──
+function tramoAcoesData(tramo, td, cfg) {
   var topMlp = td.mlpList.length > 0 ? td.mlpList[0] : null;
   var topDrv = null;
   if (topMlp && topMlp.top3 && topMlp.top3.length > 0) topDrv = topMlp.top3[0];
@@ -1176,7 +1338,12 @@ function tramoAcoes(tramo, td, cfg) {
     ]
   };
 
-  var lista = acoes[tramo] || [];
+  return acoes[tramo] || [];
+}
+
+// ── AÇÕES POR TRAMO BPP — RENDER HTML (usa tramoAcoesData) ──────────────────────────────
+function tramoAcoes(tramo, td, cfg) {
+  var lista = tramoAcoesData(tramo, td, cfg);
   if (lista.length === 0) return '';
 
   var rows = lista.map(function(a) {
@@ -1540,6 +1707,32 @@ function renderDemo(){
       +'</tr>';
   }).join('');
 
+  // ── CAPA GERENCIAL — vereditos automáticos, ordenados por criticidade (calculado ANTES do html= para não quebrar a concatenação) ──
+  var capaCards = montarCapaGerencial();
+  var capaHtml = capaCards.map(function(c){
+    var corBorda = c.bateu ? 'var(--gn)' : 'var(--rd)';
+    var badge = c.bateu ? '<span class="tag ok">\u2705 DENTRO DA META</span>' : '<span class="tag cr">\u26a0\ufe0f FORA DA META</span>';
+    var gapTxt = c.bateu ? '' : ('<div style="font-size:11px;color:var(--rd);font-weight:700;margin-top:2px">Desvio: '+Math.abs(c.gap).toFixed(1)+(typeof c.gap==='number'&&Math.abs(c.gap)<100?'pp':'')+'</div>');
+    return '<div class="card" style="border-left:4px solid '+corBorda+';margin-bottom:10px">'
+      +'<div style="padding:12px 16px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
+      +'<div><div style="font-size:15px;font-weight:800">'+c.indicador+'</div>'
+      +'<div style="font-size:11px;color:var(--td);margin-top:2px">Meta: <strong>'+c.meta+'</strong> \xb7 Resultado: <strong style="color:'+corBorda+'">'+c.real+'</strong></div>'
+      +gapTxt
+      +'</div>'+badge+'</div>'
+      +'<div style="margin-top:10px;padding:10px 12px;background:var(--sf2);border-radius:6px">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;margin-bottom:3px">\ud83d\udd0d Causa identificada</div>'
+      +'<div style="font-size:12px">'+c.causa+'</div>'
+      +'</div>'
+      +'<div style="margin-top:8px;padding:10px 12px;background:rgba(52,131,250,0.08);border-radius:6px;border:1px solid rgba(52,131,250,0.2)">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--bl);text-transform:uppercase;margin-bottom:3px">\u26a1 A\xe7\xe3o recomendada</div>'
+      +'<div style="font-size:12px">'+c.acao+'</div>'
+      +'<div style="margin-top:6px"><span class="achip">Prazo: '+c.prazo+'</span> <span class="achip resp">'+c.resp+'</span></div>'
+      +'</div>'
+      +'</div></div>';
+  }).join('');
+  var qtdForaMeta = capaCards.filter(function(c){return !c.bateu;}).length;
+
   var html=
 '<div class="sticky-top">'
 +'<div class="header">'
@@ -1558,20 +1751,33 @@ function renderDemo(){
 +'</div>'
 +'</div>'
 +'<div class="nav">'
-+'<button class="nb active" onclick="showTab(\'resumo\',this)">\ud83d\udcca Resumo</button>'
++'<button class="nb active" onclick="showTab(\'capa\',this)">\ud83e\udded Capa Gerencial</button>'
++'<button class="nb" onclick="showTab(\'resumo\',this)">\ud83d\udcca Resumo</button>'
 +'<button class="nb" onclick="showTab(\'bpp\',this)">\ud83d\udcb8 BPP</button>'
 +'<button class="nb" onclick="showTab(\'aduana\',this)">\ud83d\udd17 Aduanas</button>'
 +'<button class="nb" onclick="showTab(\'pokayoke\',this)">\u26a0\ufe0f Poka Yoke</button>'
 +'<button class="nb" onclick="showTab(\'deslocados\',this)">\ud83d\udd04 Deslocados</button>'
 +'<button class="nb" onclick="showTab(\'accuracy\',this)">\ud83c\udfaf Acur\xe1cia</button>'
 +'<button class="nb" onclick="showTab(\'ranking\',this)">\ud83c\udfc6 Ranking</button>'
++'<button class="nb" onclick="showTab(\'acoes\',this)">\ud83d\udccb A\xe7\xf5es</button>'
++'<button class="btn-theme" style="margin-left:8px" onclick="exportarPDF()">\ud83d\udda8\ufe0f Exportar PDF</button>'
 +'</div>'
 +'</div>'
 
 +'<div class="content">'
 
++'<div id="capa" class="tab active">'
++'<div class="sh"><div><div class="st">\ud83e\udded Capa Gerencial \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 Vis\xe3o consolidada para abertura da reuni\xe3o \xb7 ordenado por criticidade</div></div></div>'
++'<div class="alert '+(qtdForaMeta>0?'cr':'i')+'" style="margin-bottom:14px">'
++'<div class="ai">'+(qtdForaMeta>0?'\ud83d\udea8':'\u2705')+'</div>'
++'<div><div class="at">'+(qtdForaMeta>0? qtdForaMeta+' de '+capaCards.length+' indicadores fora da meta esta semana' : 'Todos os indicadores dentro da meta esta semana')+'</div>'
++'<div class="ab">Os cards abaixo est\xe3o ordenados do mais cr\xedtico para o menos cr\xedtico. Use esta capa para abrir a reuni\xe3o e direcionar as tratativas.</div></div>'
++'</div>'
++ capaHtml
++'</div>'
+
 // ── RESUMO ──
-+'<div id="resumo" class="tab active">'
++'<div id="resumo" class="tab">'
 +'<div class="sh"><div><div class="st">Resumo Executivo \u2014 '+cfg.week+'</div><div class="ss">'+cfg.svc+' '+cfg.svcName+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</div></div></div>'
 +'<div style="background:var(--sf);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:12px;">'
 +'<div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">\ud83d\udccb Abertura de Reuni\xe3o \u2014 '+cfg.svc+' '+cfg.week+'</div>'
@@ -1790,6 +1996,46 @@ function renderDemo(){
 + rankingAcoes
 +'</div></div>'
 +'</div>'
+
+  // ── ABA AÇÕES CONSOLIDADAS ──
+  var todasAcoes = coletarTodasAcoes();
+  var acoesPorProcesso = {};
+  todasAcoes.forEach(function(a){
+    var chave = a.processo.split(' · ')[0];
+    if(!acoesPorProcesso[chave]) acoesPorProcesso[chave]=[];
+    acoesPorProcesso[chave].push(a);
+  });
+  var processosOrdenados = Object.keys(acoesPorProcesso);
+  var chipsProcesso = '<span class="fchip all active" data-proc="TODOS">Todos <span class="filter-badge">'+todasAcoes.length+'</span></span>'
+    + processosOrdenados.map(function(p){
+        return '<span class="fchip" data-proc="'+p+'">'+p+' <span class="filter-badge">'+acoesPorProcesso[p].length+'</span></span>';
+      }).join('');
+
+  var acoesRows = todasAcoes.map(function(a,i){
+    var prioLbl = a.p==='p1'?'P1':a.p==='p2'?'P2':'P3';
+    var prioClr = a.p==='p1'?'var(--rd)':a.p==='p2'?'var(--or)':'var(--bl)';
+    var procChave = a.processo.split(' \xb7 ')[0];
+    return '<tr data-proc="'+procChave+'">'
+      +'<td><span class="tag" style="background:'+prioClr+';color:#fff;font-weight:800;font-size:9px">'+prioLbl+'</span></td>'
+      +'<td><strong>'+a.processo+'</strong></td>'
+      +'<td style="max-width:340px">'+a.acao+'</td>'
+      +'<td>'+a.resp+'</td>'
+      +'<td class="tc"><span class="achip">'+a.prazo+'</span></td>'
+      +'<td style="max-width:280px;color:var(--td);font-size:10px">'+a.comentario+'</td>'
+      +'</tr>';
+  }).join('');
+
+  html +=
+'<div id="acoes" class="tab">'
++'<div class="sh"><div><div class="st">\ud83d\udccb A\xe7\xf5es Consolidadas \u2014 '+cfg.week+'</div><div class="ss">Todas as a\xe7\xf5es de todos os processos, em um \xfanico lugar \u2014 '+todasAcoes.length+' a\xe7\xf5es mapeadas</div></div>'
++'<button class="btn-export-aba" onclick="exportAcoes(\'todas\')">\ud83d\udce5 Exportar Todas as A\xe7\xf5es</button>'
++'</div>'
++'<div class="fchips" id="fchips-acoes" style="margin-bottom:8px">'+chipsProcesso+'</div>'
++'<div class="card"><table style="border-spacing:0"><thead><tr>'
++'<th style="padding:6px 8px">Prior.</th><th style="padding:6px 8px">Processo</th><th style="padding:6px 8px">A\xe7\xe3o</th><th style="padding:6px 8px">Respons\xe1vel</th><th class="tc" style="padding:6px 8px">Prazo</th><th style="padding:6px 8px">Coment\xe1rio</th>'
++'</tr></thead><tbody id="acoes-tbody">'+acoesRows+'</tbody></table></div>'
++'</div>'
+
 +'<div class="footer"><strong>'+cfg.svc+' \u2014 '+cfg.svcName+'</strong> \xb7 Demonstrativo Semanal de Invent\xe1rio \xb7 <strong>'+cfg.week+' \xb7 '+cfg.dateStart+' a '+cfg.dateEnd+'</strong></div>';
 ;
 
@@ -1798,10 +2044,11 @@ function renderDemo(){
   document.getElementById('demoScreen').style.display='block';
 
   setTimeout(function(){
-    showTab('resumo',document.querySelector('.nb'));
-    drawAllCharts();
+    showTab('capa',document.querySelector('.nb'));
+    try{ drawAllCharts(); }catch(e){ console.error('Erro ao desenhar gráficos:',e); }
     // Bind chips do primeiro tramo ativo
     if(D.bpp.tramoDisp.length>0) bindChipListeners(D.bpp.tramoDisp[0]);
+    bindAcoesFilterListeners();
   },80);
 }
 
