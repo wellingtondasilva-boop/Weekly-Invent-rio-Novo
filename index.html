@@ -1007,6 +1007,38 @@ function calcAduanas(acc,bpp,pk,desloc,cfg){
 }
 
 // ── COLETA CENTRAL DE TODAS AS AÇÕES (usada por exportAcoes E pela aba consolidada) ──
+// ── PERSISTÊNCIA LOCAL (localStorage) — status de ações e observações gerenciais ──
+// Escopo por SVC + Semana, para não misturar dados de semanas diferentes no mesmo navegador.
+function storageKeyBase(cfg){ return 'svc_'+(cfg.svc||'X')+'_'+(cfg.week||'W0'); }
+
+// Hash simples e determinístico (não-criptográfico) para gerar um ID estável por ação,
+// baseado no texto do processo+ação — assim a mesma ação mantém o mesmo ID entre re-gerações.
+function hashSimples(str){
+  var h=0;
+  for(var i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; }
+  return Math.abs(h).toString(36);
+}
+function acaoStorageId(cfg, a){
+  return storageKeyBase(cfg)+'_acao_'+hashSimples(a.processo+'|'+a.acao);
+}
+function getAcaoStatus(acaoId){
+  try{ return localStorage.getItem(acaoId)==='1'; }catch(e){ return false; }
+}
+function setAcaoStatus(acaoId, feito){
+  try{ localStorage.setItem(acaoId, feito?'1':'0'); }catch(e){ /* localStorage indisponível — ignora silenciosamente */ }
+}
+
+// Observação gerencial por indicador da Capa (texto livre, editável)
+function obsStorageId(cfg, indicador){
+  return storageKeyBase(cfg)+'_obs_'+hashSimples(indicador);
+}
+function getObsIndicador(cfg, indicador){
+  try{ return localStorage.getItem(obsStorageId(cfg,indicador))||''; }catch(e){ return ''; }
+}
+function setObsIndicador(cfg, indicador, texto){
+  try{ localStorage.setItem(obsStorageId(cfg,indicador), texto); }catch(e){ /* ignora */ }
+}
+
 function coletarTodasAcoes(){
   if(!D) return [];
   var cfg=D.cfg,acc=D.acc,desloc=D.desloc,bpp=D.bpp,pk=D.pk,aduana=D.aduana;
@@ -1099,15 +1131,33 @@ function montarCapaGerencial(){
   var cfg=D.cfg, acc=D.acc, desloc=D.desloc, bpp=D.bpp, pk=D.pk, aduana=D.aduana;
   var cards=[];
 
+  // Helper: monta texto de tendência comparando penúltima com última semana de uma série
+  // serie = array de números em ordem cronológica (mais antiga -> mais recente)
+  // maiorMelhor = true quando valor mais alto é bom (accuracy); false quando valor mais baixo é bom (BPP, deslocados)
+  function tendenciaTexto(serie, maiorMelhor, sufixo){
+    if(!serie || serie.length<2) return '';
+    var atual=serie[serie.length-1], anterior=serie[serie.length-2];
+    var diff=atual-anterior;
+    if(Math.abs(diff)<0.05) return '<span style="color:var(--td)">\u2194 estável vs semana anterior</span>';
+    var melhorou = maiorMelhor ? diff>0 : diff<0;
+    var seta = diff>0 ? '\u2191' : '\u2193';
+    var cor = melhorou ? 'var(--gn)' : 'var(--rd)';
+    return '<span style="color:'+cor+';font-weight:700">'+seta+' '+Math.abs(diff).toFixed(1)+(sufixo||'pp')+' vs semana anterior</span>';
+  }
+
   // 1) ACCURACY
   (function(){
     var meta=cfg.metaAcc, real=acc.geral, gap=real-meta;
     var bateu=gap>=0;
     var topZona=acc.porZona&&acc.porZona.length>0?acc.porZona[0]:null;
     var causa=topZona?('Zona com mais faltantes: '+topZona[0]+' ('+topZona[1]+' pacotes)'):'Sem detalhamento de zona disponível.';
+    var tendencia='';
+    if(acc.multiSemana && acc.accSemanas && acc.accSemanas.length>1){
+      tendencia=tendenciaTexto(acc.accSemanas.map(function(s){return s.accCom;}), true, 'pp');
+    }
     cards.push({
       indicador:'\ud83c\udfaf Accuracy de Invent\xe1rio', meta:meta+'%', real:real.toFixed(1)+'%', gap:gap, bateu:bateu,
-      causa:causa,
+      causa:causa, tendencia:tendencia,
       acao: bateu? 'Manter rotina de contagem e refor\xe7ar pontos fortes da semana.' : 'Contagem emergencial nas zonas cr\xedticas + refor\xe7ar bipagem na entrada. Acionar TechOps para erros sist\xeamicos (POC).',
       resp:'L\xedder de Turno', prazo:'D+1'
     });
@@ -1119,9 +1169,13 @@ function montarCapaGerencial(){
     var bateu=real<=meta;
     var topMlp=bpp.geral.mlpList&&bpp.geral.mlpList.length>0?bpp.geral.mlpList[0]:null;
     var causa=topMlp?('MLP com maior cashout: '+topMlp.mlp+' (USD '+fmtN(topMlp.cashout)+', '+topMlp.total+' ocorr.)'):'Sem MLP ofensor identificado.';
+    var tendencia='';
+    if(bpp.tend && bpp.tend.length>1){
+      tendencia=tendenciaTexto(bpp.tend.map(function(t){return t.pct;}), false, 'pp');
+    }
     cards.push({
       indicador:'\ud83d\udcb8 BPP Bruto', meta:'\u2264 '+meta.toFixed(3)+'%', real:real.toFixed(3)+'%', gap:-gap, bateu:bateu,
-      causa:causa,
+      causa:causa, tendencia:tendencia,
       acao: bateu? 'Manter monitoramento e prevenir reincid\xeancia com o MLP l\xedder de ocorr\xeancias.' : 'Reuni\xe3o com MLP ofensor + acionamento de LP para drivers com cashout elevado. Priorizar tramos LOST/DAMAGED/FRAUD com maior desvio de meta.',
       resp:'Analista BPP', prazo:'D+1'
     });
@@ -1133,9 +1187,13 @@ function montarCapaGerencial(){
     var bateu=real<=meta;
     var topOp=desloc.ops&&desloc.ops.length>0?desloc.ops[0]:null;
     var causa=topOp?('Maior ofensor: Op. '+topOp.id+' ('+topOp.total+' deslocados, '+topOp.nc+' n\xe3o corrigidos)'):(desloc.naoCorrigidos+' deslocados n\xe3o corrigidos na semana.');
+    var tendencia='';
+    if(desloc.semanas && desloc.semanas.length>1){
+      tendencia=tendenciaTexto(desloc.semanas.map(function(s){return s.pct;}), false, 'pp');
+    }
     cards.push({
       indicador:'\ud83d\udd04 Deslocados', meta:'\u2264 '+meta+'%', real:real.toFixed(1)+'%', gap:-gap, bateu:bateu,
-      causa:causa,
+      causa:causa, tendencia:tendencia,
       acao: bateu? 'Manter refor\xe7o de passagem de turno para sustentar o resultado.' : 'Corrigir pend\xeancias imediatamente + feedback 1:1 com maior ofensor + refor\xe7ar passagem de turno.',
       resp:'L\xedder de Turno', prazo:'D+1'
     });
@@ -1149,7 +1207,7 @@ function montarCapaGerencial(){
     var causa=topUser?('Operador com maior % faltante: '+topUser.u+' ('+topUser.pctFalt+'% em '+topUser.total+' aduanas)'):(totalCadeia+' pacotes com cadeia de falha (score \u2265 3).');
     cards.push({
       indicador:'\ud83d\udd17 Aduanas', meta:'0 cadeias de falha', real:totalCadeia+' cadeias', gap:bateu?0:-totalCadeia, bateu:bateu,
-      causa:causa,
+      causa:causa, tendencia:'',
       acao: bateu? 'Nenhuma cadeia cr\xedtica identificada — manter auditoria de rotina.' : 'Investigar pacotes com cadeia de falha (faltante+BPP) + feedback com operador de maior % faltante. Risco de BPP pago indevidamente.',
       resp:'Analista Invent\xe1rio', prazo:'D+1'
     });
@@ -1167,7 +1225,7 @@ function montarCapaGerencial(){
     var causa=causaParts.length>0?causaParts.join(' \xb7 '):'Sem ofensor identificado.';
     cards.push({
       indicador:'\u26a0\ufe0f Poka Yoke (Sorting + Etiq.)', meta:'0 erros cr\xedticos', real:totalErros+' erros', gap:bateu?0:-totalErros, bateu:bateu,
-      causa:causa,
+      causa:causa, tendencia:'',
       acao: bateu? 'Nenhum erro cr\xedtico — manter reciclagem preventiva.' : 'Reciclagem cr\xedtica com maiores ofensores + mapear pontos sem cobertura PK e abrir ticket TechOps.',
       resp:'L\xedder Sorting/Etiq.', prazo:'D+1'
     });
@@ -1231,6 +1289,40 @@ function bindAcoesFilterListeners(){
         }
       };
     })(chips[i]);
+  }
+
+  // Bind dos checkboxes de status (concluído/pendente), persistido em localStorage
+  var checks=document.querySelectorAll('.acao-check');
+  for(var i=0;i<checks.length;i++){
+    (function(chk){
+      chk.onchange=function(){
+        var acaoId=chk.getAttribute('data-acao-id');
+        setAcaoStatus(acaoId, chk.checked);
+        var row=chk.closest('tr');
+        if(row){
+          row.style.opacity=chk.checked?'.55':'';
+          var acaoCell=row.querySelectorAll('td')[3];
+          if(acaoCell) acaoCell.style.textDecoration=chk.checked?'line-through':'';
+        }
+        // Atualizar contador de progresso
+        var total=document.querySelectorAll('.acao-check').length;
+        var feitas=document.querySelectorAll('.acao-check:checked').length;
+        var prog=document.getElementById('acoes-progresso');
+        if(prog) prog.textContent=feitas+' de '+total+' conclu\u00eddas';
+      };
+    })(checks[i]);
+  }
+}
+
+function bindObsListeners(){
+  var boxes=document.querySelectorAll('.obs-textarea');
+  for(var i=0;i<boxes.length;i++){
+    (function(box){
+      box.onblur=function(){
+        var indicador=box.getAttribute('data-indicador');
+        setObsIndicador(D.cfg, indicador, box.value);
+      };
+    })(boxes[i]);
   }
 }
 
@@ -1713,12 +1805,15 @@ function renderDemo(){
     var corBorda = c.bateu ? 'var(--gn)' : 'var(--rd)';
     var badge = c.bateu ? '<span class="tag ok">\u2705 DENTRO DA META</span>' : '<span class="tag cr">\u26a0\ufe0f FORA DA META</span>';
     var gapTxt = c.bateu ? '' : ('<div style="font-size:11px;color:var(--rd);font-weight:700;margin-top:2px">Desvio: '+Math.abs(c.gap).toFixed(1)+(typeof c.gap==='number'&&Math.abs(c.gap)<100?'pp':'')+'</div>');
+    var tendTxt = c.tendencia ? ('<div style="font-size:11px;margin-top:2px">'+c.tendencia+'</div>') : '';
+    var obsSalva = getObsIndicador(cfg, c.indicador);
     return '<div class="card" style="border-left:4px solid '+corBorda+';margin-bottom:10px">'
       +'<div style="padding:12px 16px">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><div style="font-size:15px;font-weight:800">'+c.indicador+'</div>'
       +'<div style="font-size:11px;color:var(--td);margin-top:2px">Meta: <strong>'+c.meta+'</strong> \xb7 Resultado: <strong style="color:'+corBorda+'">'+c.real+'</strong></div>'
       +gapTxt
+      +tendTxt
       +'</div>'+badge+'</div>'
       +'<div style="margin-top:10px;padding:10px 12px;background:var(--sf2);border-radius:6px">'
       +'<div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;margin-bottom:3px">\ud83d\udd0d Causa identificada</div>'
@@ -1728,6 +1823,10 @@ function renderDemo(){
       +'<div style="font-size:10px;font-weight:700;color:var(--bl);text-transform:uppercase;margin-bottom:3px">\u26a1 A\xe7\xe3o recomendada</div>'
       +'<div style="font-size:12px">'+c.acao+'</div>'
       +'<div style="margin-top:6px"><span class="achip">Prazo: '+c.prazo+'</span> <span class="achip resp">'+c.resp+'</span></div>'
+      +'</div>'
+      +'<div style="margin-top:8px">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;margin-bottom:3px">\ud83d\udcdd Observa\xe7\xe3o gerencial <span style="font-weight:400;text-transform:none;color:var(--td)">(opcional, ficar\xe1 salva neste navegador)</span></div>'
+      +'<textarea class="obs-textarea" data-indicador="'+c.indicador+'" placeholder="Ex: causa real foi um feriado / sistema fora do ar / j\xe1 tratado em reuni\xe3o anterior..." style="width:100%;min-height:44px;background:var(--sf2);border:1px solid var(--br);border-radius:6px;color:var(--tx);font-family:Inter,sans-serif;font-size:12px;padding:8px;resize:vertical">'+obsSalva+'</textarea>'
       +'</div>'
       +'</div></div>';
   }).join('');
@@ -2015,24 +2114,29 @@ function renderDemo(){
     var prioLbl = a.p==='p1'?'P1':a.p==='p2'?'P2':'P3';
     var prioClr = a.p==='p1'?'var(--rd)':a.p==='p2'?'var(--or)':'var(--bl)';
     var procChave = a.processo.split(' \xb7 ')[0];
-    return '<tr data-proc="'+procChave+'">'
+    var acaoId = acaoStorageId(cfg, a);
+    var feito = getAcaoStatus(acaoId);
+    return '<tr data-proc="'+procChave+'" data-acao-id="'+acaoId+'" style="'+(feito?'opacity:.55':'')+'">'
+      +'<td class="tc"><input type="checkbox" class="acao-check" data-acao-id="'+acaoId+'" '+(feito?'checked':'')+' title="Marcar como conclu\xedda" style="width:16px;height:16px;cursor:pointer"></td>'
       +'<td><span class="tag" style="background:'+prioClr+';color:#fff;font-weight:800;font-size:9px">'+prioLbl+'</span></td>'
       +'<td><strong>'+a.processo+'</strong></td>'
-      +'<td style="max-width:340px">'+a.acao+'</td>'
+      +'<td style="max-width:320px'+(feito?';text-decoration:line-through':'')+'">'+a.acao+'</td>'
       +'<td>'+a.resp+'</td>'
       +'<td class="tc"><span class="achip">'+a.prazo+'</span></td>'
-      +'<td style="max-width:280px;color:var(--td);font-size:10px">'+a.comentario+'</td>'
+      +'<td style="max-width:250px;color:var(--td);font-size:10px">'+a.comentario+'</td>'
       +'</tr>';
   }).join('');
 
+  var totalConcluidas = todasAcoes.filter(function(a){return getAcaoStatus(acaoStorageId(cfg,a));}).length;
+
   html +=
 '<div id="acoes" class="tab">'
-+'<div class="sh"><div><div class="st">\ud83d\udccb A\xe7\xf5es Consolidadas \u2014 '+cfg.week+'</div><div class="ss">Todas as a\xe7\xf5es de todos os processos, em um \xfanico lugar \u2014 '+todasAcoes.length+' a\xe7\xf5es mapeadas</div></div>'
++'<div class="sh"><div><div class="st">\ud83d\udccb A\xe7\xf5es Consolidadas \u2014 '+cfg.week+'</div><div class="ss">Todas as a\xe7\xf5es de todos os processos, em um \xfanico lugar \u2014 '+todasAcoes.length+' a\xe7\xf5es mapeadas \xb7 <span id="acoes-progresso">'+totalConcluidas+' de '+todasAcoes.length+' conclu\xeddas</span></div></div>'
 +'<button class="btn-export-aba" onclick="exportAcoes(\'todas\')">\ud83d\udce5 Exportar Todas as A\xe7\xf5es</button>'
 +'</div>'
 +'<div class="fchips" id="fchips-acoes" style="margin-bottom:8px">'+chipsProcesso+'</div>'
 +'<div class="card"><table style="border-spacing:0"><thead><tr>'
-+'<th style="padding:6px 8px">Prior.</th><th style="padding:6px 8px">Processo</th><th style="padding:6px 8px">A\xe7\xe3o</th><th style="padding:6px 8px">Respons\xe1vel</th><th class="tc" style="padding:6px 8px">Prazo</th><th style="padding:6px 8px">Coment\xe1rio</th>'
++'<th class="tc" style="padding:6px 8px">\u2705</th><th style="padding:6px 8px">Prior.</th><th style="padding:6px 8px">Processo</th><th style="padding:6px 8px">A\xe7\xe3o</th><th style="padding:6px 8px">Respons\xe1vel</th><th class="tc" style="padding:6px 8px">Prazo</th><th style="padding:6px 8px">Coment\xe1rio</th>'
 +'</tr></thead><tbody id="acoes-tbody">'+acoesRows+'</tbody></table></div>'
 +'</div>'
 
@@ -2049,6 +2153,7 @@ function renderDemo(){
     // Bind chips do primeiro tramo ativo
     if(D.bpp.tramoDisp.length>0) bindChipListeners(D.bpp.tramoDisp[0]);
     bindAcoesFilterListeners();
+    bindObsListeners();
   },80);
 }
 
