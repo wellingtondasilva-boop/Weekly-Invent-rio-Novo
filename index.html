@@ -480,6 +480,13 @@ function splitLine(line,sep){
 function tousd(s){var v=parseFloat(String(s||'').trim().replace(',','.'));return isNaN(v)?0:v;}
 function groupBy(arr,key){var m={};for(var i=0;i<arr.length;i++){var k=arr[i][key]||'';m[k]=(m[k]||0)+1;}return m;}
 function topN(obj,n){var a=Object.keys(obj).map(function(k){return[k,obj[k]];});a.sort(function(a,b){return b[1]-a[1];});return a.slice(0,n||a.length);}
+// Normaliza qualquer ID de pacote (float/notação científica/string) para uma string inteira consistente,
+// permitindo cruzar o mesmo shipment entre bases diferentes (BASE2, BPP, PK, Aduanas, Deslocados, POC).
+function normId(v){
+  if(v===null||v===undefined||v==='') return '';
+  var n=parseFloat(v);
+  return isNaN(n)?String(v).trim():String(Math.round(n));
+}
 
 
 // ── FILTRO DE PERÍODO ──────────────────────────────────────────────
@@ -562,6 +569,7 @@ function processar(){
     });
   }
   var ranking=calcRankingCruzado(pk,desloc,aduana);
+  var pacotesCronicos=calcPacotesCronicos(acc,bpp,pk,desloc,aduana);
 
   // Calcular evolução semanal de deslocados
   var deslocSemanas=[];
@@ -585,7 +593,7 @@ function processar(){
   desloc.semanas=deslocSemanas;
   acc.semanas=acc.accSemanas; // alias
 
-  D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana,alertas:alertas,ranking:ranking};
+  D={cfg:cfg,acc:acc,desloc:desloc,bpp:bpp,pk:pk,aduana:aduana,alertas:alertas,ranking:ranking,pacotesCronicos:pacotesCronicos};
 }
 
 function ptDateOrder(s){
@@ -619,13 +627,6 @@ function calcAccuracy(cfg){
     var cl=b2[i]['CLASIFICACION']||'';
     if(cl==='INVENTARIADO PLANIFICADO') inv_rows.push(b2[i]);
     else if(cl==='FALTANTE EN INVENTARIO') falt_rows.push(b2[i]);
-  }
-
-  // Normalizar ID de um row da BASE2 (float → string inteira)
-  function normId(r){
-    var v=r['SHIPMENT']||'';
-    var n=parseFloat(v);
-    return isNaN(n)?String(v).trim():String(Math.round(n));
   }
 
   // POC Set — do arquivo externo carregado (08 · Pacotes em POC)
@@ -689,7 +690,7 @@ function calcAccuracy(cfg){
     // s/ POC: reclassifica faltantes que estão em POC como inventariados
     // (o pacote está "em teoria" resolvido, não é uma perda real de acurácia).
     // O denominador (total) NÃO muda — só migra do lado faltante para o lado inventariado.
-    var faltPocCount=hasPoc?faltW.filter(function(r){return pocSet[normId(r)];}).length:0;
+    var faltPocCount=hasPoc?faltW.filter(function(r){return pocSet[normId(r['SHIPMENT'])];}).length:0;
     var invSp=nInv+faltPocCount;
     var faltSp=nFalt-faltPocCount;
     var accSem=(invSp+faltSp)>0?Math.round(invSp/(invSp+faltSp)*1000)/10:accCom;
@@ -712,7 +713,7 @@ function calcAccuracy(cfg){
   // s/ POC — reclassifica faltantes-POC como inventariados (mesmo denominador).
   // Regra de negócio: um pacote em POC está "em teoria" resolvido — não é uma
   // perda real, então conta a favor da acurácia em vez de contra.
-  var faltPocCountGeral=hasPoc?faltCur.filter(function(r){return pocSet[normId(r)];}).length:0;
+  var faltPocCountGeral=hasPoc?faltCur.filter(function(r){return pocSet[normId(r['SHIPMENT'])];}).length:0;
   var invSp =totalInv+faltPocCountGeral;
   var faltSp=totalFalt-faltPocCountGeral;
   var geralSPoc=(invSp+faltSp)>0?Math.round(invSp/(invSp+faltSp)*1000)/10:geral;
@@ -732,7 +733,7 @@ function calcAccuracy(cfg){
   var zonaMap=groupBy(faltCur,'SHP_ZONE_NAME');
   var porZona=topN(zonaMap,10).map(function(x){return[x[0],x[1]];});
   var ids_falt={};
-  falt_rows.forEach(function(r){ids_falt[r['SHIPMENT']]=true;});
+  falt_rows.forEach(function(r){ids_falt[normId(r['SHIPMENT'])]=true;});
 
   return{
     geral:geral, geralSPoc:geralSPoc, hasPoc:hasPoc,
@@ -758,10 +759,16 @@ function calcDeslocados(cfg,totalInv){
   for(var i=0;i<rows.length;i++){var k=(rows[i]['SHP_PLANNED_ZONE']||'?')+' -> '+(rows[i]['SHP_ZONE_NAME']||'?');fluxMap[k]=(fluxMap[k]||0)+1;}
   var fluxos=topN(fluxMap,10).map(function(x){return[x[0],x[1]];});
   var opMap={};
-  for(var i=0;i<rows.length;i++){var op=rows[i]['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';if(!opMap[op]) opMap[op]={total:0,nc:0};opMap[op].total++;if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') opMap[op].nc++;}
-  var ops=Object.keys(opMap).map(function(k){return{id:k,total:opMap[k].total,nc:opMap[k].nc};});
+  for(var i=0;i<rows.length;i++){
+    var op=rows[i]['SHP_INVENTORY_UNIT_OPERATOR_ID']||'?';
+    if(!opMap[op]) opMap[op]={total:0,nc:0,ids:[]};
+    opMap[op].total++;
+    if(rows[i]['PACOTES_NAO_CORRIGIDOS']==='True') opMap[op].nc++;
+    opMap[op].ids.push(normId(rows[i]['SHP_SHIPMENT_ID']));
+  }
+  var ops=Object.keys(opMap).map(function(k){return{id:k,total:opMap[k].total,nc:opMap[k].nc,ids:opMap[k].ids};});
   ops.sort(function(a,b){return b.total-a.total;}); ops=ops.slice(0,20);
-  var ids={};for(var i=0;i<rows.length;i++) ids[rows[i]['SHP_SHIPMENT_ID']]=true;
+  var ids={};for(var i=0;i<rows.length;i++) ids[normId(rows[i]['SHP_SHIPMENT_ID'])]=true;
 
   // Evolução semanal de deslocados (se BASE2 tiver múltiplas semanas)
   var deslocSemanas=[];
@@ -921,7 +928,7 @@ function calcBPP(cfg){
 
   // IDs BPP
   var ids_bpp={};
-  for(var t in wkData.tramos) for(var i=0;i<wkData.tramos[t].length;i++) ids_bpp[wkData.tramos[t][i]['Shipment']]=true;
+  for(var t in wkData.tramos) for(var i=0;i<wkData.tramos[t].length;i++) ids_bpp[normId(wkData.tramos[t][i]['Shipment'])]=true;
 
   return{geral:geralData,tramos:tramoData,tramoDisp:tramoDisp,tend:tend,tendTramo:tendTramo,ids_bpp:ids_bpp};
 }
@@ -941,9 +948,10 @@ function calcPK(cfg){
   var sortByOp={};
   for(var i=0;i<sort.length;i++){
     var op=sort[i]['OPERADOR']||'?',ev=sort[i]['EVENT_TYPE']||'',mot=sort[i]['MOTIVO_POKA_YOKE']||'Outros';
-    if(!sortByOp[op]) sortByOp[op]={total:0,qr_sem:0,gaiola:0,saida:0,div:0,motivos:{}};
+    if(!sortByOp[op]) sortByOp[op]={total:0,qr_sem:0,gaiola:0,saida:0,div:0,motivos:{},ids:[]};
     sortByOp[op].total++;
     sortByOp[op].motivos[mot]=(sortByOp[op].motivos[mot]||0)+1;
+    sortByOp[op].ids.push(normId(sort[i]['ID_PACOTE']));
     if(ev==='QR_PROBLEM_WITHOUT_POKAYOKE') sortByOp[op].qr_sem++;
     else if(ev==='CONTAINER_MISMATCH') sortByOp[op].gaiola++;
     else if(ev==='FORCE_EXIT') sortByOp[op].saida++;
@@ -952,7 +960,7 @@ function calcPK(cfg){
   var sortOps=Object.keys(sortByOp).map(function(k){
     var v=sortByOp[k];
     var topMot=Object.keys(v.motivos).map(function(m){return[m,v.motivos[m]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
-    return{op:k,total:v.total,qr_sem:v.qr_sem,gaiola:v.gaiola,saida:v.saida,div:v.div,topMot:topMot};
+    return{op:k,total:v.total,qr_sem:v.qr_sem,gaiola:v.gaiola,saida:v.saida,div:v.div,topMot:topMot,ids:v.ids};
   });
   sortOps.sort(function(a,b){return b.total-a.total;}); sortOps=sortOps.slice(0,20);
   var motMap={};for(var i=0;i<sort.length;i++){var m=sort[i]['MOTIVO_POKA_YOKE']||'?';motMap[m]=(motMap[m]||0)+1;}
@@ -963,23 +971,24 @@ function calcPK(cfg){
   var etByOp={};
   for(var i=0;i<etDedup.length;i++){
     var r=etDedup[i],op=r['Usuario_Recebido']||'?',err=r['Erro']||'',mot=r['Motivo']||r['Erro']||'Outros';
-    if(!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0,motivos:{}};
+    if(!etByOp[op]) etByOp[op]={total:0,sem_pk:0,com_pk:0,motivos:{},ids:[]};
     etByOp[op].total++;
     etByOp[op].motivos[mot]=(etByOp[op].motivos[mot]||0)+1;
+    etByOp[op].ids.push(normId(r['ID']));
     if(err==='QR_PROBLEM_WITHOUT_POKAYOKE') etByOp[op].sem_pk++; else etByOp[op].com_pk++;
   }
   var etOps=Object.keys(etByOp).map(function(k){
     var v=etByOp[k];
     var topMot=Object.keys(v.motivos).map(function(m){return[m,v.motivos[m]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,2);
-    return{op:k,total:v.total,sem_pk:v.sem_pk,com_pk:v.com_pk,topMot:topMot};
+    return{op:k,total:v.total,sem_pk:v.sem_pk,com_pk:v.com_pk,topMot:topMot,ids:v.ids};
   });
   etOps.sort(function(a,b){return b.total-a.total;}); etOps=etOps.slice(0,20);
   var etMotMap={};for(var i=0;i<etDedup.length;i++){var e=etDedup[i]['Erro']||'?';etMotMap[e]=(etMotMap[e]||0)+1;}
   var etMotivos=topN(etMotMap,5).map(function(x){return[x[0],x[1]];});
 
   var ids_sort={},ids_et={};
-  for(var i=0;i<sort.length;i++) ids_sort[sort[i]['ID_PACOTE']]=true;
-  for(var i=0;i<etDedup.length;i++) ids_et[etDedup[i]['ID']]=true;
+  for(var i=0;i<sort.length;i++) ids_sort[normId(sort[i]['ID_PACOTE'])]=true;
+  for(var i=0;i<etDedup.length;i++) ids_et[normId(etDedup[i]['ID'])]=true;
 
   return{sort:{total:sort.length,byDay:sortByDay,ops:sortOps,motivos:sortMotivos},
          et:{total:etDedup.length,ops:etOps,motivos:etMotivos},ids_sort:ids_sort,ids_et:ids_et};
@@ -988,7 +997,7 @@ function calcPK(cfg){
 function calcAduanas(acc,bpp,pk,desloc,cfg){
   var rawAduana=filtrarPorPeriodo(RAW.aduana||[],'DATA_CRIACAO_AUDITORIA',cfg);
   var rows=rawAduana,seen={},ids=[];
-  for(var i=0;i<rows.length;i++){var pid=rows[i]['ID_Pacote']||'';if(pid&&!seen[pid]){seen[pid]=rows[i];ids.push(pid);}}
+  for(var i=0;i<rows.length;i++){var pid=normId(rows[i]['ID_Pacote'])||'';if(pid&&!seen[pid]){seen[pid]=rows[i];ids.push(pid);}}
   var master=ids.map(function(pid){
     var r=seen[pid];
     var f=!!acc.ids_falt[pid],b=!!bpp.ids_bpp[pid],s=!!pk.ids_sort[pid],e=!!pk.ids_et[pid],d=!!desloc.ids[pid];
@@ -998,9 +1007,10 @@ function calcAduanas(acc,bpp,pk,desloc,cfg){
   var byUser={},byMlp={},byDay={};
   for(var i=0;i<master.length;i++){
     var m=master[i];
-    if(!byUser[m.usuario]) byUser[m.usuario]={total:0,falt:0,bpp:0,sort:0,score:0,rotas:{}};
+    if(!byUser[m.usuario]) byUser[m.usuario]={total:0,falt:0,bpp:0,sort:0,score:0,rotas:{},ids:[]};
     byUser[m.usuario].total++; byUser[m.usuario].falt+=m.falt?1:0; byUser[m.usuario].bpp+=m.bpp?1:0;
     byUser[m.usuario].sort+=m.sort?1:0; byUser[m.usuario].score+=m.score;
+    byUser[m.usuario].ids.push(m.id);
     if(m.rota) byUser[m.usuario].rotas[m.rota]=true;
     var mk=m.mlp||'Sem MLP';
     if(!byMlp[mk]) byMlp[mk]={total:0,falt:0,bpp:0,sort:0,desloc:0,rotas:{}};
@@ -1012,7 +1022,7 @@ function calcAduanas(acc,bpp,pk,desloc,cfg){
   }
   var users=Object.keys(byUser).map(function(k){
     var v=byUser[k]; var rotas=Object.keys(v.rotas).slice(0,3);
-    return{u:k,total:v.total,falt:v.falt,bpp:v.bpp,sort:v.sort,score:v.score,pctFalt:v.total>0?Math.round(v.falt/v.total*1000)/10:0,rotas:rotas};
+    return{u:k,total:v.total,falt:v.falt,bpp:v.bpp,sort:v.sort,score:v.score,pctFalt:v.total>0?Math.round(v.falt/v.total*1000)/10:0,rotas:rotas,ids:v.ids};
   });
   users.sort(function(a,b){return b.total-a.total;});
   var mlpAd=Object.keys(byMlp).map(function(k){
@@ -1425,6 +1435,22 @@ function bindObsListeners(){
   }
 }
 
+function bindRankingExpandListeners(){
+  var expandBtns=document.querySelectorAll('.rk-expand');
+  for(var i=0;i<expandBtns.length;i++){
+    (function(btn){
+      btn.onclick=function(){
+        var targetId=btn.getAttribute('data-target');
+        var row=document.getElementById(targetId);
+        if(!row) return;
+        var aberto = row.style.display!=='none';
+        row.style.display = aberto?'none':'table-row';
+        btn.innerHTML = aberto?'\u25b6 ver IDs':'\u25bc ocultar IDs';
+      };
+    })(expandBtns[i]);
+  }
+}
+
 function resetDemo(){
   document.getElementById('demoScreen').style.display='none';
   document.getElementById('demoScreen').innerHTML='';
@@ -1679,16 +1705,21 @@ function tipoRows(tipos,total){
 function calcRankingCruzado(pk, desloc, aduana) {
   var mapa = {};
 
-  function add(op, campo, valor) {
+  function add(op, campo, valor, ids) {
     if (!op || op === '?' || op === 'nan') return;
-    if (!mapa[op]) mapa[op] = {op:op, sort:0, et:0, desloc:0, deslocNc:0, aduana:0, aduanaFalt:0, score:0};
+    if (!mapa[op]) mapa[op] = {op:op, sort:0, et:0, desloc:0, deslocNc:0, aduana:0, aduanaFalt:0, score:0,
+                                 idsSort:[], idsEt:[], idsDesloc:[], idsAduana:[]};
     mapa[op][campo] += valor;
+    if(ids && ids.length){
+      var chaveIds = 'ids'+campo.charAt(0).toUpperCase()+campo.slice(1);
+      if(mapa[op][chaveIds]) mapa[op][chaveIds] = mapa[op][chaveIds].concat(ids);
+    }
   }
 
-  pk.sort.ops.forEach(function(o){ add(o.op,'sort',o.total); });
-  pk.et.ops.forEach(function(o){ add(o.op,'et',o.total); });
+  pk.sort.ops.forEach(function(o){ add(o.op,'sort',o.total,o.ids); });
+  pk.et.ops.forEach(function(o){ add(o.op,'et',o.total,o.ids); });
   desloc.ops.forEach(function(o){ add(o.id,'desloc',o.total); add(o.id,'deslocNc',o.nc); });
-  aduana.users.forEach(function(u){ add(u.u,'aduana',u.total); add(u.u,'aduanaFalt',u.falt); });
+  aduana.users.forEach(function(u){ add(u.u,'aduana',u.total,u.ids); add(u.u,'aduanaFalt',u.falt); });
 
   // Score: quantos processos distintos o operador aparece (0-4)
   var lista = Object.keys(mapa).map(function(op){
@@ -1705,6 +1736,49 @@ function calcRankingCruzado(pk, desloc, aduana) {
   });
 
   return lista.slice(0,30);
+}
+
+// ── PACOTES CRÔNICOS ──────────────────────────────────────────────
+// Cruza o ID de shipment entre TODAS as bases carregadas (não só as que passaram por Aduana),
+// para identificar pacotes que aparecem em múltiplos processos com falha na mesma semana.
+// Objetivo: apontar os IDs para consulta na plataforma oficial (vida do pacote), não substituir a investigação.
+function calcPacotesCronicos(acc, bpp, pk, desloc, aduana){
+  var pocSet = RAW.pocSet || {};
+  var hasPoc = Object.keys(pocSet).length > 0;
+
+  // União de todos os IDs que aparecem em qualquer uma das bases rastreáveis por ID
+  var todosIds = {};
+  Object.keys(acc.ids_falt||{}).forEach(function(id){ if(id) todosIds[id]=true; });
+  Object.keys(bpp.ids_bpp||{}).forEach(function(id){ if(id) todosIds[id]=true; });
+  Object.keys(pk.ids_sort||{}).forEach(function(id){ if(id) todosIds[id]=true; });
+  Object.keys(pk.ids_et||{}).forEach(function(id){ if(id) todosIds[id]=true; });
+  Object.keys(desloc.ids||{}).forEach(function(id){ if(id) todosIds[id]=true; });
+  if(hasPoc) Object.keys(pocSet).forEach(function(id){ if(id) todosIds[id]=true; });
+
+  // Para cada ID, monta o "perfil de reincidência" — em quais processos ele aparece
+  var lista = Object.keys(todosIds).map(function(id){
+    var falt=!!acc.ids_falt[id], bppF=!!bpp.ids_bpp[id], sort=!!pk.ids_sort[id],
+        et=!!pk.ids_et[id], deslocF=!!desloc.ids[id], poc=hasPoc&&!!pocSet[id];
+    var score = (falt?1:0)+(bppF?1:0)+(sort?1:0)+(et?1:0)+(deslocF?1:0)+(poc?1:0);
+    var processos=[];
+    if(falt) processos.push('Faltante');
+    if(bppF) processos.push('BPP');
+    if(sort) processos.push('Sorting PK');
+    if(et) processos.push('Etiquetagem PK');
+    if(deslocF) processos.push('Deslocado');
+    if(poc) processos.push('POC');
+    return {id:id, score:score, processos:processos};
+  });
+
+  // Só interessam pacotes crônicos de verdade: aparecem em 2+ processos distintos
+  var cronicos = lista.filter(function(x){ return x.score>=2; });
+  cronicos.sort(function(a,b){ return b.score-a.score; });
+
+  return {
+    total: cronicos.length,
+    lista: cronicos.slice(0,50), // limite de exibição — todos ficam disponíveis no export
+    listaCompleta: cronicos
+  };
 }
 
 function renderDemo(){
@@ -1885,9 +1959,23 @@ function renderDemo(){
     var scoreCls = score>=3?'cr':score>=2?'w':'ok';
     var scoreEmoji = score>=3?'\ud83d\udd25':score>=2?'\u26a0\ufe0f':'\u2705';
     var dot = function(val,cls){ return val>0?'<span class="tag '+cls+'" style="font-size:10px;padding:2px 7px">'+val+'</span>':'<span style="color:var(--td);font-size:10px">&middot;</span>'; };
+    var rowId = 'rk-detail-'+i;
+    var temIds = (v.idsSort&&v.idsSort.length) || (v.idsEt&&v.idsEt.length) || (v.idsAduana&&v.idsAduana.length);
+    var expandBtn = temIds ? '<span class="rk-expand" data-target="'+rowId+'" style="cursor:pointer;color:var(--bl);font-weight:700;font-size:10px">\u25b6 ver IDs</span>' : '';
+    var detailRow = '';
+    if(temIds){
+      var blocos=[];
+      if(v.idsSort&&v.idsSort.length) blocos.push('<div><strong style="color:var(--rd)">\ud83c\udff7\ufe0f Sorting PK ('+v.idsSort.length+'):</strong> '+v.idsSort.slice(0,30).join(', ')+(v.idsSort.length>30?' ... (+'+(v.idsSort.length-30)+')':'')+'</div>');
+      if(v.idsEt&&v.idsEt.length) blocos.push('<div><strong style="color:var(--or)">\ud83d\udcdd Etiquetagem PK ('+v.idsEt.length+'):</strong> '+v.idsEt.slice(0,30).join(', ')+(v.idsEt.length>30?' ... (+'+(v.idsEt.length-30)+')':'')+'</div>');
+      if(v.idsAduana&&v.idsAduana.length) blocos.push('<div><strong style="color:var(--pu)">\ud83d\udee3\ufe0f Aduana ('+v.idsAduana.length+'):</strong> '+v.idsAduana.slice(0,30).join(', ')+(v.idsAduana.length>30?' ... (+'+(v.idsAduana.length-30)+')':'')+'</div>');
+      detailRow = '<tr id="'+rowId+'" style="display:none;background:var(--sf2)"><td colspan="8" style="padding:10px 14px;font-size:10px;line-height:1.7;font-family:JetBrains Mono,monospace">'
+        +'<div style="color:var(--td);margin-bottom:4px;font-family:Inter,sans-serif;font-weight:700">IDs para consulta na plataforma oficial:</div>'
+        + blocos.join('')
+        +'</td></tr>';
+    }
     return '<tr style="height:34px">'
       +'<td style="padding:5px 8px">'+rn(i)+'</td>'
-      +'<td style="padding:5px 8px"><strong>\ud83d\udc64 '+v.op+'</strong></td>'
+      +'<td style="padding:5px 8px"><strong>\ud83d\udc64 '+v.op+'</strong>'+(expandBtn?' '+expandBtn:'')+'</td>'
       +'<td class="tc" style="padding:5px 4px">'+dot(v.sort,'cr')+'</td>'
       +'<td class="tc" style="padding:5px 4px">'+dot(v.et,'w')+'</td>'
       +'<td class="tc" style="padding:5px 4px">'+dot(v.desloc,'i')+'</td>'
@@ -1895,8 +1983,26 @@ function renderDemo(){
       +'<td class="tc" style="padding:5px 4px">'+dot(v.aduana,'p')+'</td>'
       +'<td class="tc" style="padding:5px 4px">'+dot(v.aduanaFalt,'cr')+'</td>'
       +'<td class="tc" style="padding:5px 4px"><span class="tag '+scoreCls+'" style="font-size:11px;font-weight:800;padding:3px 8px">'+scoreEmoji+' '+score+'/4</span></td>'
+      +'</tr>'
+      + detailRow;
+  }).join('');
+
+  // ── PACOTES CRÔNICOS — tabela de IDs reincidentes entre bases, para consulta na plataforma oficial ──
+  var cronicoRows = (D.pacotesCronicos&&D.pacotesCronicos.lista?D.pacotesCronicos.lista:[]).map(function(c,i){
+    var scoreCls = c.score>=4?'cr':c.score>=3?'w':'i';
+    var emoji = c.score>=4?'\ud83d\udd25':c.score>=3?'\u26a0\ufe0f':'\ud83d\udd0d';
+    var badges = c.processos.map(function(p){
+      var cor = p==='Faltante'?'cr':p==='BPP'?'p':p==='POC'?'i':p==='Sorting PK'?'cr':p==='Etiquetagem PK'?'w':'ok';
+      return '<span class="tag '+cor+'" style="font-size:9px;padding:2px 6px;margin-right:3px">'+p+'</span>';
+    }).join('');
+    return '<tr style="height:32px">'
+      +'<td style="padding:5px 8px">'+rn(i)+'</td>'
+      +'<td style="padding:5px 8px;font-family:JetBrains Mono,monospace;font-weight:700">'+c.id+'</td>'
+      +'<td style="padding:5px 8px">'+badges+'</td>'
+      +'<td class="tc" style="padding:5px 8px"><span class="tag '+scoreCls+'" style="font-size:10px;font-weight:800;padding:3px 8px">'+emoji+' '+c.score+' processos</span></td>'
       +'</tr>';
   }).join('');
+  var totalCronicos = D.pacotesCronicos ? D.pacotesCronicos.total : 0;
 
   // ── CAPA GERENCIAL — vereditos automáticos, ordenados por criticidade (calculado ANTES do html= para não quebrar a concatenação) ──
   var capaCards = montarCapaGerencial();
@@ -2195,6 +2301,14 @@ function renderDemo(){
 +'<div class="card" style="margin-top:8px"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83c\udfaf A\u00e7\u00f5es Priorit\u00e1rias</span><span class="cc">Top 3 operadores multifrontes</span></div><div style="padding:2px 8px 8px">'
 + rankingAcoes
 +'</div></div>'
++'<div class="sub-sh" style="margin-top:16px"><span class="sub-title">\ud83e\udded Pacotes Cr\xf4nicos</span><span class="sub-badge">'+totalCronicos+' pacote(s) reincidente(s) em 2+ processos</span></div>'
++'<div class="alert i" style="margin-bottom:8px;padding:8px 12px"><div class="ai">\ud83d\udd0d</div><div><div class="at" style="font-size:11px">Para que serve esta lista</div><div class="ab" style="font-size:10px">Estes IDs apareceram em mais de um processo com falha na mesma semana (Faltante, BPP, POC, Sorting PK, Etiquetagem PK, Deslocado). Use os IDs para consultar a vida completa do pacote na plataforma oficial e confirmar a causa raiz \u2014 o dash aponta o alerta, a investiga\xe7\xe3o final \xe9 na consulta oficial.</div></div></div>'
++(totalCronicos>0
+  ?'<div class="card"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83d\udccb IDs Reincidentes \u2014 Top '+(D.pacotesCronicos.lista.length)+' de '+totalCronicos+'</span><span class="cc">Ordenado por n\xba de processos</span></div>'
+   +'<table style="border-spacing:0"><thead><tr>'
+   +'<th style="padding:6px 8px">#</th><th style="padding:6px 8px">ID do Pacote</th><th style="padding:6px 8px">Processos onde apareceu</th><th class="tc" style="padding:6px 8px">Score</th>'
+   +'</tr></thead><tbody>'+cronicoRows+'</tbody></table></div>'
+  :'<div class="alert i" style="padding:8px 12px"><div class="ai">\u2705</div><div><div class="at" style="font-size:11px">Nenhum pacote cr\xf4nico identificado</div><div class="ab" style="font-size:10px">Nenhum ID apareceu em 2 ou mais processos com falha nesta semana.</div></div></div>')
 +'</div>'
 
   // ── ABA AÇÕES CONSOLIDADAS ──
@@ -2255,6 +2369,7 @@ function renderDemo(){
     if(D.bpp.tramoDisp.length>0) bindChipListeners(D.bpp.tramoDisp[0]);
     bindAcoesFilterListeners();
     bindObsListeners();
+    bindRankingExpandListeners();
   },80);
 }
 
