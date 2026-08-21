@@ -1,5 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<!--
+════════════════════════════════════════════════════════════════════════════
+ FOLHA DE REGRAS — DEMONSTRATIVO SEMANAL DE INVENTÁRIO SVC
+ (documentação das decisões de negócio validadas — não alterar sem revalidar)
+════════════════════════════════════════════════════════════════════════════
+
+1) ACCURACY — fórmula oficial
+   Accuracy = Inventariado ÷ (Inventariado + Faltante)
+   Usa CONTAGEM BRUTA de linhas da BASE2 (não IDs únicos / nunique).
+   Validado: bate exatamente com o % oficial do Looker (ex.: W33 = 81,0%).
+
+2) ACCURACY "SEM POC" — regra de reclassificação (não é exclusão!)
+   Um pacote Faltante que está na lista de POC (arquivo 08) é RECLASSIFICADO
+   para o lado do Inventariado — ele não é removido da conta.
+   O denominador (total de pacotes) NUNCA muda entre "com POC" e "sem POC".
+     s/POC = (Inventariado + Faltantes-que-são-POC) ÷ (Inventariado + Faltante)
+   Por quê: um pacote em POC está "em teoria" resolvido — não é uma perda real
+   de acurácia, então deve contar a favor, não ser descartado da conta.
+   Consequência inevitável da regra: Accuracy s/POC É SEMPRE ≥ Accuracy c/POC.
+   Se algum dia aparecer o contrário, há um bug — revisar aqui primeiro.
+
+3) SEMANA DE REFERÊNCIA — ancoragem por data, não por cálculo ISO de semana
+   As "semanas" do gráfico de evolução são blocos de 7 dias contados para trás
+   a partir de cfg.dateEnd (o fim do período configurado na tela), não por
+   fórmula de semana-do-ano. Isso evita que a semana "atual" fique cortada ao
+   meio quando o cálculo ISO diverge da nomenclatura interna do time (W29,
+   W30, W31...). O rótulo de cada bloco anterior é cfg.week decrementado em 1
+   a cada bloco — nunca recalculado via fórmula de data.
+
+4) NORMALIZAÇÃO DE ID DE PACOTE (função normId, global)
+   IDs de shipment aparecem em formatos diferentes entre bases (float com
+   notação científica, string, inteiro). TODA comparação de ID entre bases
+   (Faltante × BPP × Aduana × POC × Sorting × Etiquetagem × Deslocados) deve
+   passar por normId() antes de comparar — senão o cruzamento falha
+   silenciosamente (o ID "bate" na aparência mas não no valor real).
+
+5) ARQUIVO POC (08) é OPCIONAL e não conta na barra de progresso "X de 7"
+   Sem ele, todos os indicadores "s/POC" ficam iguais aos "c/POC" (hasPoc=false).
+   Quanto mais completo/atual o arquivo POC, mais perto a Accuracy s/POC chega
+   do valor oficial esperado pela operação. Um arquivo POC "datado" (snapshot
+   antigo) tende a SUBESTIMAR a Accuracy s/POC.
+
+6) WATERFALL FALTANTES (arquivo 02) é um arquivo de apoio
+   Hoje NENHUM cálculo ativo do dashboard lê este arquivo. Ele é exigido no
+   upload por completude/rastreabilidade, mas não altera nenhum número. Se
+   isso mudar no futuro, atualizar COLUNAS_ESPERADAS.falt com as colunas reais
+   necessárias (hoje está vazio de propósito).
+
+7) RANKING CRUZADO / PACOTES CRÔNICOS
+   Ranking Cruzado = por OPERADOR, cruza em quantos processos ele teve
+   ocorrência (Sorting PK, Etiquetagem PK, Deslocados, Aduanas). Score 0-4.
+   Pacotes Crônicos = por ID DE PACOTE, cruza em quantos processos aquele
+   shipment específico apareceu com falha (Faltante, BPP, POC, Sorting PK,
+   Etiquetagem PK, Deslocado). São cruzamentos DIFERENTES — um é sobre
+   pessoas, outro é sobre pacotes. Ambos servem para apontar candidatos a
+   consulta na plataforma oficial, não como veredito automático de causa raiz.
+
+8) METAS são configuráveis na tela de upload (não hardcoded)
+   cfg.metaAcc, cfg.metaDesloc, cfg.metaBpp, cfg.metaBppTramo — todos lidos
+   dos campos de configuração. Mudar a meta operacional não requer alterar
+   código, só o valor no campo correspondente na tela inicial.
+
+9) PERSISTÊNCIA (localStorage) é por navegador, não compartilhada
+   Status de ações concluídas e observações gerenciais da Capa Gerencial
+   ficam salvos no localStorage do navegador de quem está usando, com chave
+   por SVC+Semana (storageKeyBase). Não sincroniza entre pessoas/máquinas
+   diferentes — se isso for necessário no futuro, precisa migrar para um
+   backend real (ex.: planilha compartilhada via API).
+
+10) SSP15 vs. outras unidades (ex.: SSP46)
+    Não há nada fixo para SSP15 no código — SVC e Nome são só campos de
+    configuração. Rodar para outra unidade = trocar os campos + subir os
+    arquivos daquela unidade. Não há comparativo entre unidades porque as
+    metas/realidades operacionais são diferentes (decisão de produto, não
+    limitação técnica).
+-->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -24,10 +100,13 @@ body.day{--dk:#F0F2F5;--sf:#FFFFFF;--sf2:#F0F2F5;--sf3:#E1E4E8;--br:rgba(200,210
 .up-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:20px}
 .up-item{background:var(--sf2);border:1.5px dashed var(--br);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative}
 .up-item:hover{border-color:var(--bl)}.up-item.ok{border-style:solid;border-color:var(--gn);background:rgba(63,185,80,.05)}
+.up-item.warn{border-style:solid;border-color:var(--or);background:rgba(232,168,56,.08)}
 .up-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1}
 .up-name{font-size:11px;font-weight:600;margin-bottom:3px}.up-hint{font-size:9px;color:var(--td);margin-bottom:7px}
 .up-st{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--sf3);color:var(--td);display:inline-block}
 .up-item.ok .up-st{background:rgba(63,185,80,.15);color:var(--gn)}
+.up-item.warn .up-st{background:rgba(232,168,56,.15);color:var(--or)}
+.up-validation-warning{display:none;background:rgba(232,168,56,.1);border:1px solid var(--or);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:var(--tx);line-height:1.5}
 /* TOOLTIP DE ORIENTAÇÃO — ícone (i) no canto do card, acima do input de arquivo (z-index) */
 .up-info{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--sf3);color:var(--td);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;cursor:help}
 .up-info:hover{background:var(--bl);color:#fff}
@@ -236,6 +315,7 @@ tr.rh td{background:rgba(248,81,73,.06)}.tr.wh td{background:rgba(232,168,56,.04
       </div>
       <div class="up-pbar"><div class="up-pfill" id="upFill"></div></div>
       <div class="up-plabel" id="upLabel">0 de 7 arquivos carregados</div>
+      <div class="up-validation-warning" id="upValidationWarning"></div>
       <button class="btn-go" id="btnGo" disabled onclick="gerarDemo()">⚡ Gerar Demonstrativo</button>
       <p class="up-note">Arquivos processados localmente no browser — nenhum dado enviado a servidores externos.</p>
     </div>
@@ -393,6 +473,17 @@ function stackedBar(id, datasets, labels, maxV) {
 
 
 
+// ════════════════════════════════════════════════════════════════════════
+// Ver <head> do HTML para a "FOLHA DE REGRAS" completa com as decisões de
+// negócio validadas (fórmula de accuracy, regra do POC, ancoragem de semana,
+// normalização de ID, etc.). Resumo rápido de onde procurar cada coisa:
+//   normId()              → normalização de ID (usar sempre para cruzar bases)
+//   calcAccuracy()         → fórmula de accuracy c/POC e s/POC (regra #1 e #2)
+//   getWeekLabel() e uso   → ancoragem de semana por cfg.dateEnd (regra #3)
+//   calcRankingCruzado()   → ranking por OPERADOR (regra #7)
+//   calcPacotesCronicos()  → cruzamento por ID DE PACOTE (regra #7)
+//   COLUNAS_ESPERADAS      → validação de upload (o que cada arquivo precisa ter)
+// ════════════════════════════════════════════════════════════════════════
 var RAW={}, LOADED=0, D=null;
 
 // ── TEMA ──
@@ -432,22 +523,85 @@ function onFilePoc(inp){
   reader.readAsText(file,'UTF-8');
 }
 
+// ── VALIDAÇÃO DE UPLOAD ──
+// Colunas mínimas esperadas por arquivo, para avisar ANTES de gerar o demonstrativo
+// em vez de deixar o cálculo rodar silenciosamente com números zerados.
+var COLUNAS_ESPERADAS = {
+  base2:  {nome:'01 · Base 2 Inventário', cols:['CLASIFICACION','INIT_DTTM_LOCAL','SHIPMENT','SHP_ZONE_NAME']},
+  falt:   {nome:'02 · Waterfall Faltantes', cols:[]}, // arquivo de apoio — sem coluna obrigatória no cálculo atual
+  desloc: {nome:'03 · Deslocados', cols:['SHP_SHIPMENT_ID','SHP_INVENTORY_INIT_DTTM','SHP_INVENTORY_UNIT_OPERATOR_ID','PACOTES_NAO_CORRIGIDOS','SHP_PLANNED_ZONE','SHP_ZONE_NAME']},
+  bpp:    {nome:'04 · BPP 4 Semanas', cols:['Bpp Cashout Usd','Color Details','Clasificacion LG','Shipment','MLP','Values_Dates','TOTALGMV']},
+  et:     {nome:'05 · PK Etiquetagem', cols:['ID','Usuario_Recebido','Erro']},
+  sort:   {nome:'06 · PK Sorting', cols:['ID_PACOTE','OPERADOR','EVENT_TYPE','DATA_EVENTO','MOTIVO_POKA_YOKE']},
+  aduana: {nome:'07 · Aduanas', cols:['ID_Pacote','USUARIO_BIP','MLP','DATA_CRIACAO_AUDITORIA','ROTA_LOG']}
+};
+
+// Verifica se as colunas esperadas existem no cabeçalho do arquivo carregado.
+// Retorna lista de colunas faltando (vazia = tudo OK).
+function validarColunas(key, rows){
+  var regra = COLUNAS_ESPERADAS[key];
+  if(!regra || regra.cols.length===0) return []; // sem regra ou arquivo de apoio sem coluna obrigatória
+  if(!rows || rows.length===0) return regra.cols; // arquivo vazio: todas faltando
+  var header = Object.keys(rows[0]);
+  return regra.cols.filter(function(c){ return header.indexOf(c)===-1; });
+}
+
 function onFile(key,inp){
   var file=inp.files[0]; if(!file) return;
   var sep=(key==='bpp')?';':',';
   var reader=new FileReader();
   reader.onload=function(e){
     try{
-      RAW[key]=parseCSV(e.target.result,sep);
-      document.getElementById('st-'+key).textContent='✓ '+file.name.slice(0,28);
-      document.getElementById('ui-'+key).classList.add('ok');
+      var rows=parseCSV(e.target.result,sep);
+      RAW[key]=rows;
+
+      var faltando = validarColunas(key, rows);
+      var itemEl = document.getElementById('ui-'+key);
+      var stEl = document.getElementById('st-'+key);
+
+      if(rows.length===0){
+        stEl.textContent='⚠ Arquivo vazio ou sem linhas de dados';
+        itemEl.classList.remove('ok'); itemEl.classList.add('warn');
+      } else if(faltando.length>0){
+        stEl.innerHTML='⚠ Faltam colunas: <strong>'+faltando.join(', ')+'</strong>';
+        stEl.title='O arquivo foi carregado mas está sem '+faltando.length+' coluna(s) que o cálculo precisa. Confira se é o arquivo/exportação correta antes de gerar o demonstrativo.';
+        itemEl.classList.remove('ok'); itemEl.classList.add('warn');
+      } else {
+        stEl.textContent='✓ '+file.name.slice(0,28)+' ('+rows.length.toLocaleString('pt-BR')+' linhas)';
+        itemEl.classList.remove('warn'); itemEl.classList.add('ok');
+      }
+
       LOADED++;
       document.getElementById('upFill').style.width=(LOADED/7*100)+'%';
       document.getElementById('upLabel').textContent=LOADED+' de 7 arquivos carregados'+(RAW.poc?' · +POC carregado':'');
       if(LOADED===7) document.getElementById('btnGo').disabled=false;
-    }catch(err){ document.getElementById('st-'+key).textContent='❌ Erro: '+err.message; }
+      atualizarAvisoValidacao();
+    }catch(err){
+      document.getElementById('st-'+key).textContent='❌ Erro: '+err.message;
+      document.getElementById('ui-'+key).classList.remove('ok','warn');
+    }
   };
   reader.readAsText(file,'UTF-8');
+}
+
+// Mostra um banner de aviso consolidado acima do botão "Gerar Demonstrativo"
+// se algum arquivo carregado estiver com colunas faltando.
+function atualizarAvisoValidacao(){
+  var avisoEl = document.getElementById('upValidationWarning');
+  if(!avisoEl) return;
+  var itensComAviso = document.querySelectorAll('.up-item.warn');
+  if(itensComAviso.length===0){
+    avisoEl.style.display='none';
+    return;
+  }
+  var nomes = [];
+  itensComAviso.forEach(function(el){
+    var key = el.id.replace('ui-','');
+    var regra = COLUNAS_ESPERADAS[key];
+    if(regra) nomes.push(regra.nome);
+  });
+  avisoEl.innerHTML = '⚠️ <strong>'+itensComAviso.length+' arquivo(s) com coluna(s) faltando:</strong> '+nomes.join(', ')+'. O demonstrativo pode gerar números zerados ou incompletos nesses indicadores. Confira o arquivo antes de continuar, ou prossiga se souber o motivo.';
+  avisoEl.style.display='block';
 }
 
 function parseCSV(txt,sep){
@@ -1154,6 +1308,29 @@ function exportarPDF(){
   window.print();
 }
 
+// ── EXPORTAR PACOTES CRÔNICOS (CSV) ──
+// Exporta a lista COMPLETA (não só o top 50 exibido na tela) dos IDs de pacote
+// que apareceram em 2+ processos com falha na semana, para consulta na plataforma oficial.
+function exportPacotesCronicos(){
+  if(!D || !D.pacotesCronicos) return;
+  var cfg=D.cfg;
+  var hoje=new Date().toLocaleDateString('pt-BR');
+  var lista=D.pacotesCronicos.listaCompleta||D.pacotesCronicos.lista||[];
+  if(lista.length===0) return;
+
+  var headers=['ID_PACOTE','SCORE','QTD_PROCESSOS','PROCESSOS_ONDE_APARECEU','SVC','SEMANA','DATA_EXPORTACAO'];
+  var csvRows=lista.map(function(c){
+    var row=[c.id, c.score, c.processos.length, c.processos.join(' + '), cfg.svc, cfg.week, hoje];
+    return row.map(function(v){return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(';');
+  });
+  var csv='\uFEFF'+headers.map(function(h){return'"'+h+'"';}).join(';')+'\n'+csvRows.join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='Pacotes_Cronicos_'+cfg.svc+'_'+cfg.week+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
 // ── MODO APRESENTAÇÃO — tela cheia navegável por seta, focado na Capa Gerencial ──
 var _apresIdx = 0;
 function entrarModoApresentacao(){
@@ -1456,11 +1633,13 @@ function resetDemo(){
   document.getElementById('demoScreen').innerHTML='';
   document.getElementById('uploadScreen').style.display='flex';
   RAW={}; LOADED=0; D=null;
-  var items=document.querySelectorAll('.up-item'); for(var i=0;i<items.length;i++) items[i].classList.remove('ok');
+  var items=document.querySelectorAll('.up-item'); for(var i=0;i<items.length;i++) items[i].classList.remove('ok','warn');
   var sts=document.querySelectorAll('.up-st'); for(var i=0;i<sts.length;i++) sts[i].textContent='\u2b06 Aguardando';
   document.getElementById('upFill').style.width='0%';
   document.getElementById('upLabel').textContent='0 de 7 arquivos carregados';
   document.getElementById('btnGo').disabled=true;
+  var avisoEl=document.getElementById('upValidationWarning');
+  if(avisoEl){ avisoEl.style.display='none'; avisoEl.innerHTML=''; }
 }
 
 function gerarDemo(){
@@ -2304,7 +2483,7 @@ function renderDemo(){
 +'<div class="sub-sh" style="margin-top:16px"><span class="sub-title">\ud83e\udded Pacotes Cr\xf4nicos</span><span class="sub-badge">'+totalCronicos+' pacote(s) reincidente(s) em 2+ processos</span></div>'
 +'<div class="alert i" style="margin-bottom:8px;padding:8px 12px"><div class="ai">\ud83d\udd0d</div><div><div class="at" style="font-size:11px">Para que serve esta lista</div><div class="ab" style="font-size:10px">Estes IDs apareceram em mais de um processo com falha na mesma semana (Faltante, BPP, POC, Sorting PK, Etiquetagem PK, Deslocado). Use os IDs para consultar a vida completa do pacote na plataforma oficial e confirmar a causa raiz \u2014 o dash aponta o alerta, a investiga\xe7\xe3o final \xe9 na consulta oficial.</div></div></div>'
 +(totalCronicos>0
-  ?'<div class="card"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83d\udccb IDs Reincidentes \u2014 Top '+(D.pacotesCronicos.lista.length)+' de '+totalCronicos+'</span><span class="cc">Ordenado por n\xba de processos</span></div>'
+  ?'<div class="card"><div class="ch" style="padding:8px 12px"><span class="ct">\ud83d\udccb IDs Reincidentes \u2014 Top '+(D.pacotesCronicos.lista.length)+' de '+totalCronicos+'</span><button class="btn-export-aba" style="margin-left:auto" onclick="exportPacotesCronicos()">\ud83d\udce5 Exportar IDs (CSV)</button></div>'
    +'<table style="border-spacing:0"><thead><tr>'
    +'<th style="padding:6px 8px">#</th><th style="padding:6px 8px">ID do Pacote</th><th style="padding:6px 8px">Processos onde apareceu</th><th class="tc" style="padding:6px 8px">Score</th>'
    +'</tr></thead><tbody>'+cronicoRows+'</tbody></table></div>'
